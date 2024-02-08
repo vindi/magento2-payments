@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!--
+/**
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this extension to newer
+ * version in the future.
+ *
+ * @category    Vindi
+ * @package     Vindi_VP
+ *
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="payment">
+            <group id="vindi" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label">
+                <label>Vindi VP</label>
+                <include path="Vindi_VP::system/general.xml"/>
+                <include path="Vindi_VP::system/credit_card.xml"/>
+                <include path="Vindi_VP::system/bank_slip.xml"/>
+                <include path="Vindi_VP::system/bank_slip_pix.xml"/>
+                <include path="Vindi_VP::system/pix.xml"/>
+            </group>
+        </section>
+    </system>
+</config>

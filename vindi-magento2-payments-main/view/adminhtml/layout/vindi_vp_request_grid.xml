@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!--
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this extension to newer
+ * version in the future.
+ *
+ * @category    Vindi
+ * @package     Vindi_VP
+ *
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <css src="Vindi_VP::css/grid.css"/>
+    </head>
+    <body>
+        <referenceContainer name="content">
+            <uiComponent name="vindi_vp_payment_request_listing"/>
+        </referenceContainer>
+    </body>
+</page>

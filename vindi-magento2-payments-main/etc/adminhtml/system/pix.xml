@@ -1,0 +1,107 @@
+<?xml version="1.0"?>
+<!--
+/**
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this extension to newer
+ * version in the future.
+ *
+ * @category    Vindi
+ * @package     Vindi_VP
+ *
+ */
+-->
+
+<include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
+    <group id="vindi_vp_pix" translate="label" type="text" sortOrder="200" showInDefault="1" showInWebsite="1" showInStore="1">
+        <label>Pix</label>
+
+        <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Enabled</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/vindi_vp_pix/active</config_path>
+        </field>
+
+        <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+            <label>Title</label>
+            <config_path>payment/vindi_vp_pix/title</config_path>
+            <comment>Title of the payment method to be shown on checkout's page</comment>
+        </field>
+
+        <field id="checkout_instructions" translate="label comment" type="textarea" sortOrder="31" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+            <label>Checkout Instructions</label>
+            <config_path>payment/vindi_vp_pix/checkout_instructions</config_path>
+            <comment><![CDATA[Instructions to be shown in checkout's page, it can be HTML]]></comment>
+        </field>
+
+        <field id="expiration_time" translate="label comment" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Expiration Time</label>
+            <config_path>payment/vindi_vp_pix/expiration_time</config_path>
+            <comment><![CDATA[Minutes to expire the transaction, if empty it'll be 30 minutes]]></comment>
+        </field>
+
+        <field id="order_status" translate="label" type="select" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+            <label>New Order Status</label>
+            <source_model>Magento\Sales\Model\Config\Source\Order\Status\Newprocessing</source_model>
+            <config_path>payment/vindi_vp_pix/order_status</config_path>
+        </field>
+
+        <field id="paid_order_status" translate="label" type="select" sortOrder="110" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+            <label>Paid Order Status</label>
+            <source_model>Magento\Sales\Model\Config\Source\Order\Status\Processing</source_model>
+            <config_path>payment/vindi_vp_pix/paid_order_status</config_path>
+        </field>
+
+        <field id="paid_virtual_order_status" translate="label" type="select" sortOrder="120" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+            <label>Paid Virtual Order Status</label>
+            <source_model>Vindi\VP\Model\Config\Source\Order\ProcessingComplete</source_model>
+            <config_path>payment/vindi_vp_pix/paid_virtual_order_status</config_path>
+        </field>
+
+        <field id="cancelled_order_status" translate="label" type="select" sortOrder="130" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+            <label>Cancelled Order Status</label>
+            <source_model>Vindi\VP\Model\Config\Source\Order\Cancelled</source_model>
+            <config_path>payment/vindi_vp_pix/cancelled_order_status</config_path>
+        </field>
+
+        <field id="refunded_order_status" translate="label" type="select" sortOrder="140" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+            <label>Refunded Order Status</label>
+            <source_model>Vindi\VP\Model\Config\Source\Order\Cancelled</source_model>
+            <config_path>payment/vindi_vp_pix/refunded_order_status</config_path>
+        </field>
+
+        <field id="sort_order" translate="label" type="text" sortOrder="1000" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Sort Order</label>
+            <frontend_class>validate-number</frontend_class>
+            <config_path>payment/vindi_vp_pix/sort_order</config_path>
+        </field>
+
+        <field id="allowspecific" translate="label" type="allowspecific" sortOrder="1010" showInDefault="9" showInWebsite="1" showInStore="1" canRestore="1">
+            <label>Payment From Applicable Countries</label>
+            <source_model>Magento\Payment\Model\Config\Source\Allspecificcountries</source_model>
+            <config_path>payment/vindi_vp_pix/allowspecific</config_path>
+        </field>
+
+        <field id="specificcountry" translate="label" type="multiselect" sortOrder="1011" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+            <label>Payment From Specific Countries</label>
+            <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
+            <config_path>payment/vindi_vp_pix/specificcountry</config_path>
+            <depends>
+                <field id="allowspecific">1</field>
+            </depends>
+        </field>
+
+        <field id="min_order_total" translate="label" type="text" sortOrder="2000" showInDefault="1" showInWebsite="1" showInStore="1">
+            <config_path>payment/vindi_vp_pix/min_order_total</config_path>
+            <label>Minimum Order Total</label>
+            <validate>validate-number validate-zero-or-greater</validate>
+        </field>
+
+        <field id="max_order_total" translate="label" type="text" sortOrder="2010" showInDefault="1" showInWebsite="1" showInStore="1">
+            <config_path>payment/vindi_vp_pix/max_order_total</config_path>
+            <label>Maximum Order Total</label>
+            <validate>validate-number validate-zero-or-greater</validate>
+        </field>
+    </group>
+</include>
