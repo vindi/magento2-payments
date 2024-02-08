@@ -1,0 +1,114 @@
+Vindi,Vindi
+"Credit Card Type","Bandeiras de Cartão de Crédito"
+"Credit Card Owner","Nome no Cartão"
+"Card Number","Número do Cartão"
+Installments,Parcelas
+N/A,N/A
+"Interest Rate","Taxa de Juros"
+"Callback List","Lista de Callbacks"
+"Request List","Lista de Requisições"
+Content,Conteúdo
+Params,Parâmetros
+"Webhook %1","Webhook %1"
+"Order %1 on %2","Pedido %1 em %2"
+"There was an error processing your request.","Houve um erro ao processar sua requisição."
+"Payment data object should be provided","Todos os dados de pagamento devem ser fornecidos"
+"Your order wasn't accepted, please, review your payment's data or choose another payment method.","Seu pedido não foi aceito, por favor, revise os dados de pagamento ou escolha outro método de pagamento."
+"The transaction is taking longer than expected, please try again in a few moments","A transação está demorando mais do que o esperado, por favor, tente novamente em alguns momentos"
+"with interest","com juros"
+"with discount","com desconto"
+"without interest","sem juros"
+"%1x of %2 (%3). Total: %4","%1x de %2 (%3). Total: %4"
+"Callback received %1 -> %2","Callback recebido %1 -> %2"
+"Your payment for the order %1 was confirmed","Seu pagamento para o pedido %1 foi confirmado"
+"The order %1 was cancelled. Amount of %2","O pedido %1 foi cancelado. Valor de %2"
+"The order had the amount refunded by Vindi. Amount of %1","O pedido teve o valor reembolsado pela Vindi. Valor de %1"
+Authorize,"Autorizar"
+"Authorize and Capture","Autorizar e Capturar"
+"Street Line %1","Linha de Endereço %1"
+"Item with id ""%1"" does not exist.","Item com id ""%1"" não existe."
+"Could not save the callback info: %1","Não foi possível salvar as informações do callback: %1"
+"Could not save the request info: %1","Não foi possível salvar as informações da requisição: %1"
+"Credit Card Information not provided","Informações do Cartão de Crédito não fornecidas"
+"Error trying to refund order on Vindi","Erro ao tentar reembolsar pedido na Vindi"
+"The order had the amount refunded on Vindi. Amount of %1","O pedido teve o valor reembolsado na Vindi. Valor de %1"
+"Not Available","Não Disponível"
+"Card Information","Informações do Cartão"
+"Card Brand","Bandeira do Cartão"
+"Name on Card","Nome no Cartão"
+"Expiration Date","Data de Expiração"
+"Card Verification Number (CVV)","Número de Verificação do Cartão (CVV)"
+"What is this?","O que é isso?"
+"Card Installments","Parcelamento do Cartão"
+"Insert your card number to see installments options","Insira o número do seu cartão para ver as opções de parcelamento"
+"Customer Taxvat","CPF/CNPJ do Cliente"
+"Place Order","Finalizar Pedido"
+"Select Brand","Selecionar Bandeira"
+Month,Mês
+Year,Ano
+"Card Verification Number","Número de Verificação do Cartão"
+"Please enter a valid credit card type number.","Por favor, insira um número de cartão de crédito válido."
+"Vindi VP","Vindi Payments (VP)"
+"Bank Slip Payment","Pagamento com Boleto"
+Enabled,Ativado
+Title,Título
+"Use Default Checkout Instructions","Usar Instruções de Checkout Padrão"
+"If yes, it'll show a default checkout instructions","Se sim, mostrará instruções de checkout padrão"
+"Checkout Instructions","Instruções de Checkout"
+"Instructions to be shown in checkout's page, it can be HTML","Instruções a serem mostradas na página de checkout, pode ser HTML"
+"New Order Status","Status de Novos Pedidos"
+"Paid Order Status","Status de Pedidos Pagos"
+"Paid Virtual Order Status","Status de Pedidos Virtuais Pagos"
+"Cancelled Order Status","Status de Pedidos Cancelados"
+"Sort Order","Ordem de Exibição"
+"Payment From Applicable Countries","Pagamento de Países Aplicáveis"
+"Payment From Specific Countries","Pagamento de Países Específicos"
+"Minimum Order Total","Total Mínimo do Pedido"
+"Maximum Order Total","Total Máximo do Pedido"
+"Credit Card","Cartão de Crédito"
+"Auto Capture","Captura Automática"
+"Credit Card Types","Tipos de Cartão de Crédito"
+"Authorized Order Status","Status de Pedidos Autorizados"
+General,Geral
+"Credentials and General Settings","Credenciais e Configurações Gerais"
+"Configuration Email","E-mail de Configuração"
+Token,Token
+"Use Sandbox","Usar Ambiente de Testes"
+"If enabled, the transaction will be done in Vindi's test environment","Se habilitado, a transação será feita no ambiente de testes da Vindi"
+"Refund when order is cancelled","Estornar quando o pedido é cancelado (se aplicável)"
+"Refund when creditmemo is created from order","Estornar quando a nota de crédito é criada a partir do pedido"
+"If the order is made with Pix or Credit Card, it'll trigger an online refund command","Se o pedido for feito com Pix ou Cartão de Crédito, ele acionará um comando de estorno online"
+"Cancel Unapproved Orders","Cancelar Pedidos Não Aprovados"
+"Show Payment Info at Success Page","Mostrar Informações de Pagamento na Página de Sucesso"
+"If your store shows the payment info at success page, DON'T enable this feature","Se sua loja mostra as informações de pagamento na página de sucesso, NÃO habilite esta funcionalidade"
+"Enable Log Requests","Habilitar Log de Requisições"
+"Address Attributes","Atributos de Endereço"
+Street,Rua
+Number,Número
+Complement,Complemento
+"A complementary information about the address","Uma informação complementar sobre o endereço"
+District,Bairro
+Pix,Pix
+"Expiration Time","Tempo de Expiração"
+"Minutes to expire the transaction, if empty it'll be 30 minutes","Minutos para expirar a transação, se vazio será 30 minutos"
+"Refunded Order Status","Status de Pedidos Reembolsados"
+ID,ID
+"Status Code","Código de Status"
+Request,Requisição
+Response,Resposta
+Method,Método
+Created,"Data de Criação"
+Status,Status
+"Increment ID","ID do Pedido"
+Payload,Payload
+"Bank Slip","Boleto"
+"with interest","com juros"
+"with discount","com desconto"
+"without interest","sem juros"
+"%1x of %2 (%3). Total: %4","%1x de %2 (%3). Total: %4"
+"status_name","Status"
+"Download Bank Slip","Fazer Download do Boleto"
+"Copy code","Copiar código"
+"Copied!","Copiado!"
+"Bankslip Number","Linha Digitável"
+"Bank Slip Pix","BolePix"

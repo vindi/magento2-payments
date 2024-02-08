@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Vindi
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this extension to newer
+ * version in the future.
+ *
+ * @category    Vindi
+ * @package     Vindi_VP
+ * @copyright   Copyright (c) Vindi
+ *
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="invoice_totals">
+            <block class="Vindi\VP\Block\Sales\Order\Totals\Interest" name="vindi_interest">
+                <action method="setBeforeCondition">
+                    <argument name="condition" xsi:type="string">shipping</argument>
+                </action>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

@@ -1,0 +1,497 @@
+<?xml version="1.0"?>
+<!--
+/**
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this extension to newer
+ * version in the future.
+ *
+ * @category    Vindi
+ * @package     Vindi_VP
+ *
+ */
+-->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <preference for="Vindi\VP\Api\Data\CallbackInterface" type="Vindi\VP\Model\Callback"/>
+    <preference for="Vindi\VP\Api\CallbackRepositoryInterface" type="Vindi\VP\Model\ResourceModel\CallbackRepository"/>
+    <preference for="Vindi\VP\Api\Data\CallbackSearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
+
+    <preference for="Vindi\VP\Api\Data\RequestInterface" type="Vindi\VP\Model\Request"/>
+    <preference for="Vindi\VP\Api\RequestRepositoryInterface" type="Vindi\VP\Model\ResourceModel\RequestRepository"/>
+    <preference for="Vindi\VP\Api\Data\RequestSearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
+
+    <type name="Magento\Sales\Model\Order\Payment">
+        <plugin name="vindi_order_payment_can_void" type="Vindi\VP\Plugin\Order\Payment" />
+    </type>
+
+    <!-- LOG -->
+    <type name="Vindi\VP\Logger\Handler\System">
+        <arguments>
+            <argument name="filesystem" xsi:type="object">Magento\Framework\Filesystem\Driver\File</argument>
+        </arguments>
+    </type>
+    <type name="Vindi\VP\Logger\Logger">
+        <arguments>
+            <argument name="name" xsi:type="string">vindi</argument>
+            <argument name="handlers"  xsi:type="array">
+                <item name="system" xsi:type="object">Vindi\VP\Logger\Handler\System</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!-- Payment Method Facade configuration -->
+    <virtualType name="VindiBankSlipFacade" type="Magento\Payment\Model\Method\Adapter">
+        <arguments>
+            <argument name="code" xsi:type="const">\Vindi\VP\Model\Ui\BankSlip\ConfigProvider::CODE</argument>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Vindi\VP\Block\Info\BankSlip</argument>
+            <argument name="valueHandlerPool" xsi:type="object">VindiBankSlipValueHandlerPool</argument>
+            <argument name="validatorPool" xsi:type="object">VindiBankSlipValidatorPool</argument>
+            <argument name="commandPool" xsi:type="object">VindiBankSlipCommandPool</argument>
+        </arguments>
+    </virtualType>
+    <!-- Configuration reader -->
+    <virtualType name="VindiBankSlipConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">\Vindi\VP\Model\Ui\BankSlip\ConfigProvider::CODE</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Payment Method Facade configuration -->
+    <virtualType name="VindiBankSlipPixFacade" type="Magento\Payment\Model\Method\Adapter">
+        <arguments>
+            <argument name="code" xsi:type="const">\Vindi\VP\Model\Ui\BankSlipPix\ConfigProvider::CODE</argument>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Vindi\VP\Block\Info\BankSlipPix</argument>
+            <argument name="valueHandlerPool" xsi:type="object">VindiBankSlipPixValueHandlerPool</argument>
+            <argument name="validatorPool" xsi:type="object">VindiBankSlipPixValidatorPool</argument>
+            <argument name="commandPool" xsi:type="object">VindiBankSlipPixCommandPool</argument>
+        </arguments>
+    </virtualType>
+    <!-- Configuration reader -->
+    <virtualType name="VindiBankSlipPixConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">\Vindi\VP\Model\Ui\BankSlipPix\ConfigProvider::CODE</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Payment Method Facade configuration -->
+    <virtualType name="VindiPixFacade" type="Magento\Payment\Model\Method\Adapter">
+        <arguments>
+            <argument name="code" xsi:type="const">\Vindi\VP\Model\Ui\Pix\ConfigProvider::CODE</argument>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Vindi\VP\Block\Info\Pix</argument>
+            <argument name="valueHandlerPool" xsi:type="object">VindiPixValueHandlerPool</argument>
+            <argument name="validatorPool" xsi:type="object">VindiPixValidatorPool</argument>
+            <argument name="commandPool" xsi:type="object">VindiPixCommandPool</argument>
+        </arguments>
+    </virtualType>
+    <!-- Configuration reader -->
+    <virtualType name="VindiPixConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">\Vindi\VP\Model\Ui\Pix\ConfigProvider::CODE</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Payment Method Facade configuration -->
+    <virtualType name="VindiPaymentCreditCardFacade" type="Magento\Payment\Model\Method\Adapter">
+        <arguments>
+            <argument name="code" xsi:type="const">\Vindi\VP\Model\Ui\CreditCard\ConfigProvider::CODE</argument>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Vindi\VP\Block\Info\CreditCard</argument>
+            <argument name="valueHandlerPool" xsi:type="object">VindiCreditCardValueHandlerPool</argument>
+            <argument name="validatorPool" xsi:type="object">VindiCreditCardValidatorPool</argument>
+            <argument name="commandPool" xsi:type="object">VindiCreditCardCommandPool</argument>
+        </arguments>
+    </virtualType>
+    <!-- Configuration reader -->
+    <virtualType name="VindiCreditCardConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">\Vindi\VP\Model\Ui\CreditCard\ConfigProvider::CODE</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Commands infrastructure -->
+    <virtualType name="VindiBankSlipCommandPool" type="Magento\Payment\Gateway\Command\CommandPool">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="order" xsi:type="string">VindiBankSlipOrderCommand</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="VindiBankSlipPixCommandPool" type="Magento\Payment\Gateway\Command\CommandPool">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="order" xsi:type="string">VindiBankSlipPixOrderCommand</item>
+                <item name="void" xsi:type="string">VindiPaymentRefundCommand</item>
+                <item name="cancel" xsi:type="string">VindiPaymentRefundCommand</item>
+                <item name="refund" xsi:type="string">VindiPaymentRefundCommand</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="VindiPixCommandPool" type="Magento\Payment\Gateway\Command\CommandPool">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="order" xsi:type="string">VindiPixOrderCommand</item>
+                <item name="void" xsi:type="string">VindiPaymentRefundCommand</item>
+                <item name="cancel" xsi:type="string">VindiPaymentRefundCommand</item>
+                <item name="refund" xsi:type="string">VindiPaymentRefundCommand</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="VindiCreditCardCommandPool" type="Magento\Payment\Gateway\Command\CommandPool">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="order" xsi:type="string">VindiCreditCardOrderCommand</item>
+                <item name="capture" xsi:type="string">VindiCreditCardCaptureCommand</item>
+                <item name="void" xsi:type="string">VindiPaymentRefundCommand</item>
+                <item name="cancel" xsi:type="string">VindiPaymentRefundCommand</item>
+                <item name="refund" xsi:type="string">VindiPaymentRefundCommand</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <!-- BankSlip order command  -->
+    <virtualType name="VindiBankSlipClientTransaction" type="Vindi\VP\Gateway\Http\Client\Transaction">
+        <arguments>
+            <argument name="methodCode" xsi:type="string">vindi_vp_bankslip</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="VindiBankSlipOrderCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">VindiBankSlipOrderRequest</argument>
+            <argument name="handler" xsi:type="object">VindiBankSlipResponseHandlerComposite</argument>
+            <argument name="transferFactory" xsi:type="object">Vindi\VP\Gateway\Http\TransferFactory</argument>
+            <argument name="validator" xsi:type="object">VindiBankSlipValidator</argument>
+            <argument name="client" xsi:type="object">VindiBankSlipClientTransaction</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="VindiBankSlipPixClientTransaction" type="Vindi\VP\Gateway\Http\Client\Transaction">
+        <arguments>
+            <argument name="methodCode" xsi:type="string">vindi_vp_bankslippix</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="VindiBankSlipPixOrderCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">VindiBankSlipPixOrderRequest</argument>
+            <argument name="handler" xsi:type="object">VindiBankSlipPixResponseHandlerComposite</argument>
+            <argument name="transferFactory" xsi:type="object">Vindi\VP\Gateway\Http\TransferFactory</argument>
+            <argument name="validator" xsi:type="object">VindiBankSlipPixValidator</argument>
+            <argument name="client" xsi:type="object">VindiBankSlipPixClientTransaction</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="VindiPixClientTransaction" type="Vindi\VP\Gateway\Http\Client\Transaction">
+        <arguments>
+            <argument name="methodCode" xsi:type="string">vindi_vp_pix</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="VindiPixOrderCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">VindiPixOrderRequest</argument>
+            <argument name="handler" xsi:type="object">VindiPixResponseHandlerComposite</argument>
+            <argument name="transferFactory" xsi:type="object">Vindi\VP\Gateway\Http\TransferFactory</argument>
+            <argument name="validator" xsi:type="object">VindiPixValidator</argument>
+            <argument name="client" xsi:type="object">VindiPixClientTransaction</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="VindiCreditCardClientTransaction" type="Vindi\VP\Gateway\Http\Client\Transaction">
+        <arguments>
+            <argument name="methodCode" xsi:type="string">vindi_vp_cc</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="VindiCreditCardOrderCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">VindiCreditCardOrderRequest</argument>
+            <argument name="handler" xsi:type="object">VindiCreditCardResponseHandlerComposite</argument>
+            <argument name="transferFactory" xsi:type="object">Vindi\VP\Gateway\Http\TransferFactory</argument>
+            <argument name="validator" xsi:type="object">VindiCreditCardValidator</argument>
+            <argument name="client" xsi:type="object">VindiCreditCardClientTransaction</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="VindiCreditCardCaptureCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">Vindi\VP\Gateway\Request\CaptureRequest</argument>
+            <argument name="handler" xsi:type="object">Vindi\VP\Gateway\Response\CaptureHandler</argument>
+            <argument name="transferFactory" xsi:type="object">Vindi\VP\Gateway\Http\TransferFactory</argument>
+            <argument name="client" xsi:type="object">Vindi\VP\Gateway\Http\Client\Capture</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Refund command -->
+    <virtualType name="VindiPaymentRefundCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">Vindi\VP\Gateway\Request\RefundRequest</argument>
+            <argument name="handler" xsi:type="object">Vindi\VP\Gateway\Response\RefundHandler</argument>
+            <argument name="transferFactory" xsi:type="object">Vindi\VP\Gateway\Http\TransferFactory</argument>
+            <argument name="client" xsi:type="object">Vindi\VP\Gateway\Http\Client\Refund</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Order Request -->
+    <virtualType name="VindiBankSlipOrderRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
+        <arguments>
+            <argument name="builders" xsi:type="array">
+                <item name="transaction" xsi:type="string">VindiBankSlipTransactionRequest</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="VindiBankSlipPixOrderRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
+        <arguments>
+            <argument name="builders" xsi:type="array">
+                <item name="transaction" xsi:type="string">VindiBankSlipPixTransactionRequest</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="VindiPixOrderRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
+        <arguments>
+            <argument name="builders" xsi:type="array">
+                <item name="transaction" xsi:type="string">VindiPixTransactionRequest</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="VindiCreditCardOrderRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
+        <arguments>
+            <argument name="builders" xsi:type="array">
+                <item name="transaction" xsi:type="string">VindiCreditCardTransactionRequest</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Transaction Request -->
+    <virtualType name="VindiBankSlipTransactionRequest" type="Vindi\VP\Gateway\Request\BankSlip\TransactionRequest">
+        <arguments>
+            <argument name="config" xsi:type="object">VindiBankSlipConfig</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="VindiBankSlipPixTransactionRequest" type="Vindi\VP\Gateway\Request\BankSlipPix\TransactionRequest">
+        <arguments>
+            <argument name="config" xsi:type="object">VindiBankSlipPixConfig</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="VindiPixTransactionRequest" type="Vindi\VP\Gateway\Request\Pix\TransactionRequest">
+        <arguments>
+            <argument name="config" xsi:type="object">VindiPixConfig</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="VindiCreditCardTransactionRequest" type="Vindi\VP\Gateway\Request\CreditCard\TransactionRequest">
+        <arguments>
+            <argument name="config" xsi:type="object">VindiCreditCardConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Validators Pool -->
+    <virtualType name="VindiBankSlipValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="country" xsi:type="string">VindiBankSlipCountryValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="VindiBankSlipCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
+        <arguments>
+            <argument name="config" xsi:type="object">VindiBankSlipConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="VindiBankSlipPixValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="country" xsi:type="string">VindiBankSlipPixCountryValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="VindiBankSlipPixCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
+        <arguments>
+            <argument name="config" xsi:type="object">VindiBankSlipPixConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="VindiPixValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="country" xsi:type="string">VindiPixCountryValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="VindiPixCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
+        <arguments>
+            <argument name="config" xsi:type="object">VindiPixConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="VindiCreditCardValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="country" xsi:type="string">VindiCreditCardCountryValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="VindiCreditCardCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
+        <arguments>
+            <argument name="config" xsi:type="object">VindiCreditCardConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Validators -->
+    <virtualType name="VindiBankSlipValidator" type="Magento\Payment\Gateway\Validator\ValidatorComposite">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="responseCode" xsi:type="string">Vindi\VP\Gateway\Validator\ResponseCodeValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="VindiBankSlipPixValidator" type="Magento\Payment\Gateway\Validator\ValidatorComposite">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="responseCode" xsi:type="string">Vindi\VP\Gateway\Validator\ResponseCodeValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="VindiPixValidator" type="Magento\Payment\Gateway\Validator\ValidatorComposite">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="responseCode" xsi:type="string">Vindi\VP\Gateway\Validator\ResponseCodeValidator</item>
+                <item name="opened" xsi:type="string">Vindi\VP\Gateway\Validator\PixValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="VindiCreditCardValidator" type="Magento\Payment\Gateway\Validator\ValidatorComposite">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="responseCode" xsi:type="string">Vindi\VP\Gateway\Validator\ResponseCodeValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Response handlers -->
+    <virtualType name="VindiBankSlipResponseHandlerComposite" type="Magento\Payment\Gateway\Response\HandlerChain">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="transaction" xsi:type="string">Vindi\VP\Gateway\Response\BankSlip\TransactionHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="VindiBankSlipPixResponseHandlerComposite" type="Magento\Payment\Gateway\Response\HandlerChain">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="transaction" xsi:type="string">Vindi\VP\Gateway\Response\BankSlipPix\TransactionHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="VindiPixResponseHandlerComposite" type="Magento\Payment\Gateway\Response\HandlerChain">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="transaction" xsi:type="string">Vindi\VP\Gateway\Response\Pix\TransactionHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="VindiCreditCardResponseHandlerComposite" type="Magento\Payment\Gateway\Response\HandlerChain">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="transaction" xsi:type="string">Vindi\VP\Gateway\Response\CreditCard\TransactionHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Value handlers infrastructure -->
+    <virtualType name="VindiBankSlipValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">VindiBankSlipConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="VindiBankSlipPixValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">VindiBankSlipPixConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="VindiPixValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">VindiPixConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="VindiCreditCardValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">VindiCreditCardConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Value handlers -->
+    <virtualType name="VindiBankSlipConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">VindiBankSlipConfig</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="VindiBankSlipPixConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">VindiBankSlipPixConfig</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="VindiPixConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">VindiPixConfig</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="VindiCreditCardConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">VindiCreditCardConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Info Blocks -->
+    <type name="Vindi\VP\Block\Info\BankSlip">
+        <arguments>
+            <argument name="config" xsi:type="object">VindiBankSlipConfig</argument>
+        </arguments>
+    </type>
+    <type name="Vindi\VP\Block\Info\BankSlipPix">
+        <arguments>
+            <argument name="config" xsi:type="object">VindiBankSlipPixConfig</argument>
+        </arguments>
+    </type>
+    <type name="Vindi\VP\Block\Info\Pix">
+        <arguments>
+            <argument name="config" xsi:type="object">VindiPixConfig</argument>
+        </arguments>
+    </type>
+    <type name="Vindi\VP\Block\Info\CreditCard">
+        <arguments>
+            <argument name="config" xsi:type="object">VindiCreditCardConfig</argument>
+        </arguments>
+    </type>
+
+    <!-- Admin Grids -->
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="vindi_vp_payment_callback_listing_data_source" xsi:type="string">VindiPaymentCallbackCollection</item>
+                <item name="vindi_vp_payment_request_listing_data_source" xsi:type="string">VindiPaymentRequestCollection</item>
+            </argument>
+        </arguments>
+    </type>
+    <virtualType name="VindiPaymentCallbackCollection" type="Vindi\VP\Ui\DataProvider\Callback\Listing\Collection">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">vindi_vp_callback</argument>
+            <argument name="resourceModel" xsi:type="string">Vindi\VP\Model\ResourceModel\Callback</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="VindiPaymentRequestCollection" type="Vindi\VP\Ui\DataProvider\Request\Listing\Collection">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">vindi_vp_request</argument>
+            <argument name="resourceModel" xsi:type="string">Vindi\VP\Model\ResourceModel\Request</argument>
+        </arguments>
+    </virtualType>
+</config>

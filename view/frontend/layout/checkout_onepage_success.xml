@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!--
+/**
+ *
+ * @category    Vindi
+ * @package     Vindi_VP
+ */
+ -->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <css src="Vindi_VP::css/checkout.css" />
+        <script src="Vindi_VP::js/payments.js" />
+    </head>
+    <body>
+        <referenceContainer name="order.success.additional.info">
+            <block class="Vindi\VP\Block\Checkout\Success"
+                   name="vindi.payment.success"
+                   template="Vindi_VP::checkout/success.phtml"
+                   cacheable="false"
+                   ifconfig="vindi_vp/general/show_payment_info"
+            />
+        </referenceContainer>
+    </body>
+</page>

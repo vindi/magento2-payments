@@ -1,0 +1,74 @@
+<?php
+
+/**
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this extension to newer
+ * version in the future.
+ *
+ * @category    Vindi
+ * @package     Vindi_Payment
+ * @copyright   Copyright (c) Vindi
+ */
+
+/**
+ * @var \Vindi\VP\Block\Info\Pix $block
+ * @see \Magento\Payment\Block\Info
+ */
+
+/** @var \Magento\Framework\Escaper $escaper */
+
+$specificInfo = $block->getSpecificInformation();
+$title = $block->escapeHtml($block->getMethod()->getTitle());
+$payment = $block->getInfo();
+$emv = $block->getEmv();
+$qrCodeImage = $block->getQRCodeImage();
+?>
+<dl class="payment-method vindi-vp-content">
+
+    <dt class="title">
+        <?= $block->escapeHtml($title) ?>
+    </dt>
+    <dd class="content">
+        <div class="vindi-pix pix">
+            <div class="pix-barcode-container">
+                <div class="pix-img-code">
+                    <?php if ($qrCodeImage): ?>
+                        <img alt="<?= $block->escapeHtml(__('QRCode')) ?>" src="<?= $qrCodeImage ?>" class="vindi-pix-qrcode" />
+                    <?php endif; ?>
+                    <div class="pix-qrcode"><?= $emv ?></div>
+                </div>
+                <button class="pix-copy-button"
+                        data-text="<?= $block->escapeHtml(__('Copied!')) ?>"
+                        onclick="vindiVp.copyCode(this, '.pix-qrcode', false)">
+                    <?= $block->escapeHtml(__('Copy code')) ?>
+                </button>
+            </div>
+        </div>
+    </dd>
+</dl>
+<?= $block->getChildHtml() ?>
+
+
+<style>
+    .pix-barcode-container {
+        margin-top:10px;
+    }
+    .pix-img-code{
+        max-width: 180px;
+        margin: auto;
+    }
+    .pix-qrcode {
+        overflow-wrap: break-word;
+    }
+    .pix-copy-button {
+        margin: 10px auto;
+    }
+    .vindi-vp-content {
+        text-align: center;
+    }
+
+    .vindi-vp-content .title {
+        font-size: 2.5rem;
+    }
+</style>

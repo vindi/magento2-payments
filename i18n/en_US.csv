@@ -1,0 +1,125 @@
+Vindi,Vindi
+"Credit Card Type","Credit Card Type"
+"Credit Card Owner","Credit Card Owner"
+"Card Number","Card Number"
+Installments,Installments
+N/A,N/A
+"Interest Rate","Interest Rate"
+"Callback List","Callback List"
+"Request List","Request List"
+Content,Content
+Params,Params
+"Webhook %1","Webhook %1"
+"Order %1 on %2","Order %1 on %2"
+"There was an error processing your request.","There was an error processing your request."
+"Payment data object should be provided","Payment data object should be provided"
+"Your order wasn't accepted, please, review your payment's data or choose another payment method.","Your order wasn't accepted, please, review your payment's data or choose another payment method."
+"The transaction is taking longer than expected, please try again in a few moments","The transaction is taking longer than expected, please try again in a few moments"
+"with interest","with interest"
+"with discount","with discount"
+"without interest","without interest"
+"%1x of %2 (%3). Total: %4","%1x of %2 (%3). Total: %4"
+"Callback received %1 -> %2","Callback received %1 -> %2"
+"Your payment for the order %1 was confirmed","Your payment for the order %1 was confirmed"
+"The order %1 was cancelled. Amount of %2","The order %1 was cancelled. Amount of %2"
+"The order had the amount refunded by Vindi. Amount of %1","The order had the amount refunded by Vindi. Amount of %1"
+Authorize,Authorize
+"Authorize and Capture","Authorize and Capture"
+"Street Line %1","Street Line %1"
+"Item with id ""%1"" does not exist.","Item with id ""%1"" does not exist."
+"Could not save the callback info: %1","Could not save the callback info: %1"
+"Could not save the request info: %1","Could not save the request info: %1"
+"Credit Card Information not provided","Credit Card Information not provided"
+"Error trying to refund order on Vindi","Error trying to refund order on Vindi"
+"The order had the amount refunded on Vindi. Amount of %1","The order had the amount refunded on Vindi. Amount of %1"
+"Not Available","Not Available"
+"Card Information","Card Information"
+"Card Brand","Card Brand"
+"Name on Card","Name on Card"
+"Expiration Date","Expiration Date"
+"Card Verification Number (CVV)","Card Verification Number (CVV)"
+"What is this?","What is this?"
+"Card Installments","Card Installments"
+"Insert your card number to see installments options","Insert your card number to see installments options"
+"Customer Taxvat","Customer Taxvat"
+"Place Order","Place Order"
+"Select Brand","Select Brand"
+Month,Month
+Year,Year
+"Card Verification Number","Card Verification Number"
+"Please enter a valid credit card type number.","Please enter a valid credit card type number."
+"Vindi VP","Vindi VP"
+"Bank Slip Payment","Bank Slip Payment"
+Enabled,Enabled
+Title,Title
+"Use Default Checkout Instructions","Use Default Checkout Instructions"
+"If yes, it'll show a default checkout instructions","If yes, it'll show a default checkout instructions"
+"Checkout Instructions","Checkout Instructions"
+"Instructions to be shown in checkout's page, it can be HTML","Instructions to be shown in checkout's page, it can be HTML"
+"New Order Status","New Order Status"
+"Paid Order Status","Paid Order Status"
+"Paid Virtual Order Status","Paid Virtual Order Status"
+"Cancelled Order Status","Cancelled Order Status"
+"Text for order waiting e-mail validation","Text for order waiting e-mail validation"
+"Text for order in review","Text for order in review"
+"Text for order waiting first payment","Text for order waiting first payment"
+"Description for order waiting review","Description for order waiting review"
+"Description for order denied","Description for order denied"
+"Description for order approved","Description for order approved"
+"Sort Order","Sort Order"
+"Payment From Applicable Countries","Payment From Applicable Countries"
+"Payment From Specific Countries","Payment From Specific Countries"
+"Minimum Order Total","Minimum Order Total"
+"Maximum Order Total","Maximum Order Total"
+"Credit Card","Credit Card"
+"Auto Capture","Auto Capture"
+"Credit Card Types","Credit Card Types"
+"Authorized Order Status","Authorized Order Status"
+General,General
+"Credentials and General Settings","Credentials and General Settings"
+"Configuration Email","Configuration Email"
+Token,Token
+"Use Sandbox","Use Sandbox"
+"If enabled, the transaction will be done in Vindi's test environment","If enabled, the transaction will be done in Vindi's test environment"
+"Refund when order is cancelled","Refund when order is cancelled"
+"If the order is made with Pix or BNPL, it'll trigger a refund command","If the order is made with Pix or BNPL, it'll trigger a refund command"
+"Refund when creditmemo is created from order","Refund when creditmemo is created from order"
+"If the order is made with Pix or Credit Card, it'll trigger an online refund command","If the order is made with Pix or Credit Card, it'll trigger an online refund command"
+"Cancel Unapproved Orders","Cancel Unapproved Orders"
+"Show Payment Info at Success Page","Show Payment Info at Success Page"
+"If your store shows the payment info at success page, DON'T enable this feature","If your store shows the payment info at success page, DON'T enable this feature"
+"Enable Log Requests","Enable Log Requests"
+"Address Attributes","Address Attributes"
+Street,Street
+Number,Number
+Complement,Complement
+"A complementary information about the address","A complementary information about the address"
+District,District
+Pix,Pix
+"Expiration Time","Expiration Time"
+"Minutes to expire the transaction, if empty it'll be 30 minutes","Minutes to expire the transaction, if empty it'll be 30 minutes"
+"Use Custom Pix Payment Key","Use Custom Pix Payment Key"
+"If you want to use a custom PIX Key instead of a default key on Vindi","If you want to use a custom PIX Key instead of a default key on Vindi"
+"Custom Pix Payment Key","Custom Pix Payment Key"
+"Your PIX Key must be a phone number, Taxvat, e-mail or a random key","Your PIX Key must be a phone number, Taxvat, e-mail or a random key"
+"Refunded Order Status","Refunded Order Status"
+ID,ID
+"Status Code","Status Code"
+Request,Request
+Response,Response
+Method,Method
+Created,Created
+Status,Status
+"Increment ID","Increment ID"
+Payload,Payload
+"Bank Slip","Bank Slip"
+"with interest","with interest"
+"with discount","with discount"
+"without interest","without interest"
+"%1x of %2 (%3). Total: %4","%1x of %2 (%3). Total: %4"
+"status_name","Status"
+"Download Bank Slip","Download Bank Slip"
+"Copy code","Copy code"
+"Copied!","Copied!"
+"Bankslip Number","Bankslip Number"
+"Bank Slip Pix","Bank Slip Pix"

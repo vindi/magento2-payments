@@ -1,0 +1,98 @@
+<?xml version="1.0"?>
+<!--
+/**
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this extension to newer
+ * version in the future.
+ *
+ * @category    Vindi
+ * @package     Vindi_VP
+ *
+ */
+-->
+
+<include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
+    <group id="vindi_vp_bankslippix" translate="label" type="text" sortOrder="300" showInDefault="1" showInWebsite="1" showInStore="1">
+        <label>Bank Slip Pix</label>
+
+        <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Enabled</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/vindi_vp_bankslippix/active</config_path>
+        </field>
+
+        <field id="title" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+            <label>Title</label>
+            <config_path>payment/vindi_vp_bankslippix/title</config_path>
+            <comment>Title of the payment method to be shown on checkout's page</comment>
+        </field>
+
+        <field id="checkout_instructions" translate="label comment" type="textarea" sortOrder="121" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Checkout Instructions</label>
+            <config_path>payment/vindi_vp_bankslippix/checkout_instructions</config_path>
+            <comment><![CDATA[Instructions to be shown in checkout's page, it can be HTML]]></comment>
+        </field>
+
+        <field id="order_status" translate="label" type="select" sortOrder="1000" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+            <label>New Order Status</label>
+            <source_model>Magento\Sales\Model\Config\Source\Order\Status\Newprocessing</source_model>
+            <config_path>payment/vindi_vp_bankslippix/order_status</config_path>
+        </field>
+
+        <field id="paid_order_status" translate="label" type="select" sortOrder="1010" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+            <label>Paid Order Status</label>
+            <source_model>Magento\Sales\Model\Config\Source\Order\Status\Processing</source_model>
+            <config_path>payment/vindi_vp_bankslippix/paid_order_status</config_path>
+        </field>
+
+        <field id="paid_virtual_order_status" translate="label" type="select" sortOrder="1020" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+            <label>Paid Virtual Order Status</label>
+            <source_model>Vindi\VP\Model\Config\Source\Order\ProcessingComplete</source_model>
+            <config_path>payment/vindi_vp_bankslippix/paid_virtual_order_status</config_path>
+        </field>
+
+        <field id="cancelled_order_status" translate="label" type="select" sortOrder="1030" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+            <label>Cancelled Order Status</label>
+            <source_model>Vindi\VP\Model\Config\Source\Order\Cancelled</source_model>
+            <config_path>payment/vindi_vp_bankslippix/cancelled_order_status</config_path>
+            <depends>
+                <field id="cancelled_unapproved_orders">1</field>
+            </depends>
+        </field>
+
+        <field id="sort_order" translate="label" type="text" sortOrder="10000" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Sort Order</label>
+            <frontend_class>validate-number</frontend_class>
+            <config_path>payment/vindi_vp_bankslippix/sort_order</config_path>
+        </field>
+
+        <field id="allowspecific" translate="label" type="allowspecific" sortOrder="10010" showInDefault="9" showInWebsite="1" showInStore="1" canRestore="1">
+            <label>Payment From Applicable Countries</label>
+            <source_model>Magento\Payment\Model\Config\Source\Allspecificcountries</source_model>
+            <config_path>payment/vindi_vp_bankslippix/allowspecific</config_path>
+        </field>
+
+        <field id="specificcountry" translate="label" type="multiselect" sortOrder="10011" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+            <label>Payment From Specific Countries</label>
+            <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
+            <config_path>payment/vindi_vp_bankslippix/specificcountry</config_path>
+            <depends>
+                <field id="allowspecific">1</field>
+            </depends>
+        </field>
+
+        <field id="min_order_total" translate="label" type="text" sortOrder="20000" showInDefault="1" showInWebsite="1" showInStore="1">
+            <config_path>payment/vindi_vp_bankslippix/min_order_total</config_path>
+            <label>Minimum Order Total</label>
+            <validate>validate-number validate-zero-or-greater</validate>
+        </field>
+
+        <field id="max_order_total" translate="label" type="text" sortOrder="20010" showInDefault="1" showInWebsite="1" showInStore="1">
+            <config_path>payment/vindi_vp_bankslippix/max_order_total</config_path>
+            <label>Maximum Order Total</label>
+            <validate>validate-number validate-zero-or-greater</validate>
+        </field>
+    </group>
+</include>
