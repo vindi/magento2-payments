@@ -47,8 +47,6 @@ class Data extends \Magento\Payment\Helper\Data
 {
     public const FINGERPRINT_URL = 'https://static.traycheckout.com.br/js/finger_print.js';
 
-    public const DEFAULT_CURRENCY = 'BRL';
-
     protected array $methodNames = [
         'MC' => 'Mastercard',
         'AU' => 'Aura',
