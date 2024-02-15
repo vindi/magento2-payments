@@ -33,14 +33,14 @@
 
     <div data-bind="attr: {class: 'payment-method-content container-' + getCode()}">
         <form data-bind="attr: {id: 'form_' + getCode()}">
-            <fieldset data-bind="attr: {class: 'fieldset payment items ccard ' + getCode(), id: 'payment_form_' + getCode()}">
+            <fieldset data-bind="attr: {class: 'fieldset payment items ccard ' + getCode(), id: 'payment_form_' + getCode()}, visible: showCardData">
                 <!-- ko if: (isShowLegend())-->
                 <legend class="legend">
                     <span><!-- ko i18n: 'Card Information'--><!-- /ko --></span>
                 </legend><br />
                 <!-- /ko -->
 
-                <div class="field number cc-number required vindi-cc-number-container" data-bind="visible: showCardData">
+                <div class="field number cc-number required vindi-cc-number-container">
                     <div class="credit-card-types-container">
                         <ul class="credit-card-types">
                             <!-- ko foreach: {data: getCcAvailableTypesValues(), as: 'item'} -->
@@ -61,23 +61,21 @@
                         </ul>
                         <input type="hidden"
                                name="payment[cc_type]"
-                               class="input-text"
+                               class="input-text-vindi"
                                value=""
                                data-bind="attr: {id: getCode() + '_cc_type', 'data-container': getCode() + '-cc-type'}, value: creditCardType">
                     </div>
 
-                    <label data-bind="attr: {for: getCode() + '_cc_number'}" class="label">
-                        <span><!-- ko i18n: 'Card Number'--><!-- /ko --></span>
-                    </label>
                     <div class="control">
                         <input name="payment[cc_number]"
                                type="number"
-                               class="input-text"
+                               class="input-text-vindi"
                                value=""
                                data-bind="attr: {
                                         autocomplete: off,
                                         id: getCode() + '_cc_number',
                                         title: $t('Card Number'),
+                                        placeholder: $t('Card Number'),
                                         'data-container': getCode() + '-cc-number',
                                         'data-validate': JSON.stringify({'required-number':true, 'validate-vindi-card-number':'#' + getCode() + '_cc_number'})
                                       },
@@ -89,19 +87,17 @@
                     </div>
                 </div>
 
-                <div class="field number required" data-bind="attr: {id: getCode() + '_cc_owner'}, visible: showCardData">
-                    <label data-bind="attr: {for: getCode() + '_cc_owner'}" class="label">
-                        <span><!-- ko i18n: 'Name on Card' --><!-- /ko --></span>
-                    </label>
+                <div class="field number required" data-bind="attr: {id: getCode() + '-cc-owner-container'}">
                     <div class="control">
                         <input type="text"
                                name="payment[cc_owner]"
-                               class="input-text"
+                               class="input-text-vindi"
                                value=""
                                data-bind="attr: {
                                         id: getCode() + '_cc_owner',
                                         title: $t('Name on Card'),
-                                        'data-container': getCode() + '-cc-owner',
+                                        placeholder: $t('Name on Card'),
+                                        'data-container': getCode() + '-cc-owner-container',
                                         'data-validate': JSON.stringify({'required-number':true})
                                       },
                                       enable: isActive($parents),
@@ -110,90 +106,65 @@
                     </div>
                 </div>
 
-                <div class="field date required" data-bind="attr: {id: getCode() + '_cc_type_exp_div'}, visible: showCardData">
-                    <label data-bind="attr: {for: getCode() + '_expiration'}" class="label">
-                        <span><!-- ko i18n: 'Expiration Date'--><!-- /ko --></span>
-                    </label>
-                    <div class="control">
-                        <div class="fields group group-2">
-                            <div class="field no-label month">
-                                <div class="control">
-                                    <select name="payment[cc_exp_month]"
-                                            class="select select-month"
-                                            data-bind="attr: {
-                                                    id: getCode() + '_expiration',
-                                                    'data-container': getCode() + '-cc-month',
-                                                    'data-validate': JSON.stringify({required:true, 'validate-cc-exp':'#' + getCode() + '_expiration_yr'})
-                                                },
-                                                enable: isActive($parents),
-                                                options: getCcMonthsValues(),
-                                                optionsValue: 'value',
-                                                optionsText: 'month',
-                                                optionsCaption: $t('Month'),
-                                                value: creditCardExpMonth">
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="field no-label year">
-                                <div class="control">
-                                    <select name="payment[cc_exp_year]"
-                                            class="select select-year"
-                                            data-bind="attr: {
-                                                    id: getCode() + '_expiration_yr',
-                                                    'data-container': getCode() + '-cc-year',
-                                                    'data-validate': JSON.stringify({required:true})
-                                                },
-                                                enable: isActive($parents),
-                                                options: getCcYearsValues(),
-                                                optionsValue: 'value',
-                                                optionsText: 'year',
-                                                optionsCaption: $t('Year'),
-                                                value: creditCardExpYear">
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- ko if: (hasVerification())-->
-                <div class="field cvv required" data-bind="attr: {id: getCode() + '_cc_type_cvv_div'}, visible: showCardData">
-                    <label data-bind="attr: {for: getCode() + '_cc_cid'}" class="label">
-                        <span><!-- ko i18n: 'Card Verification Number (CVV)'--><!-- /ko --></span>
-                    </label>
-                    <div class="control _with-tooltip">
+
+                <div class="field number required vindi-cc-exp-cvv" >
+                    <span data-bind="attr: {id: getCode() + '-cc-exp-date-container'}">
+                        <input type="text"
+                               name="payment[cc_exp_date]"
+                               class="input-text-vindi"
+                               value=""
+                               pattern="[0-9]*"
+                               inputmode="numeric"
+                               data-bind="attr: {
+                                        id: getCode() + '_cc_exp_date',
+                                        title: $t('Expiration Date'),
+                                        placeholder: $t('Expiration Date'),
+                                        'data-container': getCode() + '-cc-exp-date-container',
+                                        'data-validate': JSON.stringify({'required-number':true})
+                                      },
+                                      enable: isActive($parents),
+                                      value: creditCardExpDate,
+                                      valueUpdate: 'keyup' "/>
+                    </span>
+                    <span data-bind="attr: {id: getCode() + '-cc-cvv'}">
                         <input type="text"
                                autocomplete="off"
-                               class="input-text cvv"
                                name="payment[cc_cid]"
+                               class="input-text-vindi"
                                value=""
                                data-bind="attr: {
-                                    id: getCode() + '_cc_cid',
-                                    title: $t('Card Verification Number'),
-                                    maxlength: 4,
-                                    'data-container': getCode() + '-cc-cvv',
-                                    'data-validate': JSON.stringify({'required-number':true, 'validate-number':'#' + getCode() + '_cc_type'})
-                                },
-                                enable: isActive($parents),
-                                value: creditCardVerificationNumber" />
-                        <div class="field-tooltip toggle">
-                        <span class="field-tooltip-action action-cvv"
-                              tabindex="0"
-                              data-toggle="dropdown"
-                              data-bind="attr: {title: $t('What is this?')}, mageInit: {'dropdown':{'activeClass': '_active'}}">
-                            <span><!-- ko i18n: 'What is this?'--><!-- /ko --></span>
-                        </span>
-                            <div class="field-tooltip-content"
-                                 data-target="dropdown"
-                                 data-bind="html: getCvvImageHtml()"></div>
-                        </div>
+                                id: getCode() + '_cc_cid',
+                                title: $t('Card Verification Number'),
+                                placeholder: $t('CVV'),
+                                maxlength: 4,
+                                'data-container': getCode() + '-cc-cvv',
+                                'data-validate': JSON.stringify({'required-number':true, 'validate-number':'#' + getCode() + '_cc_type'})
+                            },
+                            enable: isActive($parents),
+                            value: creditCardVerificationNumber" />
+                    </span>
+                </div>
+
+                <div class="field number required" data-bind="attr: {id: getCode() + '_taxat'}">
+                    <div class="control">
+                        <input type="text"
+                               name="payment[taxvat]"
+                               class="input-text-vindi cpf"
+                               value=""
+                               data-bind="attr: {
+                                        id: getCode() + '_taxvat',
+                                        title: $t('Customer Taxvat'),
+                                        placeholder: $t('Customer Taxvat'),
+                                        maxlength: 11,
+                                        'data-container': getCode() + '-taxvat',
+                                        'data-validate': JSON.stringify({'required':true, 'required-number':true})
+                                      },
+                                      value: taxvat,
+                                      valueUpdate: 'keyup' "/>
                     </div>
                 </div>
-                <!-- /ko -->
 
                 <div class="field installments required" data-bind="attr: {id: getCode() + '_installments_div'}">
-                    <label data-bind="attr: {for: getCode() + '_installments'}" class="label">
-                        <span><!-- ko i18n: 'Card Installments'--><!-- /ko --></span>
-                    </label>
                     <div class="control">
                         <select name="payment[installments]"
                                 class="select"
@@ -211,24 +182,12 @@
                     </div>
                 </div>
 
-                <div class="field number required" data-bind="attr: {id: getCode() + '_taxat'}">
-                    <label data-bind="attr: {for: getCode() + '_taxvat'}" class="label">
-                        <span><!-- ko i18n: 'Customer Taxvat' --><!-- /ko --></span>
-                    </label>
-                    <div class="control">
-                        <input type="text"
-                               name="payment[taxvat]"
-                               class="input-text cpf"
-                               value=""
-                               data-bind="attr: {
-                                        id: getCode() + '_taxvat',
-                                        title: $t('Customer Taxvat'),
-                                        maxlength: 11,
-                                        'data-container': getCode() + '-taxvat',
-                                        'data-validate': JSON.stringify({'required':true, 'required-number':true})
-                                      },
-                                      value: taxvat,
-                                      valueUpdate: 'keyup' "/>
+                <div class="vindi-vp-cc-container vind-cc-preload">
+                    <div class="vind-cc-creditcard">
+                        <div id="vindi-vp-cc-front" class="vindi-vp-cc-front">
+                            <div id="vindi-vp-cc-ccsingle"></div>
+                        </div>
+                        <div id="vindi-vp-cc-back" class="vindi-vp-cc-back"></div>
                     </div>
                 </div>
 
@@ -248,6 +207,7 @@
                 </div>
 
             </fieldset>
+            <div afterRender="loadCard"></div>
         </form>
 
         <div class="actions-toolbar">
@@ -264,3 +224,4 @@
         </div>
     </div>
 </div>
+

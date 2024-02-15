@@ -31,11 +31,12 @@ define(
         'Vindi_VP/js/model/credit-card-validation/credit-card-number-validator',
         'Magento_Payment/js/model/credit-card-validation/credit-card-data',
         'Vindi_VP/js/fingerprint',
+        'vindi-cc-form',
         'Magento_Payment/js/model/credit-card-validation/validator',
         'Magento_Checkout/js/model/payment/additional-validators',
         'mage/mage',
         'mage/validation',
-        'vindi_vp/validation'
+        'vindi_vp/validation',
     ],
     function (
         _,
@@ -48,7 +49,8 @@ define(
         Component,
         cardNumberValidator,
         creditCardData,
-        fingerprint
+        fingerprint,
+        creditCardForm
     ) {
         'use strict';
 
@@ -75,6 +77,7 @@ define(
                     .observe([
                         'taxvat',
                         'creditCardType',
+                        'creditCardExpDate',
                         'creditCardExpYear',
                         'creditCardExpMonth',
                         'vindiCreditCardNumber',
@@ -126,7 +129,20 @@ define(
                     self.updateInstallmentsValues();
                 });
 
+
                 return this;
+            },
+
+            loadCard: function () {
+                let ccName = document.getElementById(this.getCode() + '_cc_owner');
+                let ccNumber = document.getElementById(this.getCode() + '_cc_number');
+                let ccExpDate = document.getElementById(this.getCode() + '_cc_exp_date');
+                let ccCvv = document.getElementById(this.getCode() + '_cc_cid');
+                let ccSingle = document.getElementById('vindi-vp-cc-ccsingle');
+                let ccFront = document.getElementById('vindi-vp-cc-front');
+                let ccBack = document.getElementById('vindi-vp-cc-back');
+
+                creditCardForm(ccName, ccNumber, ccExpDate, ccCvv, ccSingle, ccFront, ccBack);
             },
 
             getCode: function () {
@@ -138,15 +154,25 @@ define(
              * @returns {Object}
              */
             getData: function () {
+
                 fingerprint(window.checkoutConfig.payment[this.getCode()].sandbox);
+                let ccExpMonth = '';
+                let ccExpYear = '';
+                let ccExpDate = this.creditCardExpDate();
+
+                if (typeof ccExpDate !== "undefined" && ccExpDate !== null) {
+                    let ccExpDateFull = ccExpDate.split('/');
+                    ccExpMonth = ccExpDateFull[0];
+                    ccExpYear = '20' + ccExpDateFull[1];
+                }
                 return {
                     'method': this.item.method,
                     'additional_data': {
                         'taxvat': this.taxvat(),
                         'cc_cid': this.creditCardVerificationNumber(),
                         'cc_type': this.creditCardType(),
-                        'cc_exp_year': this.creditCardExpYear(),
-                        'cc_exp_month': this.creditCardExpMonth(),
+                        'cc_exp_month': ccExpMonth,
+                        'cc_exp_year': '20' + ccExpYear,
                         'cc_number': this.vindiCreditCardNumber(),
                         'cc_owner': this.creditCardOwner(),
                         'installments': this.creditCardInstallments(),
