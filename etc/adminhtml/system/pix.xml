@@ -35,12 +35,6 @@
             <comment><![CDATA[Instructions to be shown in checkout's page, it can be HTML]]></comment>
         </field>
 
-        <field id="expiration_time" translate="label comment" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
-            <label>Expiration Time</label>
-            <config_path>payment/vindi_vp_pix/expiration_time</config_path>
-            <comment><![CDATA[Minutes to expire the transaction, if empty it'll be 30 minutes]]></comment>
-        </field>
-
         <field id="order_status" translate="label" type="select" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
             <label>New Order Status</label>
             <source_model>Magento\Sales\Model\Config\Source\Order\Status\Newprocessing</source_model>
@@ -92,16 +86,18 @@
             </depends>
         </field>
 
-        <field id="min_order_total" translate="label" type="text" sortOrder="2000" showInDefault="1" showInWebsite="1" showInStore="1">
+        <field id="min_order_total" translate="label" type="text" sortOrder="20000" showInDefault="1" showInWebsite="1" showInStore="1">
             <config_path>payment/vindi_vp_pix/min_order_total</config_path>
-            <label>Minimum Order Total</label>
+            <label>Minimum Order Total.</label>
             <validate>validate-number validate-zero-or-greater</validate>
+            <comment>Only orders with an amount higher than this will show this method</comment>
         </field>
 
-        <field id="max_order_total" translate="label" type="text" sortOrder="2010" showInDefault="1" showInWebsite="1" showInStore="1">
+        <field id="max_order_total" translate="label" type="text" sortOrder="20100" showInDefault="1" showInWebsite="1" showInStore="1">
             <config_path>payment/vindi_vp_pix/max_order_total</config_path>
-            <label>Maximum Order Total</label>
+            <label>Maximum Order Total.</label>
             <validate>validate-number validate-zero-or-greater</validate>
+            <comment>Only orders with an amount lower than this will show this method</comment>
         </field>
     </group>
 </include>

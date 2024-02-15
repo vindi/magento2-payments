@@ -41,18 +41,18 @@
                 <comment><![CDATA[If enabled, the transaction will be done in Vindi's test environment]]></comment>
             </field>
 
-            <field id="refund_on_cancel" translate="label comment" type="select" sortOrder="45" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Refund when order is cancelled</label>
-                <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                <config_path>vindi_vp/general/refund_on_cancel</config_path>
-            </field>
+<!--            <field id="refund_on_cancel" translate="label comment" type="select" sortOrder="45" showInDefault="1" showInWebsite="1" showInStore="1">-->
+<!--                <label>Refund when order is cancelled</label>-->
+<!--                <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>-->
+<!--                <config_path>vindi_vp/general/refund_on_cancel</config_path>-->
+<!--            </field>-->
 
-            <field id="cancel_unapproved_orders" translate="label" type="select" sortOrder="47" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
-                <label>Cancel Unapproved Orders</label>
-                <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                <config_path>payment/general/cancel_unapproved_orders</config_path>
-                <comment><![CDATA[Order unapproved will be automatically cancelled]]></comment>
-            </field>
+<!--            <field id="cancel_unapproved_orders" translate="label" type="select" sortOrder="47" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">-->
+<!--                <label>Cancel Unapproved Orders</label>-->
+<!--                <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>-->
+<!--                <config_path>payment/general/cancel_unapproved_orders</config_path>-->
+<!--                <comment><![CDATA[Order unapproved will be automatically cancelled]]></comment>-->
+<!--            </field>-->
 
             <field id="show_payment_info" translate="label comment" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Show Payment Info at Success Page</label>
