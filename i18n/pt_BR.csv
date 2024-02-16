@@ -114,3 +114,8 @@ Payload,Payload
 "Copied!","Copiado!"
 "Bankslip Number","Linha Digitável"
 "Bank Slip Pix","BolePix"
+"Credentials used for all Vindi services, if you don't have the private key, contact us.","Credenciais usadas para todos os serviços da Vindi, se você não tem um token, entre em contato conosco."
+"Insert here your email used for configure your account","Insira aqui o e-mail usado para configurar sua conta"
+"Insert here the token used for authenticate your transaction, that token can be found in your Vindi Account","Insira aqui o token usado para autenticar sua transação, esse token pode ser encontrado em sua conta Vindi"
+"Address data that'll be sent to Pix, BankSlip and Credit Card","Dados de endereço que serão enviados para Pix, Boleto, BolePix e Cartão de Crédito"
+"Title of the payment method to be shown on checkout's page","Título do método de pagamento a ser mostrado na página de checkout"

@@ -24,7 +24,7 @@
             <field id="email" translate="label comment" type="text" sortOrder="15" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Configuration Email</label>
                 <config_path>vindi_vp/general/email</config_path>
-                <comment>Insert here your email used for configure yout account</comment>
+                <comment>Insert here your email used for configure your account</comment>
             </field>
 
             <field id="token" translate="label comment" type="obscure" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">

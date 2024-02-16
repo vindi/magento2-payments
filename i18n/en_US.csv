@@ -125,3 +125,8 @@ Payload,Payload
 "Copied!","Copied!"
 "Bankslip Number","Bankslip Number"
 "Bank Slip Pix","Bank Slip Pix"
+"Credentials used for all Vindi services, if you don't have the private key, contact us.","Credentials used for all Vindi services, if you don't have the private key, contact us."
+"Insert here your email used for configure your account","Insert here your email used for configure your account"
+"Insert here the token used for authenticate your transaction, that token can be found in your Vindi Account","Insert here the token used for authenticate your transaction, that token can be found in your Vindi Account"
+"Address data that'll be sent to Pix, BankSlip and Credit Card","Address data that'll be sent to Pix, BankSlip and Credit Card"
+"Title of the payment method to be shown on checkout's page","Title of the payment method to be shown on checkout's page"
