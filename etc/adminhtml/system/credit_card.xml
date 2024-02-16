@@ -18,55 +18,55 @@
     <group id="vindi_vp_cc" translate="label comment" type="text" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
         <label>Credit Card</label>
 
-        <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+        <field id="active" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>Enabled</label>
             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
             <config_path>payment/vindi_vp_cc/active</config_path>
         </field>
 
-        <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+        <field id="title" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
             <label>Title</label>
             <config_path>payment/vindi_vp_cc/title</config_path>
             <comment>Title of the payment method to be shown on checkout's page</comment>
         </field>
 
-        <field id="cctypes" translate="label" type="multiselect" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+        <field id="cctypes" translate="label comment" type="multiselect" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
             <label>Credit Card Types</label>
             <source_model>Vindi\VP\Model\Config\Source\CcType</source_model>
             <config_path>payment/vindi_vp_cc/cctypes</config_path>
         </field>
 
-        <field id="order_status" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+        <field id="order_status" translate="label comment" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
             <label>New Order Status</label>
             <source_model>Magento\Sales\Model\Config\Source\Order\Status\Newprocessing</source_model>
             <config_path>payment/vindi_vp_cc/order_status</config_path>
         </field>
 
-        <field id="paid_order_status" translate="label" type="select" sortOrder="51" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+        <field id="paid_order_status" translate="label comment" type="select" sortOrder="51" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
             <label>Paid Order Status</label>
             <source_model>Magento\Sales\Model\Config\Source\Order\Status\Processing</source_model>
             <config_path>payment/vindi_vp_cc/paid_order_status</config_path>
         </field>
 
-        <field id="paid_virtual_order_status" translate="label" type="select" sortOrder="52" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+        <field id="paid_virtual_order_status" translate="label comment" type="select" sortOrder="52" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
             <label>Paid Virtual Order Status</label>
             <source_model>Vindi\VP\Model\Config\Source\Order\ProcessingComplete</source_model>
             <config_path>payment/vindi_vp_cc/paid_virtual_order_status</config_path>
         </field>
 
-        <field id="sort_order" translate="label" type="text" sortOrder="10000" showInDefault="1" showInWebsite="1" showInStore="1">
+        <field id="sort_order" translate="label comment" type="text" sortOrder="10000" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>Sort Order</label>
             <frontend_class>validate-number</frontend_class>
             <config_path>payment/vindi_vp_cc/sort_order</config_path>
         </field>
 
-        <field id="allowspecific" translate="label" type="allowspecific" sortOrder="10100" showInDefault="9" showInWebsite="1" showInStore="1" canRestore="1">
+        <field id="allowspecific" translate="label comment" type="allowspecific" sortOrder="10100" showInDefault="9" showInWebsite="1" showInStore="1" canRestore="1">
             <label>Payment From Applicable Countries</label>
             <source_model>Magento\Payment\Model\Config\Source\Allspecificcountries</source_model>
             <config_path>payment/vindi_vp_cc/allowspecific</config_path>
         </field>
 
-        <field id="specificcountry" translate="label" type="multiselect" sortOrder="10110" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+        <field id="specificcountry" translate="label comment" type="multiselect" sortOrder="10110" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
             <label>Payment From Specific Countries</label>
             <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
             <config_path>payment/vindi_vp_cc/specificcountry</config_path>
@@ -75,14 +75,14 @@
             </depends>
         </field>
 
-        <field id="min_order_total" translate="label" type="text" sortOrder="20000" showInDefault="1" showInWebsite="1" showInStore="1">
+        <field id="min_order_total" translate="label comment" type="text" sortOrder="20000" showInDefault="1" showInWebsite="1" showInStore="1">
             <config_path>payment/vindi_vp_cc/min_order_total</config_path>
             <label>Minimum Order Total.</label>
             <validate>validate-number validate-zero-or-greater</validate>
             <comment>Only orders with an amount higher than this will show this method</comment>
         </field>
 
-        <field id="max_order_total" translate="label" type="text" sortOrder="20100" showInDefault="1" showInWebsite="1" showInStore="1">
+        <field id="max_order_total" translate="label comment" type="text" sortOrder="20100" showInDefault="1" showInWebsite="1" showInStore="1">
             <config_path>payment/vindi_vp_cc/max_order_total</config_path>
             <label>Maximum Order Total.</label>
             <validate>validate-number validate-zero-or-greater</validate>
