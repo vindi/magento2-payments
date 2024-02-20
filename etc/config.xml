@@ -17,14 +17,10 @@
     <default>
         <vindi_vp>
             <general>
-                <refund_on_cancel>1</refund_on_cancel>
+                <refund_on_cancel>0</refund_on_cancel>
                 <show_payment_info>0</show_payment_info>
-                <cancel_unapproved_orders>1</cancel_unapproved_orders>
+                <cancel_unapproved_orders>0</cancel_unapproved_orders>
             </general>
-            <payments>
-                <private_key backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
-                <commerce>adobe</commerce>
-            </payments>
             <address>
                 <street>0</street>
                 <number>1</number>
@@ -55,7 +51,7 @@
                 <paid_order_status>processing</paid_order_status>
                 <paid_virtual_order_status>complete</paid_virtual_order_status>
                 <cancelled_order_status>canceled</cancelled_order_status>
-                <allowspecific>1</allowspecific>
+                <allowspecific>0</allowspecific>
                 <specificcountry>BR</specificcountry>
                 <!-- Method config -->
                 <is_gateway>1</is_gateway>
@@ -79,7 +75,7 @@
                 <paid_order_status>processing</paid_order_status>
                 <paid_virtual_order_status>complete</paid_virtual_order_status>
                 <cancelled_order_status>canceled</cancelled_order_status>
-                <allowspecific>1</allowspecific>
+                <allowspecific>0</allowspecific>
                 <specificcountry>BR</specificcountry>
                 <!-- Method config -->
                 <is_gateway>1</is_gateway>
@@ -104,7 +100,7 @@
                 <paid_order_status>processing</paid_order_status>
                 <paid_virtual_order_status>complete</paid_virtual_order_status>
                 <cancelled_order_status>canceled</cancelled_order_status>
-                <allowspecific>1</allowspecific>
+                <allowspecific>0</allowspecific>
                 <specificcountry>BR</specificcountry>
                 <min_order_total>1</min_order_total>
                 <!-- Method config -->
