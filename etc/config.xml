@@ -130,6 +130,7 @@
                 <has_interest>0</has_interest>
                 <specificcountry>BR</specificcountry>
                 <cctypes>MC,VI,ELO,AE,HC,HI</cctypes>
+                <min_installments_amount>1</min_installments_amount>
                 <!-- Method config -->
                 <is_gateway>1</is_gateway>
                 <can_use_checkout>1</can_use_checkout>

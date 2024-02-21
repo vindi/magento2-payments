@@ -119,3 +119,7 @@ Payload,Payload
 "Insert here the token used for authenticate your transaction, that token can be found in your Vindi Account","Insira aqui o token usado para autenticar sua transação, esse token pode ser encontrado em sua conta Vindi"
 "Address data that'll be sent to Pix, BankSlip and Credit Card","Dados de endereço que serão enviados para Pix, Boleto, BolePix e Cartão de Crédito"
 "Title of the payment method to be shown on checkout's page","Título do método de pagamento a ser mostrado na página de checkout"
+"Max installments to be shown on checkout when using Vindi Payments, if set, this will override the maximum installments saved on Vindi's Panel","Máximo de parcelas a serem mostradas no checkout ao usar Vindi Payments, se definido, isso substituirá o máximo de parcelas salvas no Painel da Vindi"
+"Max Installments","Número Máximo de Parcelas"
+"Minimum Installments Amount","Valor Mínimo por Parcela"
+"Minimum Amount for each installment","Valor Mínimo para cada parcela no checkout"

@@ -71,6 +71,7 @@ class Installments extends AbstractHelper
                 'price' => (string) $total,
                 'type_response' => 'J'
             ], $storeId);
+
             if ($responseData['status'] == 200) {
                 if (isset($responseData['response']['data_response'])) {
                     $installments = $this->handleResponse(
@@ -122,9 +123,14 @@ class Installments extends AbstractHelper
     protected function handleResponse(array $paymentMethods, string $ccType): array
     {
         $installments = [];
+
         foreach ($paymentMethods as $paymentMethod) {
             if ($this->helper->getMethodName($ccType) == $paymentMethod['payment_method_name']) {
                 foreach ($paymentMethod['splittings'] as $installment) {
+                    if (!$this->validate($installment)) {
+                        continue;
+                    }
+
                     $price = (float) $installment['value_split'];
                     $total = (float) $installment['value_transaction'];
                     $installmentNumber = (int) $installment['split'];
@@ -149,6 +155,21 @@ class Installments extends AbstractHelper
         }
 
         return $installments;
+    }
+
+    protected function validate(array $installment): bool
+    {
+        $maxInstallments = (int) $this->helper->getConfig('max_installments', 'vindi_vp_cc');
+        if ($maxInstallments > 0 && $installment['split'] > $maxInstallments) {
+            return false;
+        }
+
+        $minInstallmentsAmount = (float) $this->helper->getConfig('min_installments_amount', 'vindi_vp_cc');
+        if ($installment['value_split'] < $minInstallmentsAmount) {
+            return false;
+        }
+
+        return true;
     }
 
     protected function logError(string $message): void
