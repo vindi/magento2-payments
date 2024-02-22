@@ -130,3 +130,7 @@ Payload,Payload
 "Insert here the token used for authenticate your transaction, that token can be found in your Vindi Account","Insert here the token used for authenticate your transaction, that token can be found in your Vindi Account"
 "Address data that'll be sent to Pix, BankSlip and Credit Card","Address data that'll be sent to Pix, BankSlip and Credit Card"
 "Title of the payment method to be shown on checkout's page","Title of the payment method to be shown on checkout's page"
+"Max installments to be shown on checkout when using Vindi Payments, if set, this will override the maximum installments saved on Vindi's Panel","Max installments to be shown on checkout when using Vindi Payments, if set, this will override the maximum installments saved on Vindi's Panel"
+"Max Installments","Max Installments"
+"Minimum Installments Amount","Minimum Installments Amount"
+"Minimum Amount for each installment","Minimum Amount for each installment"
