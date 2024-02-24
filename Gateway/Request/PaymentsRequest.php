@@ -115,30 +115,59 @@ class PaymentsRequest
 
     protected function getTransaction(Order $order, float $amount): array
     {
-        return [
+        $transaction = [
             'token_account' => $this->helper->getToken($order->getStoreId()),
             'finger_print' => $order->getPayment()->getAdditionalInformation('finger_print'),
             'customer' => $this->getCustomerData($order),
-            'transaction' => $this->getTransactionInfo($order),
+            'transaction' => $this->getTransactionInfo($order, $amount),
             'transaction_product' => $this->getItemsData($order)
         ];
+
+        $resellerToken = $this->helper->getResellerToken($order->getStoreId());
+        if ($resellerToken) {
+            $transaction['reseller_token'] = $resellerToken;
+        }
+
+        return $transaction;
     }
 
     /**
      * @param Order $order
+     * @param float $orderAmount
      * @return array
      */
-    protected function getTransactionInfo($order): array
+    protected function getTransactionInfo(Order $order, float $orderAmount): array
     {
         return [
             'customer_ip' => $order->getRemoteIp(),
             'order_number' => $order->getIncrementId(),
             'shipping_type' => $order->getShippingDescription(),
             'shipping_price' => (string) $order->getShippingAmount(),
-            'price_discount' => (string) $order->getDiscountAmount(),
+            'price_discount' => (string) $this->getDiscountAmount($order, $orderAmount),
+            'price_additional' => (string) $this->getPriceAdditional($order, $orderAmount),
             'url_notification' => $this->helper->getPaymentsNotificationUrl($order),
-            'free' => $order->getIncrementId()
+            'free' => 'MAGENTO_API_' . $this->helper->getModuleVersion()
         ];
+    }
+
+    public function getDiscountAmount(Order $order, $orderAmount): float
+    {
+        $discountAmount = (float) $order->getDiscountAmount();
+        $transactionAmount = $order->getBaseSubtotal() + $order->getShippingAmount() + $discountAmount;
+        if ($transactionAmount > $orderAmount) {
+            $discountAmount = $transactionAmount - $orderAmount;
+        }
+        return $discountAmount;
+    }
+
+    protected function getPriceAdditional(Order $order, float $orderAmount): float
+    {
+        $priceAdditional = 0;
+        $transactionAmount = $order->getBaseSubtotal() + $order->getShippingAmount() + $order->getDiscountAmount();
+        if ($transactionAmount < $orderAmount) {
+            $priceAdditional = $orderAmount - $transactionAmount;
+        }
+        return (float) $priceAdditional;
     }
 
     public function getCustomerData(Order $order): array

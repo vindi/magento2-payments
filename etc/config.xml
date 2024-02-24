@@ -20,6 +20,7 @@
                 <refund_on_cancel>0</refund_on_cancel>
                 <show_payment_info>0</show_payment_info>
                 <cancel_unapproved_orders>0</cancel_unapproved_orders>
+                <reseller_token>4957fbd8f9b9962</reseller_token>
             </general>
             <address>
                 <street>0</street>
@@ -30,15 +31,16 @@
             <endpoints>
                 <payments_uri>https://api.intermediador.yapay.com.br/</payments_uri>
                 <payments_uri_sandbox>https://api.intermediador.sandbox.yapay.com.br/</payments_uri_sandbox>
-                <installments_uri>https://api.intermediador.yapay.com.br/v1/</installments_uri>
-                <installments_uri_sandbox>https://api.intermediador.sandbox.yapay.com.br/v1/</installments_uri_sandbox>
+                <installments_uri>https://api.intermediador.yapay.com.br/</installments_uri>
+                <installments_uri_sandbox>https://api.intermediador.sandbox.yapay.com.br/</installments_uri_sandbox>
                 <payments>
+                    <auth>api/v1/authorizations/access_token</auth>
                     <create>api/v3/transactions/payment</create>
                     <get><![CDATA[api/v3/transactions/get_by_token_brief/?token_account={token}&token_transaction={order_id}]]></get>
                     <cancel>api/v3/transactions/cancel</cancel>
                     <refund>api/v3/transactions/cancel</refund>
                 </payments>
-                <installments>transactions/simulate_splitting</installments>
+                <installments>v1/transactions/simulate_splitting</installments>
             </endpoints>
         </vindi_vp>
         <payment>
@@ -106,13 +108,13 @@
                 <!-- Method config -->
                 <is_gateway>1</is_gateway>
                 <can_use_checkout>1</can_use_checkout>
-                <can_use_internal>1</can_use_internal>
+                <can_use_internal>0</can_use_internal>
                 <can_order>1</can_order>
                 <can_capture>0</can_capture>
                 <can_capture_partial>0</can_capture_partial>
                 <can_refund_partial_per_invoice>0</can_refund_partial_per_invoice>
-                <can_cancel>1</can_cancel>
-                <can_refund>1</can_refund>
+                <can_cancel>0</can_cancel>
+                <can_refund>0</can_refund>
                 <can_void>1</can_void>
                 <can_edit>0</can_edit>
                 <paymentInfoKeys>transaction_id,token_transaction,status_name,tid,payment_method_id,payment_method_name,split</paymentInfoKeys>
@@ -140,9 +142,9 @@
                 <can_capture_partial>0</can_capture_partial>
                 <can_use_internal>1</can_use_internal>
                 <can_refund_partial_per_invoice>0</can_refund_partial_per_invoice>
-                <can_refund>1</can_refund>
-                <can_void>1</can_void>
-                <can_cancel>1</can_cancel>
+                <can_cancel>0</can_cancel>
+                <can_refund>0</can_refund>
+                <can_void>0</can_void>
                 <can_edit>0</can_edit>
                 <masked_fields>cvv,cc_number</masked_fields>
                 <useccv>1</useccv>
