@@ -20,7 +20,7 @@
                 <refund_on_cancel>0</refund_on_cancel>
                 <show_payment_info>0</show_payment_info>
                 <cancel_unapproved_orders>0</cancel_unapproved_orders>
-                <reseller_token>4957fbd8f9b9962</reseller_token>
+                <reseller_token></reseller_token>
             </general>
             <address>
                 <street>0</street>
