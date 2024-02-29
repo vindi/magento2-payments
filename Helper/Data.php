@@ -23,6 +23,7 @@ use Magento\Directory\Helper\Data as DirectoryData;
 use Magento\Framework\App\Config\Initial;
 use Magento\Framework\App\Helper\Context;
 use Magento\Framework\Component\ComponentRegistrar;
+use Magento\Framework\Filesystem\Io\File;
 use Magento\Framework\Stdlib\DateTime\DateTime;
 use Magento\Framework\UrlInterface;
 use Magento\Framework\View\LayoutFactory;
@@ -129,6 +130,11 @@ class Data extends \Magento\Payment\Helper\Data
      */
     protected $encryptor;
 
+    /**
+     * @var File
+     */
+    protected $file;
+
     public function __construct(
         Context $context,
         LayoutFactory $layoutFactory,
@@ -149,7 +155,8 @@ class Data extends \Magento\Payment\Helper\Data
         ComponentRegistrar $componentRegistrar,
         DateTime $dateTime,
         DirectoryData $helperDirectory,
-        EncryptorInterface $encryptor
+        EncryptorInterface $encryptor,
+        File $file
     ) {
         parent::__construct($context, $layoutFactory, $paymentMethodFactory, $appEmulation, $paymentConfig, $initialConfig);
 
@@ -167,6 +174,7 @@ class Data extends \Magento\Payment\Helper\Data
         $this->dateTime = $dateTime;
         $this->helperDirectory = $helperDirectory;
         $this->encryptor = $encryptor;
+        $this->file = $file;
     }
 
     public function getAllowedMethods(): array
@@ -211,6 +219,32 @@ class Data extends \Magento\Payment\Helper\Data
         return $token;
     }
 
+    public function getConsumerKey($storeId = null): string
+    {
+        $key = $this->encryptor->decrypt($this->getGeneralConfig('consumer_key', $storeId));
+        if (empty($key)) {
+            $this->log('Consumer key is empty');
+        }
+        return $key;
+    }
+
+    public function getConsumerSecret($storeId = null): string
+    {
+        $secret = $this->encryptor->decrypt($this->getGeneralConfig('consumer_secret', $storeId));
+        if (empty($secret)) {
+            $this->log('Secret key is empty');
+        }
+        return $secret;
+    }
+
+    public function getResellerToken($storeId = null): string
+    {
+        if ((bool) $this->getGeneralConfig('use_sandbox', $storeId)) {
+            return '';
+        }
+        return $this->getGeneralConfig('reseller_token', $storeId);
+    }
+
     /**
      * @param string $message
      * @return string
@@ -218,11 +252,11 @@ class Data extends \Magento\Payment\Helper\Data
     public function mask(string $message): string
     {
         $message = preg_replace('/"hash":\s?"([^"]+)"/', '"hash":"*********"', $message);
-        $message = preg_replace('/"card_cvv":\s?"([^"]+)"/', '"security_code":"***"', $message);
-        $message = preg_replace('/"card_expdate_month":\s?"([^"]+)"/', '"expiration_month":"**"', $message);
-        $message = preg_replace('/"card_expdate_year":\s?"([^"]+)"/', '"expiration_year":"****"', $message);
+        $message = preg_replace('/"card_cvv":\s?"([^"]+)"/', '"card_cvv":"***"', $message);
+        $message = preg_replace('/"card_expdate_month":\s?"([^"]+)"/', '"card_expdate_month":"**"', $message);
+        $message = preg_replace('/"card_expdate_year":\s?"([^"]+)"/', '"card_expdate_year":"****"', $message);
         $message = preg_replace('/"notification_url":\s?\["([^"]+)"\]/', '"notification_url":["*****************"]', $message);
-        return preg_replace('/"card_number":\s?"(\d{6})\d{3,9}(\d{4})"/', '"number":"$1******$2"', $message);
+        return preg_replace('/"card_number":\s?"(\d{6})\d{3,9}(\d{4})"/', '"card_number":"$1******$2"', $message);
     }
 
     /**
@@ -391,6 +425,23 @@ class Data extends \Magento\Payment\Helper\Data
             $methodId = $this->methodIds[$ccType];
         }
         return $methodId ?? '0';
+    }
+
+    public function getModuleVersion(): string
+    {
+        $modulePath = $this->componentRegistrar->getPath(ComponentRegistrar::MODULE, 'Vindi_VP');
+        $composerJsonPath = $modulePath . '/composer.json';
+
+        if ($this->file->fileExists($composerJsonPath)) {
+            $composerJsonContent = $this->file->read($composerJsonPath);
+            $composerData = json_decode($composerJsonContent, true);
+
+            if (isset($composerData['version'])) {
+                return $composerData['version'];
+            }
+        }
+
+        return '*.*.*';
     }
 
     public function formatDate(string $date): string

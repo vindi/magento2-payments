@@ -53,15 +53,6 @@
             <config_path>payment/vindi_vp_bankslip/paid_virtual_order_status</config_path>
         </field>
 
-<!--        <field id="cancelled_order_status" translate="label comment" type="select" sortOrder="1030" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">-->
-<!--            <label>Cancelled Order Status</label>-->
-<!--            <source_model>Vindi\VP\Model\Config\Source\Order\Cancelled</source_model>-->
-<!--            <config_path>payment/vindi_vp_bankslip/cancelled_order_status</config_path>-->
-<!--            <depends>-->
-<!--                <field id="cancelled_unapproved_orders">1</field>-->
-<!--            </depends>-->
-<!--        </field>-->
-
         <field id="sort_order" translate="label comment" type="text" sortOrder="10000" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>Sort Order</label>
             <frontend_class>validate-number</frontend_class>
@@ -84,17 +75,17 @@
         </field>
 
         <field id="min_order_total" translate="label comment" type="text" sortOrder="20000" showInDefault="1" showInWebsite="1" showInStore="1">
-            <config_path>payment/vindi_vp_bankslip/min_order_total</config_path>
             <label>Minimum Order Total.</label>
             <validate>validate-number validate-zero-or-greater</validate>
             <comment>Only orders with an amount higher than this will show this method</comment>
+            <config_path>payment/vindi_vp_bankslip/min_order_total</config_path>
         </field>
 
         <field id="max_order_total" translate="label comment" type="text" sortOrder="20100" showInDefault="1" showInWebsite="1" showInStore="1">
-            <config_path>payment/vindi_vp_bankslip/max_order_total</config_path>
             <label>Maximum Order Total.</label>
             <validate>validate-number validate-zero-or-greater</validate>
             <comment>Only orders with an amount lower than this will show this method</comment>
+            <config_path>payment/vindi_vp_bankslip/max_order_total</config_path>
         </field>
     </group>
 </include>

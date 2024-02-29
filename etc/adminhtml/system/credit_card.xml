@@ -88,17 +88,17 @@
         </field>
 
         <field id="min_order_total" translate="label comment" type="text" sortOrder="20000" showInDefault="1" showInWebsite="1" showInStore="1">
-            <config_path>payment/vindi_vp_cc/min_order_total</config_path>
             <label>Minimum Order Total.</label>
             <validate>validate-number validate-zero-or-greater</validate>
             <comment>Only orders with an amount higher than this will show this method</comment>
+            <config_path>payment/vindi_vp_cc/min_order_total</config_path>
         </field>
 
         <field id="max_order_total" translate="label comment" type="text" sortOrder="20100" showInDefault="1" showInWebsite="1" showInStore="1">
-            <config_path>payment/vindi_vp_cc/max_order_total</config_path>
             <label>Maximum Order Total.</label>
             <validate>validate-number validate-zero-or-greater</validate>
             <comment>Only orders with an amount lower than this will show this method</comment>
+            <config_path>payment/vindi_vp_cc/max_order_total</config_path>
         </field>
 
     </group>

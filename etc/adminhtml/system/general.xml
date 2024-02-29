@@ -41,24 +41,11 @@
                 <comment><![CDATA[If enabled, the transaction will be done in Vindi's test environment]]></comment>
             </field>
 
-<!--            <field id="refund_on_cancel" translate="label comment" type="select" sortOrder="45" showInDefault="1" showInWebsite="1" showInStore="1">-->
-<!--                <label>Refund when order is cancelled</label>-->
-<!--                <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>-->
-<!--                <config_path>vindi_vp/general/refund_on_cancel</config_path>-->
-<!--            </field>-->
-
-<!--            <field id="cancel_unapproved_orders" translate="label comment" type="select" sortOrder="47" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">-->
-<!--                <label>Cancel Unapproved Orders</label>-->
-<!--                <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>-->
-<!--                <config_path>payment/general/cancel_unapproved_orders</config_path>-->
-<!--                <comment><![CDATA[Order unapproved will be automatically cancelled]]></comment>-->
-<!--            </field>-->
-
             <field id="show_payment_info" translate="label comment" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Show Payment Info at Success Page</label>
                 <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                <config_path>vindi_vp/general/show_payment_info</config_path>
                 <comment><![CDATA[If your store shows the payment info at success page, DON'T enable this feature]]></comment>
+                <config_path>vindi_vp/general/show_payment_info</config_path>
             </field>
 
             <field id="debug" translate="label comment" type="select" sortOrder="55" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -66,6 +53,31 @@
                 <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 <config_path>vindi_vp/general/debug</config_path>
             </field>
+        </group>
+
+        <group id="additional_credentials" translate="label comment" sortOrder="200" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Additional Credentials</label>
+<!--            <comment>To refund is necessary to add consumer key and consumer secret</comment>-->
+
+            <field id="reseller_token" translate="label comment" type="obscure" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                <label>Reseller Token</label>
+                <comment>Only change it if necessary requested by Vindi's team</comment>
+                <config_path>vindi_vp/general/reseller_token</config_path>
+            </field>
+
+<!--            <field id="consumer_key" translate="label comment" type="obscure" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">-->
+<!--                <label>Consumer Key</label>-->
+<!--                <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>-->
+<!--                <config_path>vindi_vp/general/consumer_key</config_path>-->
+<!--                <comment>Insert here the Consumer Key for your transaction, that key can be found in your Vindi Account</comment>-->
+<!--            </field>-->
+
+<!--            <field id="consumer_secret" translate="label comment" type="obscure" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">-->
+<!--                <label>Consumer Secret</label>-->
+<!--                <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>-->
+<!--                <config_path>vindi_vp/general/consumer_secret</config_path>-->
+<!--                <comment>Insert here the Secret Key for your transaction, that key can be found in your Vindi Account</comment>-->
+<!--            </field>-->
         </group>
 
         <group id="vindi_address" translate="label comment" sortOrder="300" showInDefault="1" showInWebsite="1" showInStore="1">
