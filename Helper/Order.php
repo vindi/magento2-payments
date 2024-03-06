@@ -238,7 +238,7 @@ class Order extends \Magento\Payment\Helper\Data
      * @return void
      * @throws \Magento\Framework\Exception\AlreadyExistsException
      */
-    public function savePayment($payment)
+    public function savePayment($payment): void
     {
         $this->resourcePayment->save($payment);
     }

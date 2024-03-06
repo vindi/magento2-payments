@@ -444,6 +444,11 @@ class Data extends \Magento\Payment\Helper\Data
         return '*.*.*';
     }
 
+    public function isUrl(string $trackNumber): bool
+    {
+        return filter_var($trackNumber, FILTER_VALIDATE_URL);
+    }
+
     public function formatDate(string $date): string
     {
         return date('d/m/Y', strtotime($date));
