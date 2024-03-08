@@ -19,6 +19,7 @@ use Vindi\VP\Gateway\Http\Client\Api\Create;
 use Vindi\VP\Gateway\Http\Client\Api\Query;
 use Vindi\VP\Gateway\Http\Client\Api\Refund;
 use Vindi\VP\Gateway\Http\Client\Api\Installments;
+use Vindi\VP\Gateway\Http\Client\Api\Track;
 use Vindi\VP\Helper\Data;
 
 class Api
@@ -48,18 +49,25 @@ class Api
      */
     private $query;
 
+    /**
+     * @var Track
+     */
+    private $track;
+
     public function __construct(
         Data $helper,
         Create $create,
         Refund $refund,
         Installments $installments,
-        Query $query
+        Query $query,
+        Track $track
     ) {
         $this->helper = $helper;
         $this->create = $create;
         $this->refund = $refund;
         $this->installments = $installments;
         $this->query = $query;
+        $this->track = $track;
     }
 
     public function create(): Create
@@ -75,6 +83,11 @@ class Api
     public function refund(): Refund
     {
         return $this->refund;
+    }
+
+    public function track(): Track
+    {
+        return $this->track;
     }
 
     public function installments(): Installments

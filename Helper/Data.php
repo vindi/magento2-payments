@@ -251,6 +251,8 @@ class Data extends \Magento\Payment\Helper\Data
      */
     public function mask(string $message): string
     {
+        $message = preg_replace('/"token_account":\s?"([^"]+)"/', '"token_account":"*********"', $message);
+        $message = preg_replace('/"reseller_token":\s?"([^"]+)"/', '"reseller_token":"*********"', $message);
         $message = preg_replace('/"hash":\s?"([^"]+)"/', '"hash":"*********"', $message);
         $message = preg_replace('/"card_cvv":\s?"([^"]+)"/', '"card_cvv":"***"', $message);
         $message = preg_replace('/"card_expdate_month":\s?"([^"]+)"/', '"card_expdate_month":"**"', $message);
@@ -442,6 +444,11 @@ class Data extends \Magento\Payment\Helper\Data
         }
 
         return '*.*.*';
+    }
+
+    public function isUrl(string $trackNumber): bool
+    {
+        return filter_var($trackNumber, FILTER_VALIDATE_URL);
     }
 
     public function formatDate(string $date): string
