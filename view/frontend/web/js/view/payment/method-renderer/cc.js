@@ -163,7 +163,7 @@ define(
                 if (typeof ccExpDate !== "undefined" && ccExpDate !== null) {
                     let ccExpDateFull = ccExpDate.split('/');
                     ccExpMonth = ccExpDateFull[0];
-                    ccExpYear = '20' + ccExpDateFull[1];
+                    ccExpYear = ccExpDateFull[1];
                 }
                 return {
                     'method': this.item.method,
