@@ -172,7 +172,7 @@ define(
                         'cc_cid': this.creditCardVerificationNumber(),
                         'cc_type': this.creditCardType(),
                         'cc_exp_month': ccExpMonth,
-                        'cc_exp_year': '20' + ccExpYear,
+                        'cc_exp_year': ccExpYear.length === 4 ? ccExpYear : '20' + ccExpYear,
                         'cc_number': this.vindiCreditCardNumber(),
                         'cc_owner': this.creditCardOwner(),
                         'installments': this.creditCardInstallments(),
