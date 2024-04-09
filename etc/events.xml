@@ -26,6 +26,10 @@
         <observer name="vindi_vp_cc_credit_card_assign" instance="Vindi\VP\Observer\CreditCardAssignObserver"/>
     </event>
 
+    <event name="payment_method_assign_data_vindi_vp_bankslippix">
+        <observer name="vindi_vp_bankslippix_data_assign" instance="Vindi\VP\Observer\DataAssignObserver" />
+    </event>
+
     <event name="payment_method_is_active">
         <observer name="vindi_vp_payment_payment_method_is_active" instance="Vindi\VP\Observer\PaymentMethodIsActive" />
     </event>
