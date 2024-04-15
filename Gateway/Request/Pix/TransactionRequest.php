@@ -40,7 +40,7 @@ class TransactionRequest extends PaymentsRequest implements BuilderInterface
         $order = $payment->getOrder();
 
         $request = $this->getTransaction($order, $buildSubject['amount']);
-        $request['payment'] = $this->getPaymentMethod($order, $payment->getMethod());
+        $request['payment'] = $this->getPaymentMethod($order);
 
         return ['request' => $request, 'client_config' => ['store_id' => $order->getStoreId()]];
     }

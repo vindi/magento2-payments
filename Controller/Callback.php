@@ -100,7 +100,7 @@ abstract class Callback extends Action implements \Magento\Framework\App\CsrfAwa
         $this->callbackFactory = $callbackFactory;
         $this->eventManager = $eventManager;
 
-        return parent::__construct($context);
+        parent::__construct($context);
     }
 
     /**

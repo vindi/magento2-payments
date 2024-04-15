@@ -168,6 +168,7 @@ class Request extends AbstractModel implements RequestInterface
      */
     public function getExtensionAttributes()
     {
+        //@phpstan-ignore-next-line
         return $this->_getExtensionAttributes();
     }
 
@@ -176,6 +177,7 @@ class Request extends AbstractModel implements RequestInterface
      */
     public function setExtensionAttributes(RequestExtensionInterface $extensionAttributes)
     {
+        //@phpstan-ignore-next-line
         $this->_setExtensionAttributes($extensionAttributes);
     }
 }

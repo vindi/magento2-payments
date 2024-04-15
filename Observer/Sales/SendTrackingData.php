@@ -90,7 +90,7 @@ class SendTrackingData implements ObserverInterface
         $this->api->logRequest($data, Api\Track::LOG_NAME);
         $trackData = $this->api->track()->execute($data);
         $this->api->logResponse($trackData, Api\Track::LOG_NAME);
-        $statusCode = $response['status'] ?? null;
+        $statusCode = $trackData['status'] ?? null;
         $this->api->saveRequest($data, $trackData['response'], $statusCode, 'track');
 
         return $trackData['response'];
