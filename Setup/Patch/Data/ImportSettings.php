@@ -64,6 +64,8 @@ class ImportSettings implements DataPatchInterface
         } catch (\Exception $e) {
             $this->logger->critical($e);
         }
+
+        return $this;
     }
 
     /**

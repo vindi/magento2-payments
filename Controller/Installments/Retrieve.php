@@ -62,7 +62,7 @@ class Retrieve extends Action implements HttpPostActionInterface, CsrfAwareActio
         $this->helperData = $helperData;
         $this->helperInstallments = $helperInstallments;
 
-        return parent::__construct($context);
+        parent::__construct($context);
     }
 
     public function execute()

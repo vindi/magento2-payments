@@ -206,14 +206,10 @@ class Order extends \Magento\Payment\Helper\Data
 
                     $message = __('Your payment for the order %1 was confirmed', $order->getIncrementId());
                     $order->addCommentToStatusHistory($message, $updateStatus, true);
-                } elseif (
-                    $this->helperData->getGeneralConfig('cancel_unapproved_orders', $order->getStoreId())
-                ) {
-                    if ($vindiStatus == self::STATUS_DENIED) {
-                        $order = $this->cancelOrder($order, $amount, $callback);
-                    } elseif ($vindiStatus == self::STATUS_REFUNDED) {
-                        $order = $this->refundOrder($order, $amount, $callback);
-                    }
+                } elseif ($vindiStatus == self::STATUS_DENIED) {
+                    $order = $this->cancelOrder($order, $amount, $callback);
+                } elseif ($vindiStatus == self::STATUS_REFUNDED) {
+                    $order = $this->refundOrder($order, $amount, $callback);
                 }
 
                 $payment->setAdditionalInformation('status', $vindiStatus);
