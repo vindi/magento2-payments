@@ -87,7 +87,11 @@ class TransactionHandler implements HandlerInterface
         $responseTransaction = $transaction['data_response']['transaction'];
         $payment = $this->helperOrder->updateDefaultAdditionalInfo($payment, $responseTransaction);
 
-        if ($responseTransaction['status_id'] == HelperOrder::STATUS_PENDING) {
+        if (
+            $responseTransaction['status_id'] == HelperOrder::STATUS_PENDING
+            || $responseTransaction['status_id'] == HelperOrder::STATUS_MONITORING
+            || $responseTransaction['status_id'] == HelperOrder::STATUS_CONTESTATION
+        ) {
             $payment->getOrder()->setState('new');
             $payment->setSkipOrderProcessing(true);
         }
