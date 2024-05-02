@@ -163,11 +163,11 @@ class PaymentsRequest
     protected function getPriceAdditional(Order $order, float $orderAmount): float
     {
         $priceAdditional = 0;
-        $transactionAmount = $order->getBaseSubtotal() + $order->getShippingAmount() + $order->getDiscountAmount();
+        $transactionAmount = (float) $order->getBaseSubtotal() + (float) $order->getShippingAmount() + (float) $order->getDiscountAmount();
         if ($transactionAmount < $orderAmount) {
             $priceAdditional = $orderAmount - $transactionAmount;
         }
-        return (float) $priceAdditional;
+        return round((float) $priceAdditional, 2);
     }
 
     public function getCustomerData(Order $order): array
