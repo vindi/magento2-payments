@@ -185,7 +185,7 @@ class PaymentsRequest
 
         $customerData = [
             'name' => $fullName,
-            'cpf' => $customerTaxVat,
+            'cpf' => preg_replace('/\D/', '', (string) $customerTaxVat),
             'email' => $order->getCustomerEmail(),
             'contacts' => [
                 [
@@ -195,6 +195,8 @@ class PaymentsRequest
             ],
             'addresses' => $this->getAddresses($order)
         ];
+
+        $customerData = $this->helper->getCompanyData($order, $customerData);
 
         if ($order->getCustomerDob()) {
             $customerData['birth_date'] = $this->helper->formatDate($order->getCustomerDob());
