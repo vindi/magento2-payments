@@ -98,7 +98,10 @@ class ConfigProvider extends CcGenericConfigProvider
         $methodCode = self::CODE;
 
         $customer = $this->customerSession->getCustomer();
-        $customerTaxvat = ($customer && $customer->getTaxvat()) ? $customer->getTaxvat() : '';
+        if ($customer && $customer->getTaxvat()) {
+            $taxVat = preg_replace('/[^0-9]/', '', (string) $customer->getTaxvat());
+            $customerTaxvat = strlen($taxVat == 11) ? $taxVat : '';
+        }
 
         return [
             'payment' => [

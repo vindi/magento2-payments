@@ -26,7 +26,7 @@ use Magento\Payment\Gateway\Http\TransferInterface;
 
 class Capture implements ClientInterface
 {
-    const LOG_NAME = 'koin-capture';
+    const LOG_NAME = 'vindi-capture';
 
     /**
      * @var Transaction
