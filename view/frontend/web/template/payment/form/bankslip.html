@@ -21,7 +21,7 @@
 
             <div class="field number required" data-bind="attr: {id: getCode() + '_taxat'}">
                 <label data-bind="attr: {for: getCode() + '_taxvat'}" class="label">
-                    <span><!-- ko i18n: 'Customer Taxvat' --><!-- /ko --></span>
+                    <span><!-- ko i18n: 'Buyer Taxvat' --><!-- /ko --></span>
                 </label>
                 <div class="control">
                     <input type="text"
@@ -30,7 +30,7 @@
                            value=""
                            data-bind="attr: {
                                         id: getCode() + '_taxvat',
-                                        title: $t('Customer Taxvat'),
+                                        title: $t('Buyer Taxvat'),
                                         maxlength: 11,
                                         'data-container': getCode() + '-taxvat',
                                         'data-validate': JSON.stringify({'required':true, 'required-number':true})

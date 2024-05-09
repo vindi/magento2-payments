@@ -14,15 +14,12 @@
 
 namespace Vindi\VP\Helper;
 
-use Magento\Framework\Encryption\EncryptorInterface;
-use Vindi\VP\Logger\Logger;
-use Vindi\VP\Api\RequestRepositoryInterface;
-use Vindi\VP\Model\RequestFactory;
 use Magento\Catalog\Api\CategoryRepositoryInterface;
 use Magento\Directory\Helper\Data as DirectoryData;
 use Magento\Framework\App\Config\Initial;
 use Magento\Framework\App\Helper\Context;
 use Magento\Framework\Component\ComponentRegistrar;
+use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Filesystem\Io\File;
 use Magento\Framework\Stdlib\DateTime\DateTime;
 use Magento\Framework\UrlInterface;
@@ -39,6 +36,10 @@ use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\HTTP\PhpEnvironment\RemoteAddress;
 use Magento\Customer\Model\Session as CustomerSession;
 use Psr\Log\LoggerInterface;
+use Vindi\VP\Logger\Logger;
+use Vindi\VP\Api\RequestRepositoryInterface;
+use Vindi\VP\Model\Customer\Company;
+use Vindi\VP\Model\RequestFactory;
 
 /**
  * Class Data
@@ -454,5 +455,23 @@ class Data extends \Magento\Payment\Helper\Data
     public function formatDate(string $date): string
     {
         return date('d/m/Y', strtotime($date));
+    }
+
+    public function getCompanyData(OrderInterface $order, array $customerData): array
+    {
+        $company = new Company();
+
+        $this->_eventManager->dispatch(
+            'vindi_payments_get_company_data',
+            ['order' => $order, 'customer_data' => $customerData, 'company' => $company]
+        );
+
+        if ($company->getCnpj()) {
+            $customerData['cnpj'] = $company->getCnpj();
+            $customerData['trade_name'] = $company->getTradeName();
+            $customerData['company_name'] = $company->getCompanyName();
+        }
+
+        return $customerData;
     }
 }

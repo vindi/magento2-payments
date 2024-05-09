@@ -97,9 +97,12 @@ class ConfigProvider implements ConfigProviderInterface
     {
         $customerTaxvat = '';
         $customer = $this->customerSession->getCustomer();
+
         if ($customer && $customer->getTaxvat()) {
-            $customerTaxvat = $customer->getTaxvat();
+            $taxVat = preg_replace('/[^0-9]/', '', (string) $customer->getTaxvat());
+            $customerTaxvat = strlen($taxVat) == 11 ? $taxVat : '';
         }
+
         return [
             'payment' => [
                 self::CODE => [

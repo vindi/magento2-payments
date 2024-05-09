@@ -58,6 +58,7 @@ php bin/magento setup:static-content:deploy pt_BR en_US
 Módulo disponível em português e inglês, compatível com a versão 2.4 do Adobe Commerce.
 O módulo utiliza a API da Vindi para a geração de pagamentos com:  
 - Boleto
+- Bolepix
 - PIX  
 - Cartão de Crédito
 
