@@ -1,0 +1,141 @@
+<?php
+
+/**
+ * @var \Vindi\VP\Block\Custom\PaymentLinkSuccess $block
+ */
+
+$order = $block->getOrder();
+$payment = $order->getPayment();
+$paymentMethod = $payment->getMethod();
+
+?>
+<div>
+    <h1><?= __('Thank you! Your order has been successfully placed and will be processed after payment.') ?></h1>
+    <span><?= __($this->getInstructions()) ?></span>
+</div>
+<?php if ($paymentMethod == 'vindi_vp_cc'): ?>
+    <div class="vindi-vp-cc container" >
+        <form action="<?= $block->getBaseUrl() . 'sales/order/history' ?>" method="GET">
+            <button class="pix-copy-button" type="submit">
+                <?= $block->escapeHtml(__('My Orders')) ?>
+            </button>
+        </form>
+    </div>
+<?php endif;?>
+
+<?php if ($paymentMethod == 'vindi_vp_pix'): ?>
+<?php
+    $qrCodeImage = (string) $payment->getAdditionalInformation('qr_code_url');;
+    $emv = (string) $payment->getAdditionalInformation('qr_code_emv');
+?>
+    <?php if ($qrCodeImage): ?>
+    <div class="vindi-pix pix">
+        <div class="qrcode">
+            <h2 ><?= __('Pay with Pix') ?></h2>
+
+                <img alt="<?= $block->escapeHtml(__('QRCode')) ?>" src="<?= $qrCodeImage ?>" class="vindi-pix-qrcode" />
+        </div>
+        <div class="pix-code">
+            <h3><?= __('Pix code:') ?></h3>
+            <div class="pix-qrcode"><?= $emv ?></div>
+            <button class="pix-copy-button"
+                    data-text="<?= $block->escapeHtml(__('Copied!')) ?>"
+                    onclick="vindiVp.copyCode(this, '.pix-qrcode', false)">
+                <?= $block->escapeHtml(__('Copy code')) ?>
+            </button>
+        </div>
+    </div>
+    <?php endif; ?>
+<?php endif;?>
+
+<?php if ($paymentMethod == 'vindi_vp_bankslippix'): ?>
+    <?php
+    $qrCodeImage = (string) $payment->getAdditionalInformation('qr_code_url');
+    $emv = (string) $payment->getAdditionalInformation('qr_code_emv');
+    $bankSlipUrl = (string) $payment->getAdditionalInformation('bank_slip_url');
+    $bankSlipNumber = (string) $payment->getAdditionalInformation('bank_slip_number');
+    ?>
+            <div class="button-container">
+                <?php if ($bankSlipUrl): ?>
+                    <form action="<?= $bankSlipUrl?>" method="GET" target="_blank" >
+                        <button class="pix-copy-button" type="submit">
+                            <?= $block->escapeHtml(__('VIEW BANKSLIPPIX')) ?>
+                        </button>
+                    </form>
+                <?php endif; ?>
+            </div>
+            <div class="vindi-bankslippix container" >
+                <div class="vindi-bankslip bankslip">
+                    <h2 ><?= __('Pay with Bankslip') ?></h2>
+                    <div class="bankslip-barcode-container">
+                        <div class="bankslip-img-code">
+                            <div class="bankslip-number-container">
+                                <h3><?= __('Bankslip code:') ?></h3>
+                                <div class="bankslip-number"><?= $bankSlipNumber ?></div>
+                            </div>
+                            <button class="bankslip-copy-button"
+                                    data-text="<?= $block->escapeHtml(__('Copied!')) ?>"
+                                    onclick="vindiVp.copyCode(this, '.bankslip-number', false)">
+                                <?= $block->escapeHtml(__('Copy Barcode')) ?>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <?php if ($qrCodeImage): ?>
+                    <div class="vindi-pix pix">
+                        <h2><?= $block->escapeHtml('Pay with Pix') ?></h2>
+                        <div class="pix-barcode-container">
+                            <div class="pix-img-code">
+                                <?php if ($qrCodeImage): ?>
+                                    <img alt="<?= $block->escapeHtml(__('QRCode')) ?>" src="<?= $qrCodeImage ?>" class="vindi-pix-qrcode" />
+                                <?php endif; ?>
+                                <h3><?= __('Pix Code') ?></h3>
+                                <div class="pix-qrcode"><?= $emv ?></div>
+                                <button class="pix-copy-button"
+                                        data-text="<?= $block->escapeHtml(__('Copied!')) ?>"
+                                        onclick="vindiVp.copyCode(this, '.pix-qrcode', false)">
+                                    <?= $block->escapeHtml(__('Copy code')) ?>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                <?php endif; ?>
+            </div>
+<?php endif;?>
+
+<?php if ($paymentMethod == 'vindi_vp_bankslip'): ?>
+    <?php
+        $bankSlipUrl = (string) $payment->getAdditionalInformation('bank_slip_url');
+        $bankSlipNumber = (string) $payment->getAdditionalInformation('bank_slip_number');
+    ?>
+    <div class="button-container">
+        <?php if ($bankSlipUrl): ?>
+            <form action="<?= $bankSlipUrl?>" method="GET" target="_blank" >
+                <button class="pix-copy-button" type="submit">
+                    <?= $block->escapeHtml(__('VIEW BANKSLIP')) ?>
+                </button>
+            </form>
+        <?php endif; ?>
+    </div>
+    <div class="vindi-vp-bankslip">
+        <div class="content">
+            <h2 ><?= __('Pay with Bankslip:') ?></h2>
+            <div class="vindi-bankslip bankslip">
+                <div class="bankslip-barcode-container">
+                    <div class="bankslip-number-container">
+                        <h3><?= __('Bankslip code') ?></h3>
+                        <div class="bankslip-number"><?= $bankSlipNumber ?></div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="bankslip-copy-button"
+                    data-text="<?= $block->escapeHtml(__('Copied!')) ?>"
+                    onclick="vindiVp.copyCode(this, '.bankslip-number', false)">
+                <?= $block->escapeHtml(__('Copy barcode:')) ?>
+            </button>
+        </div>
+    </div>
+<?php endif;?>
+
+

@@ -12,7 +12,8 @@ define(
         return Component.extend({
             defaults: {
                 template: 'Vindi_VP/payment/form/bankslippix',
-                taxvat: window.checkoutConfig.payment.vindi_vp_bankslippix.customer_taxvat.replace(/[^0-9]/g, "")
+                taxvat: window.checkoutConfig.payment.vindi_vp_bankslippix.customer_taxvat.replace(/[^0-9]/g, ""),
+                isCheckoutPage: ko.observable(true)
             },
 
             /** @inheritdoc */
