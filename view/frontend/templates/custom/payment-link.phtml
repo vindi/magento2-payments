@@ -1,0 +1,104 @@
+<?php
+
+/**
+ * @var \Vindi\VP\Block\Custom\PaymentLink $block
+ */
+
+$paymentLink = $block->getPaymentLink();
+
+?>
+<?php if($paymentLink): ?>
+<?php
+    $paymentMethodCode = str_replace('vindi_vp_','', $paymentLink->getVindiPaymentMethod());
+    $order = $block->getOrder();
+    $customer = $block->getCustomerById($order->getCustomerId());
+    $billingAddress = $order->getBillingAddress();
+    $instructions = $block->getInstructions();
+    $block->deletePaymentLink($paymentLink);
+?>
+<div class="vindi-link-container" style="display: flex; justify-content: space-between;">
+    <div class="customer-data">
+        <div class="customer-information">
+            <h1><?= __('Customer Infomation') ?></h1>
+            <div>
+                <span><?= __('Name: ') . $order->getCustomerFirstname() ?></span>
+                <span><?= __('Email: ') . $order->getCustomerEmail() ?></span>
+                <span><?= __('Telephone: ') . $billingAddress->getTelephone() ?></span>
+            </div>
+        </div>
+        <div class="customer-shipping">
+            <h1><?= __('Shipping Details') ?></h1>
+            <div>
+                <?php $streets = [
+                    'Street: ',
+                    'Number: ',
+                    'Complement: ',
+                    'District: '
+                ]
+                ?>
+                <?php foreach ($streets as $key => $street): ?>
+                    <?php if (!empty($billingAddress->getStreet()[$key])): ?>
+                        <span><?= __($street) . $billingAddress->getStreet()[$key] ?></span>
+                    <?php endif; ?>
+                <?php endforeach ?>
+                <span><?= __('City: ') . $billingAddress->getCity() ?></span>
+                <span><?= __('State: ') . $billingAddress->getRegionCode() ?></span>
+                <span><?= __('Telephone: ') . $billingAddress->getTelephone() ?></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="payment-container" data-bind="scope: 'payment-method'">
+        <!-- ko template: getTemplate() --><!-- /ko -->
+    </div>
+
+    <div class="summary">
+        <h1><?= __('Order Summary') ?></h1>
+        <?php foreach ($order->getItems() as $id => $item): ?>
+        <div>
+            <span><?= $item->getName() ?></span>
+            <span><?= $block->getFormattedPrice((float) $item->getPrice()) ?></span>
+        </div>
+        <?php endforeach; ?>
+        <div>
+            <span><?= __('Total: ') . $block->getFormattedPrice($order->getGrandTotal()) ?></span>
+        </div>
+        <div class="actions-toolbar" data-bind="scope: 'payment-method'">
+            <div class="primary">
+                <button class="action primary checkout"
+                        type="submit"
+                        data-bind="
+                            click: sendPayment,
+                            attr: {title: $t('Place Order')}
+                            ">
+                    <span data-bind="i18n: 'Place Order'"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <script>
+        window.ccIcons = '<?= $block->getIcons() ?>';
+    </script>
+    <script type="text/x-magento-init">
+        {
+            "*": {
+                "Magento_Ui/js/core/app": {
+                    "components": {
+                        "payment-method": {
+                            "component": "Vindi_VP/js/view/custom/<?=  'payment-link-' . $paymentMethodCode ?>",
+                            "methodCode": "<?= $paymentLink->getVindiPaymentMethod() ?>",
+                            "methodTitle": "<?= $order->getPayment()->getMethodInstance()->getTitle() ?>",
+                            "customerTaxvat": "<?= $customer->getTaxvat() ?>",
+                            "formKey": "<?= $block->getFormKey() ?>",
+                            "isSandbox": "<?= $block->isSandbox() ?>",
+                            "orderId": "<?= $order->getId() ?>",
+                            "grandTotal": "<?= $order->getGrandTotal() ?>",
+                            "instructions": "<?= $instructions ?>"
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</div>
+<?php endif;?>

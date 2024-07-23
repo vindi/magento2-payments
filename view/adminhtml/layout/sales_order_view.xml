@@ -17,6 +17,7 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <head>
         <css src="Vindi_VP::css/grid.css"/>
+        <script src="Vindi_VP::js/payments.js" />
     </head>
     <body>
         <referenceContainer name="left">
@@ -35,5 +36,8 @@
                 </action>
             </block>
         </referenceContainer>
+        <referenceBlock name="order_additional_info">
+            <block class="Vindi\VP\Block\Adminhtml\Order\LinkField" name="admin.link.field" template="Vindi_VP::link-field.phtml" />
+        </referenceBlock>
     </body>
 </page>

@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Email:etc/email_templates.xsd">
+    <template id="payment_us_vindi_vp_vindi_general_global_credencials_payment_link_template" label="Payment Link Notification" file="payment_link.html" type="html" module="Vindi_VP" area="frontend"/>
+</config>

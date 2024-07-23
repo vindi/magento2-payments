@@ -23,7 +23,14 @@
     <preference for="Vindi\VP\Api\RequestRepositoryInterface" type="Vindi\VP\Model\ResourceModel\RequestRepository"/>
     <preference for="Vindi\VP\Api\Data\RequestSearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
 
+    <preference for="Vindi\VP\Api\Data\PaymentLinkInterface" type="Vindi\VP\Model\PaymentLink"/>
+    <preference for="Vindi\VP\Api\PaymentLinkRepositoryInterface" type="Vindi\VP\Model\ResourceModel\PaymentLinkRepository"/>
+
     <preference for="Vindi\VP\Api\Data\CompanyInterface" type="Vindi\VP\Model\Customer\Company"/>
+
+    <type name="Magento\Sales\Model\Service\OrderService">
+        <plugin name="after_place_order_plugin" type="Vindi\VP\Plugin\Model\Service\OrderService" />
+    </type>
 
     <type name="Magento\Sales\Model\Order\Payment">
         <plugin name="vindi_order_payment_can_void" type="Vindi\VP\Plugin\Order\Payment" />

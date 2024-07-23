@@ -339,3 +339,30 @@
     transform: rotateY(180deg);
 }
 
+.credit-card-types {
+    padding: 0;
+}
+.credit-card-types .item {
+    display: inline-block;
+    list-style: none;
+    margin: 0 5px 0 0;
+    vertical-align: top;
+}
+.credit-card-types .item._active {
+    font-weight: 700;
+}
+.credit-card-types .item._active img {
+    -webkit-filter: grayscale(0%);
+}
+.credit-card-types .item._inactive {
+    opacity: .4;
+}
+.credit-card-types .item span {
+    display: inline-block;
+    padding-top: 6px;
+    vertical-align: top;
+}
+.credit-card-types img {
+    -webkit-filter: grayscale(100%);
+    -webkit-transition: all .6s ease;
+}
