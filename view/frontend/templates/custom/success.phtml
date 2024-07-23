@@ -7,10 +7,10 @@
 $order = $block->getOrder();
 $payment = $order->getPayment();
 $paymentMethod = $payment->getMethod();
-
+$message = $paymentMethod == 'vindi_vp_cc' ? 'Thank you! Your order has been successfully placed and is being processed.' : 'Thank you! Your order has been successfully placed and will be processed after payment.'
 ?>
 <div>
-    <h1><?= __('Thank you! Your order has been successfully placed and will be processed after payment.') ?></h1>
+    <h1><?= __($paymentMethod) ?></h1>
     <span><?= __($this->getInstructions()) ?></span>
 </div>
 <?php if ($paymentMethod == 'vindi_vp_cc'): ?>
@@ -31,7 +31,7 @@ $paymentMethod = $payment->getMethod();
     <?php if ($qrCodeImage): ?>
     <div class="vindi-pix pix">
         <div class="qrcode">
-            <h2 ><?= __('Pay with Pix') ?></h2>
+            <h2 ><?= __('Pay with Pix:') ?></h2>
 
                 <img alt="<?= $block->escapeHtml(__('QRCode')) ?>" src="<?= $qrCodeImage ?>" class="vindi-pix-qrcode" />
         </div>
@@ -41,7 +41,7 @@ $paymentMethod = $payment->getMethod();
             <button class="pix-copy-button"
                     data-text="<?= $block->escapeHtml(__('Copied!')) ?>"
                     onclick="vindiVp.copyCode(this, '.pix-qrcode', false)">
-                <?= $block->escapeHtml(__('Copy code')) ?>
+                <?= $block->escapeHtml(__('Copy PIX code')) ?>
             </button>
         </div>
     </div>
@@ -66,7 +66,7 @@ $paymentMethod = $payment->getMethod();
             </div>
             <div class="vindi-bankslippix container" >
                 <div class="vindi-bankslip bankslip">
-                    <h2 ><?= __('Pay with Bankslip') ?></h2>
+                    <h2 ><?= __('Pay with Bankslip:') ?></h2>
                     <div class="bankslip-barcode-container">
                         <div class="bankslip-img-code">
                             <div class="bankslip-number-container">
@@ -83,7 +83,7 @@ $paymentMethod = $payment->getMethod();
                 </div>
                 <?php if ($qrCodeImage): ?>
                     <div class="vindi-pix pix">
-                        <h2><?= $block->escapeHtml('Pay with Pix') ?></h2>
+                        <h2><?= $block->escapeHtml('Pay with Pix:') ?></h2>
                         <div class="pix-barcode-container">
                             <div class="pix-img-code">
                                 <?php if ($qrCodeImage): ?>

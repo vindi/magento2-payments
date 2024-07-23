@@ -41,6 +41,11 @@ class PaymentLinkService
     public const SALES_EMAIL = 'trans_email/ident_sales/email';
 
     /**
+     * Path to get the payment link template
+     */
+    public const PAYMENT_LINK_TEMPLATE_PATH = 'vindi_vp/general/payment_link_template';
+
+    /**
      * @var PaymentLinkCollectionFactory
      */
     private PaymentLinkCollectionFactory $paymentLinkCollectionFactory;
@@ -179,14 +184,14 @@ class PaymentLinkService
 
             $templateVars = array(
                 'customer_name' => $order->getCustomerFirstname(),
-                'link' => $paymentLink->getLink()
+                'payment_link' => $paymentLink->getLink()
             );
             $from = array(
                 'email' => $this->scopeConfig->getValue(self::SALES_EMAIL, ScopeInterface::SCOPE_STORE),
                 'name' => $this->scopeConfig->getValue(self::SALES_EMAIL, ScopeInterface::SCOPE_STORE)
             );
-
-            $this->sendEmailService->sendEmailTemplate('payment_link_template',$order->getCustomerEmail(), $order->getCustomerFirstname(), $from, $templateVars);
+            $emailTemplateId = $this->scopeConfig->getValue(self::PAYMENT_LINK_TEMPLATE_PATH, ScopeInterface::SCOPE_STORE);
+            $this->sendEmailService->sendEmailTemplate($emailTemplateId, $order->getCustomerEmail(), $order->getCustomerFirstname(), $from, $templateVars);
             return true;
         } catch (\Exception $exception) {
             $this->logger->error($exception->getMessage());

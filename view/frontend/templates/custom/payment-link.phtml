@@ -53,6 +53,7 @@ $paymentLink = $block->getPaymentLink();
     </div>
 
     <div class="summary">
+        <h1><?= __('Order Summary') ?></h1>
         <?php foreach ($order->getItems() as $id => $item): ?>
         <div>
             <span><?= $item->getName() ?></span>
@@ -60,7 +61,6 @@ $paymentLink = $block->getPaymentLink();
         </div>
         <?php endforeach; ?>
         <div>
-            <span>Total </span>
             <span><?= __('Total: ') . $block->getFormattedPrice($order->getGrandTotal()) ?></span>
         </div>
         <div class="actions-toolbar" data-bind="scope: 'payment-method'">
