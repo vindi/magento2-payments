@@ -31,7 +31,7 @@ class ChangePaymentBeforePlace implements ObserverInterface
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
         $order = $observer->getEvent()->getOrder();
-        if ($order->getData() && str_contains($order->getPayment()->getMethod(), 'vindi_vp')) {
+        if ($order->getData() && str_contains($order->getPayment()->getMethod(), 'vindi')) {
             $order->getPayment()->setMethod('vindi_payment_link_' . $order->getPayment()->getMethod());
         }
     }
