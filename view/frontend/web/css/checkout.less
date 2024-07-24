@@ -366,3 +366,172 @@
     -webkit-filter: grayscale(100%);
     -webkit-transition: all .6s ease;
 }
+
+// Payment Link Page
+.vindi-link-container {
+    @media (min-width: 768px) {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-column-gap: 30px;
+
+        .customer-information {
+            padding-bottom: 40px;
+        }
+    }
+
+    p {
+        margin-bottom: 20px;
+    }
+
+    h2 {
+        color: #828282;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .customer-shipping {
+        > div {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-column-gap: 10px;
+        }
+
+        p {
+            margin-bottom: 25px;
+        }
+
+        strong {
+            display: block;
+        }
+    }
+
+    .payment-method-box {
+        padding: 18px 27px;
+        margin-bottom: 20px;
+        border: 1px solid #e7e7e7;
+
+        label {
+            font-weight: 700;
+            font-size: 20px;
+            display: block;
+            margin-bottom: 30px;
+        }
+
+        .instructions {
+            font-size: 12px;
+            color: #979797;
+            text-align: center;
+            padding: 0 20px;
+
+            &:before {
+                display: block;
+                margin: auto;
+                padding-bottom: 30px;
+            }
+            
+            &.bankslip:before {
+                content: url('../images/boleto.png');
+            }
+
+            &.bankslippix:before {
+                content: url('../images/bolepix.png');
+            }
+
+            &.pix:before {
+                content: url('../images/pix.png');
+            }
+        }
+    }
+
+    .summary {
+        &__content {
+            padding: 20px 25px 80px;
+            background-color: #f5f5f5;
+            margin-bottom: 20px;
+        }
+
+        summary {
+            padding: 15px 0;
+            border-bottom: 1px solid #bdbdbd;
+            font-size: 18px;
+            font-weight: 300;
+            color: #828282;
+            background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0.84375 1L5.02384 5L9.20394 1' stroke='%23828282' stroke-width='1.4'/%3E%3C/svg%3E%0A");
+            background-repeat: no-repeat;
+            background-position: right center;
+            cursor: pointer;
+        }
+
+        details[open] {
+            summary {
+                background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0.84375 5L5.02384 1L9.20394 5' stroke='%23828282' stroke-width='1.4'/%3E%3C/svg%3E%0A");
+            }
+            > div {
+                border-bottom: 1px solid #bdbdbd;
+                padding: 5px 0;
+            }
+        }
+
+        .flex-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        &-item {
+            padding: 8px 0;
+
+            &__name {
+                font-size: 14px;
+                padding-right: 15px;
+            }
+
+            &__value {
+                font-size: 16px;
+            }
+        }
+
+        &-total {
+            padding-top: 40px;
+
+            &__title {
+                font-size: 18px;
+                color: #828282;
+            }
+
+            &__amount {
+                font-size: 26px;
+                color: #4f4f4f;
+            }
+        }
+    }
+
+    .actions-toolbar {
+        .action.primary {
+            min-height: 40px;
+            width: 100%;
+        }
+    }
+
+    .container-vindi_vp_cc .vindi-vp-cc-container {
+        padding: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .vindi_vp-checkout-index {
+        padding-bottom: 80px;
+    }
+
+    .vindi-link-container {
+        .actions-toolbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #fff;
+            padding: 15px;
+            box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
+        }
+    }
+}
