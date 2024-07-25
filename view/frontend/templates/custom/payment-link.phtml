@@ -16,18 +16,18 @@ $paymentLink = $block->getPaymentLink();
     $instructions = $block->getInstructions();
     $block->deletePaymentLink($paymentLink);
 ?>
-<div class="vindi-link-container" style="display: flex; justify-content: space-between;">
+<div class="vindi-link-container">
     <div class="customer-data">
         <div class="customer-information">
-            <h1><?= __('Customer Infomation') ?></h1>
+            <h2><?= __('Customer Infomation') ?></h2>
             <div>
-                <span><?= __('Name: ') . $order->getCustomerFirstname() ?></span>
-                <span><?= __('Email: ') . $order->getCustomerEmail() ?></span>
-                <span><?= __('Telephone: ') . $billingAddress->getTelephone() ?></span>
+                <p><strong><?= __('Name: ') ?></strong><span><?= $order->getCustomerFirstname() ?></span></p>
+                <p><strong><?= __('Email: ') ?></strong><span><?= $order->getCustomerEmail() ?></span></p>
+                <p><strong><?= __('Telephone: ') ?></strong><span><?= $billingAddress->getTelephone() ?></span></p>
             </div>
         </div>
         <div class="customer-shipping">
-            <h1><?= __('Shipping Details') ?></h1>
+            <h2><?= __('Shipping Details') ?></h2>
             <div>
                 <?php $streets = [
                     'Street: ',
@@ -38,42 +38,51 @@ $paymentLink = $block->getPaymentLink();
                 ?>
                 <?php foreach ($streets as $key => $street): ?>
                     <?php if (!empty($billingAddress->getStreet()[$key])): ?>
-                        <span><?= __($street) . $billingAddress->getStreet()[$key] ?></span>
+                        <p><strong><?= __($street) ?></strong><span><?= $billingAddress->getStreet()[$key] ?></span></p>
                     <?php endif; ?>
                 <?php endforeach ?>
-                <span><?= __('City: ') . $billingAddress->getCity() ?></span>
-                <span><?= __('State: ') . $billingAddress->getRegionCode() ?></span>
-                <span><?= __('Telephone: ') . $billingAddress->getTelephone() ?></span>
+                <p><strong><?= __('City: ') ?></strong><span><?= $billingAddress->getCity() ?></span></p>
+                <p><strong><?= __('State: ') ?></strong><span><?= $billingAddress->getRegionCode() ?></span></p>
+                <p><strong><?= __('Telephone: ') ?></strong><span><?= $billingAddress->getTelephone() ?></span></p>
             </div>
         </div>
     </div>
 
     <div class="payment-container" data-bind="scope: 'payment-method'">
+        <h2><?= __('Payment method') ?></h2>
         <!-- ko template: getTemplate() --><!-- /ko -->
     </div>
 
     <div class="summary">
-        <h1><?= __('Order Summary') ?></h1>
-        <?php foreach ($order->getItems() as $id => $item): ?>
-        <div>
-            <span><?= $item->getName() ?></span>
-            <span><?= $block->getFormattedPrice((float) $item->getPrice()) ?></span>
-        </div>
-        <?php endforeach; ?>
-        <div>
-            <span><?= __('Total: ') . $block->getFormattedPrice($order->getGrandTotal()) ?></span>
+        <h2><?= __('Order Summary') ?></h2>
+        <div class="summary__content">
+            <details open>
+                <summary>
+                    <?= count($order->getItems()) == 1 ? __('1 item') : __('%1 items', count($order->getItems())); ?>
+                </summary>
+                <div>
+                    <?php foreach ($order->getItems() as $id => $item): ?>
+                        <div class="summary-item flex-content">
+                            <span class="summary-item__name"><?= $item->getName() ?></span>
+                            <span class="summary-item__value"><?= $block->getFormattedPrice((float) $item->getPrice()) ?></span>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </details>
+            <div class="summary-total flex-content">
+                <strong class="summary-total__title"><?= __('Total amount: ') ?></strong>
+                <strong class="summary-total__amount"><?= $block->getFormattedPrice($order->getGrandTotal()) ?></strong>
+            </div>
         </div>
         <div class="actions-toolbar" data-bind="scope: 'payment-method'">
-            <div class="primary">
-                <button class="action primary checkout"
-                        type="submit"
-                        data-bind="
-                            click: sendPayment,
-                            attr: {title: $t('Place Order')}
-                            ">
-                    <span data-bind="i18n: 'Place Order'"></span>
-                </button>
-            </div>
+            <button class="action primary checkout"
+                    type="submit"
+                    data-bind="
+                        click: sendPayment,
+                        attr: {title: $t('Place Order')}
+                        ">
+                <span data-bind="i18n: 'Place Order'"></span>
+            </button>
         </div>
     </div>
     <script>
