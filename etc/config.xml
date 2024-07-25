@@ -30,7 +30,7 @@
                 <refund_on_cancel>0</refund_on_cancel>
                 <show_payment_info>0</show_payment_info>
                 <reseller_token>4957fbd8f9b9962</reseller_token>
-                <payment_link_template>payment_us_vindi_vp_vindi_general_global_credencials_payment_link_template</payment_link_template>
+                <payment_link_template>payment_link_template</payment_link_template>
             </general>
             <address>
                 <street>0</street>

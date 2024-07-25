@@ -57,7 +57,7 @@
                    showInWebsite="1" showInStore="1">
                 <label>Payment Link Email Template</label>
                 <comment><![CDATA[Select the email template, if the &quot;Default&quot; option is selected, the module's default template will be considered.]]></comment>
-                <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                <source_model>Vindi\VP\Model\Config\Source\EmailTemplate</source_model>
                 <config_path>vindi_vp/general/payment_link_template</config_path>
             </field>
         </group>
