@@ -19,7 +19,7 @@ define(
         creditCardForm,
         url
     ) {
-
+        'use strict';
 
         return Component.extend({
             defaults: {
