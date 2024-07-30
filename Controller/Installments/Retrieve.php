@@ -100,7 +100,7 @@ class Retrieve extends Action implements HttpPostActionInterface, CsrfAwareActio
     public function getInstallments(string $ccType): array
     {
         $this->session->setVindiCcType($ccType);
-        $grandTotal = (float) $this->getPaymentLinkGrandTotal() ?? $this->checkoutSession->getQuote()->getGrandTotal();
+        $grandTotal = $this->getPaymentLinkGrandTotal() ?? $this->checkoutSession->getQuote()->getGrandTotal();
         $storeId = $this->checkoutSession->getQuote()->getStoreId();
         return $this->helperInstallments->getAllInstallments($grandTotal, $ccType, $storeId);
     }
