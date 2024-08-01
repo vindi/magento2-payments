@@ -7,10 +7,11 @@
 $order = $block->getOrder();
 $payment = $order->getPayment();
 $paymentMethod = $payment->getMethod();
+$paymentTitle = $payment->getMethodInstance()->getTitle();
 $message = $paymentMethod == 'vindi_vp_cc' ? 'Thank you! Your order has been successfully placed and is being processed.' : 'Thank you! Your order has been successfully placed and will be processed after payment.'
 ?>
 <div>
-    <h1><?= __($paymentMethod) ?></h1>
+    <h1><?= __($paymentTitle) ?></h1>
     <span><?= __($this->getInstructions()) ?></span>
 </div>
 <?php if ($paymentMethod == 'vindi_vp_cc'): ?>

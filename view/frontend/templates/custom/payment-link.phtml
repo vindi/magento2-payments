@@ -69,10 +69,74 @@ $paymentLink = $block->getPaymentLink();
                     <?php endforeach; ?>
                 </div>
             </details>
-            <div class="summary-total flex-content">
-                <strong class="summary-total__title"><?= __('Total amount: ') ?></strong>
-                <strong class="summary-total__amount"><?= $block->getFormattedPrice($order->getGrandTotal()) ?></strong>
-            </div>
+
+            <?php
+            $shippingMode = $block->getDisplayShippingMode();
+            $displayDiscount = $order->getCouponCode();
+            $discountDescription = $order->getDiscountDescription();
+            $formattedDiscount = $block->getFormattedPrice((float) $order->getDiscountAmount());
+            $shippingDescription = $order->getShippingDescription();
+            $formattedShippingAmount = $block->getFormattedPrice((float) $order->getShippingAmount());
+            $formattedShippingInclTax = $block->getFormattedPrice((float) $order->getShippingInclTax());
+            ?>
+
+            <?php if ($shippingMode === 'both'): ?>
+                <div class="totals shipping excl flex-content">
+                    <?php if ($displayDiscount): ?>
+                        <span class="summary-discount__name"><?= __('Discount (%1)', $discountDescription) ?></span>
+                        <span class="summary-discount__value"><?= $formattedDiscount ?></span>
+                    <?php endif; ?>
+                    <span class="summary-shipping__title"><?= __('Shipping Excl. Tax') ?></span>
+                    <span class="summary-shipping__name"><?= $shippingDescription ?></span>
+                    <span class="summary-shipping__value"><?= $formattedShippingAmount ?></span>
+                </div>
+                <div class="totals shipping incl flex-content">
+                    <?php if ($displayDiscount): ?>
+                        <span class="summary-discount__name"><?= __('Discount (%1)', $discountDescription) ?></span>
+                        <span class="summary-discount__value"><?= $formattedDiscount ?></span>
+                    <?php endif; ?>
+                    <span class="summary-shipping__title"><?= __('Shipping Incl. Tax') ?></span>
+                    <span class="summary-shipping__name"><?= $shippingDescription ?></span>
+                    <span class="summary-shipping__value"><?= $formattedShippingInclTax ?></span>
+                </div>
+            <?php elseif ($shippingMode === 'including'): ?>
+                <div class="totals shipping incl flex-content">
+                    <?php if ($displayDiscount): ?>
+                        <span class="summary-discount__name"><?= __('Discount (%1)', $discountDescription) ?></span>
+                        <span class="summary-discount__value"><?= $formattedDiscount ?></span>
+                    <?php endif; ?>
+                    <span class="summary-shipping__title"><?= __('Shipping') ?></span>
+                    <span class="summary-shipping__name"><?= $shippingDescription ?></span>
+                    <span class="summary-shipping__value"><?= $formattedShippingInclTax ?></span>
+                </div>
+            <?php elseif ($shippingMode === 'excluding'): ?>
+                <div class="totals shipping excl flex-content">
+                    <?php if ($displayDiscount): ?>
+                        <span class="summary-discount__name"><?= __('Discount (%1)', $discountDescription) ?></span>
+                        <span class="summary-discount__value"><?= $formattedDiscount ?></span>
+                    <?php endif; ?>
+                    <span class="summary-shipping__title"><?= __('Shipping') ?></span>
+                    <span class="summary-shipping__name"><?= $shippingDescription ?></span>
+                    <span class="summary-shipping__value"><?= $formattedShippingAmount ?></span>
+                </div>
+            <?php endif; ?>
+
+            <?php if ($block->isTaxDisplayedInGrandTotal()): ?>
+                <div class="summary-total incl flex-content">
+                    <strong class="summary-total__title"><?= __('Order Total Incl. Tax: ') ?></strong>
+                    <span class="summary-totals-incl__value"><?= $block->getFormattedPrice($order->getGrandTotal()) ?></span>
+                </div>
+                <div class="summary-total excl flex-content">
+                    <strong class="summary-total__title"><?= __('Order Total Excl. Tax: ') ?></strong>
+                    <?php $amount = $order->getGrandTotal() - $order->getTaxAmount() ?>
+                    <strong class="summary-totals-excl__value"><?= $amount >= 0 ? $block->getFormattedPrice($amount) : $block->getFormattedPrice(0) ?></strong>
+                </div>
+            <?php else: ?>
+                <div class="summary-total flex-content">
+                    <strong class="summary-total__title"><?= __('Order Total: ') ?></strong>
+                    <strong class="summary-total__amount"><?= $block->getFormattedPrice($order->getGrandTotal()) ?></strong>
+                </div>
+            <?php endif; ?>
         </div>
         <div class="actions-toolbar" data-bind="scope: 'payment-method'">
             <button class="action primary checkout"

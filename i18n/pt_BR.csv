@@ -160,3 +160,6 @@ Payload,Payload
 "Total amount: ","Total a pagar:"
 "Payment method","Método de pagamento"
 "%1 items","%1 itens"
+"This link has expired or is no longer available, please try another link or contact the shopkeeper to get a new payment link.","Esse link expirou ou não esta mais disponível, por favor tente outro link ou entre em contato com o lojista para obter um novo link de pagamento."
+"Send Payment Link", "Enviar Link de Pagamento"
+"Create and Send New Payment Link", "Criar e Enviar Novo Link de Pagamento"

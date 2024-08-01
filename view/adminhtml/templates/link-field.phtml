@@ -20,6 +20,7 @@
             <input type="hidden" name="form_key" value="<?php echo $block->getFormKey() ?>" />
             <input type="hidden" id="orderid" value="<?php
             $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+            $buttonLabel = $block->getPaymentLink() ? __('Send Payment Link') : __('Create and Send New Payment Link');
             $request = $objectManager->get('Magento\Framework\App\Request\Http');
             echo $param = $request->getParam('order_id');?>"/>
             <span class="link" style="display: none"><?= $block->getPaymentLink(); ?></span>
@@ -35,7 +36,7 @@
                 <?= $block->escapeHtml(__('Copy link')) ?>
             </button>
         </fieldset>
-        <button id="send" class="action-default action-secondary action-send"><?php /* @escapeNotVerified */ echo __('Send Payment Link') ?></button>
+        <button id="send" class="action-default action-secondary action-send"><?php /* @escapeNotVerified */ echo $buttonLabel ?></button>
     </div>
 </section>
 
