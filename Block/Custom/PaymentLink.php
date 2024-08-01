@@ -28,6 +28,7 @@ use Magento\Store\Model\StoreManagerInterface;
 use Vindi\VP\Helper\Data as Helper;
 use Vindi\VP\Model\PaymentLinkService;
 use Vindi\VP\Model\Ui\CreditCard\ConfigProvider;
+use Magento\Tax\Model\TaxConfigProvider;
 
 class PaymentLink extends Template
 {
@@ -72,6 +73,11 @@ class PaymentLink extends Template
     private PriceHelper $priceHelper;
 
     /**
+     * @var TaxConfigProvider
+     */
+    public TaxConfigProvider $taxConfigProvider;
+
+    /**
      * @param Context $context
      * @param PaymentLinkService $paymentLinkService
      * @param ConfigProvider $configProvider
@@ -80,6 +86,7 @@ class PaymentLink extends Template
      * @param StoreManagerInterface $storeManager
      * @param CustomerRepositoryInterface $customerRepository
      * @param PriceHelper $priceHelper
+     * @param TaxConfigProvider $taxConfigProvider
      * @param array $data
      */
     public function __construct(
@@ -91,6 +98,7 @@ class PaymentLink extends Template
         StoreManagerInterface $storeManager,
         CustomerRepositoryInterface $customerRepository,
         PriceHelper $priceHelper,
+        TaxConfigProvider $taxConfigProvider,
         array $data = [])
     {
         $this->paymentLinkService = $paymentLinkService;
@@ -101,6 +109,7 @@ class PaymentLink extends Template
         $this->storeManager = $storeManager;
         $this->customerRepository = $customerRepository;
         $this->priceHelper = $priceHelper;
+        $this->taxConfigProvider = $taxConfigProvider;
     }
 
     /**
@@ -195,6 +204,22 @@ class PaymentLink extends Template
     {
         $method = str_replace('vindi_payment_link_','', $this->getPaymentLink()->getVindiPaymentMethod());
         return $this->helper->getConfig('checkout_instructions', $method);
+    }
+
+    /**
+     * @return string
+     */
+    public function getDisplayShippingMode()
+    {
+        return $this->taxConfigProvider->getDisplayShippingMode();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isTaxDisplayedInGrandTotal()
+    {
+        return $this->taxConfigProvider->isTaxDisplayedInGrandTotal();
     }
 
 }
