@@ -87,6 +87,10 @@ class SendTransaction implements HttpPostActionInterface
         $paymentData = $this->httpRequest->getParam('payment_data');
         $order = $this->paymentLinkService->getOrderByOrderId($orderId);
 
+        if (isset($paymentData['additional_data']['taxvat'])) {
+            $paymentData['vindi_customer_taxvat'] = $paymentData['additional_data']['taxvat'];
+        }
+
         try {
             foreach ($paymentData['additional_data'] as $index => $data) {
                 $order->getPayment()->setData($index, $data);
