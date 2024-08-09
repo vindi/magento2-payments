@@ -142,10 +142,9 @@ $paymentLink = $block->getPaymentLink();
             <button class="action primary checkout"
                     type="submit"
                     data-bind="
-                        click: sendPayment,
-                        attr: {title: $t('Place Order')}
+                        click: sendPayment
                         ">
-                <span data-bind="i18n: 'Place Order'"></span>
+                <span><?= __('Place Order') ?></span>
             </button>
         </div>
     </div>
