@@ -83,7 +83,8 @@ class Index implements HttpGetActionInterface
     {
         $result = $this->resultPageFactory->create();
         $hash = $this->request->getParam('hash');
-        if (!$this->paymentLinkService->getPaymentLinkByHash($hash)->getData()) {
+        $paymentLink = $this->paymentLinkService->getPaymentLinkByHash($hash);
+        if (!$paymentLink->getData() || $this->paymentLinkService->isLinkExpired($paymentLink->getCreatedAt())) {
             $this->messageManager->addErrorMessage(__('This link has expired or is no longer available,
             please try another link or contact the shopkeeper to get a new payment link.'));
             return $this->redirectFactory->create()->setPath('noroute');

@@ -25,6 +25,8 @@ use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\Message\ManagerInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
+use Magento\Sales\Model\Order\Invoice;
+use Vindi\VP\Helper\Order as HelperOrder;
 use Vindi\VP\Model\PaymentLinkService;
 
 class SendTransaction implements HttpPostActionInterface
@@ -55,25 +57,33 @@ class SendTransaction implements HttpPostActionInterface
     private ManagerInterface $messageManager;
 
     /**
+     * @var HelperOrder
+     */
+    private HelperOrder $helperOrder;
+
+    /**
      * @param JsonFactory $resultJsonFactory
      * @param PaymentLinkService $paymentLinkService
      * @param RequestInterface $httpRequest
      * @param OrderRepositoryInterface $orderRepository
      * @param ManagerInterface $messageManager
+     * @param HelperOrder $helperOrder
      */
     public function __construct(
         JsonFactory $resultJsonFactory,
         PaymentLinkService $paymentLinkService,
         RequestInterface $httpRequest,
         OrderRepositoryInterface $orderRepository,
-        ManagerInterface $messageManager
+        ManagerInterface $messageManager,
+        HelperOrder $helperOrder
     )
     {
         $this->resultJsonFactory = $resultJsonFactory;
         $this->paymentLinkService = $paymentLinkService;
         $this->httpRequest = $httpRequest;
-        $this->orderRepository = $orderRepository;
         $this->messageManager = $messageManager;
+        $this->helperOrder = $helperOrder;
+        $this->orderRepository = $orderRepository;
     }
 
     /**
@@ -100,6 +110,13 @@ class SendTransaction implements HttpPostActionInterface
             $order->getPayment()->setMethod(str_replace('vindi_payment_link_','', $order->getPayment()->getMethod()));
             $order->getPayment()->place();
             $this->orderRepository->save($order);
+            $apiStatus = (int) $order->getPayment()->getAdditionalInformation('status');
+
+            if ($order->getPayment()->getMethod() == \Vindi\VP\Model\Ui\CreditCard\ConfigProvider::CODE) {
+                if ($apiStatus == HelperOrder::STATUS_APPROVED) {
+                    $this->helperOrder->captureOrder($order, Invoice::CAPTURE_ONLINE);
+                }
+            }
             $result['success'] = true;
         } catch (\Exception $e) {
             $this->messageManager->addErrorMessage(__($e->getMessage()));

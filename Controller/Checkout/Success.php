@@ -83,9 +83,10 @@ class Success implements HttpGetActionInterface
         $order = $this->paymentLinkService->getOrderByOrderId($orderId);
         $orderStatus = $order->getStatus();
         $configStatus = $this->helperData->getConfig('order_status', $order->getPayment()->getMethod());
+        $isCcMethod = str_contains($order->getPayment()->getMethod(), 'cc');
 
         try {
-            if (!$orderId || $orderStatus !== $configStatus) {
+            if (!$orderId || (!$isCcMethod && $orderStatus !== $configStatus)) {
                 return $this->redirectFactory->create()->setPath('noroute');
             }
         } catch (\Exception $e) {
