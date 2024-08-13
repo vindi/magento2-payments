@@ -189,7 +189,12 @@ class PaymentLinkService
 
             $templateVars = array(
                 'customer_name' => $order->getCustomerFirstname(),
-                'payment_link' => $paymentLink->getLink()
+                'customer_fullname' => $order->getCustomerFirstname() . ' ' . $order->getCustomerLastname(),
+                'payment_link' => $paymentLink->getLink(),
+                'order_id' => $orderId,
+                'order_increment' => $order->getIncrementId(),
+                'customer_email' => $order->getCustomerEmail(),
+                'telephone' => $order->getBillingAddress()->getTelephone()
             );
             $from = array(
                 'email' => $this->scopeConfig->getValue(self::SALES_EMAIL, ScopeInterface::SCOPE_STORE),
