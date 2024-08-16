@@ -59,7 +59,9 @@ class LinkField extends Template
     public function getPaymentLink()
     {
         $paymentLinkData = $this->paymentLinkService->getPaymentLink($this->getOrderId());
-        return $paymentLinkData->getLink() ?? '';
+        $isExpired = false;
+        if ($paymentLinkData->getData()) $isExpired = $this->paymentLinkService->isLinkExpired($paymentLinkData->getCreatedAt());
+        return $paymentLinkData->getLink() && !$isExpired ? $paymentLinkData->getLink() : '';
     }
 
     /**

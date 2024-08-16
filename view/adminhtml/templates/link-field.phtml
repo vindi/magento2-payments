@@ -4,7 +4,7 @@
  * @var Vindi\VP\Block\Adminhtml\Order\LinkField $block
  * @var \Magento\Framework\Escaper $escaper
  */
-
+$paymentLink = $block->getPaymentLink();
 ?>
 <?php if(str_contains($block->getPaymentMethod(), $block::VINDI_PAYMENT_LINK)): ?>
 <section class="admin__page-section">
@@ -16,17 +16,17 @@
     <div class="admin__page-section-item-content edit-checkoutfield-date"
          style="display: flex;flex-direction: row;flex-wrap: nowrap;align-items: center;"
          id="edit-checkoutfield-info-form">
-        <fieldset class="admin__fieldset" style="display: <?= !$block->getPaymentLink() ? 'none' : 'block' ?>">
+        <fieldset class="admin__fieldset" style="display: <?= !$paymentLink ? 'none' : 'block' ?>">
             <input type="hidden" name="form_key" value="<?php echo $block->getFormKey() ?>" />
             <input type="hidden" id="orderid" value="<?php
             $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-            $buttonLabel = $block->getPaymentLink() ? __('Send Payment Link') : __('Create and Send New Payment Link');
+            $buttonLabel = $paymentLink ? __('Send Payment Link') : __('Create and Send New Payment Link');
             $request = $objectManager->get('Magento\Framework\App\Request\Http');
             echo $param = $request->getParam('order_id');?>"/>
-            <span class="link" style="display: none"><?= $block->getPaymentLink(); ?></span>
+            <span class="link" style="display: none"><?= $paymentLink; ?></span>
             <input type="text"
                    class="admin__control-text"
-                   value="<?php echo $block->getPaymentLink(); ?>"
+                   value="<?php echo $paymentLink; ?>"
                    style="margin-right: 10px"
                    readonly>
             <button class="pix-copy-button"
