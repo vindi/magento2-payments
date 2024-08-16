@@ -72,7 +72,6 @@ $paymentLink = $block->getPaymentLink();
 
             <?php
             $shippingMode = $block->getDisplayShippingMode();
-            $displayDiscount = $order->getCouponCode();
             $discountDescription = $order->getDiscountDescription();
             $formattedDiscount = $block->getFormattedPrice((float) $order->getDiscountAmount());
             $shippingDescription = $order->getShippingDescription();
@@ -82,8 +81,8 @@ $paymentLink = $block->getPaymentLink();
 
             <?php if ($shippingMode === 'both'): ?>
                 <div class="totals shipping excl flex-content">
-                    <?php if ($displayDiscount): ?>
-                        <span class="summary-discount__name"><?= __('Discount (%1)', $discountDescription) ?></span>
+                    <?php if ($formattedDiscount): ?>
+                        <span class="summary-discount__name"><?= $discountDescription ?  __('Discount (%1)', $discountDescription) : __('Discount ') ?></span>
                         <span class="summary-discount__value"><?= $formattedDiscount ?></span>
                     <?php endif; ?>
                     <span class="summary-shipping__title"><?= __('Shipping Excl. Tax') ?></span>
@@ -91,8 +90,8 @@ $paymentLink = $block->getPaymentLink();
                     <span class="summary-shipping__value"><?= $formattedShippingAmount ?></span>
                 </div>
                 <div class="totals shipping incl flex-content">
-                    <?php if ($displayDiscount): ?>
-                        <span class="summary-discount__name"><?= __('Discount (%1)', $discountDescription) ?></span>
+                    <?php if ($formattedDiscount): ?>
+                        <span class="summary-discount__name"><?= $discountDescription ?  __('Discount (%1)', $discountDescription) : __('Discount ') ?></span>
                         <span class="summary-discount__value"><?= $formattedDiscount ?></span>
                     <?php endif; ?>
                     <span class="summary-shipping__title"><?= __('Shipping Incl. Tax') ?></span>
@@ -101,8 +100,8 @@ $paymentLink = $block->getPaymentLink();
                 </div>
             <?php elseif ($shippingMode === 'including'): ?>
                 <div class="totals shipping incl flex-content">
-                    <?php if ($displayDiscount): ?>
-                        <span class="summary-discount__name"><?= __('Discount (%1)', $discountDescription) ?></span>
+                    <?php if ($formattedDiscount): ?>
+                        <span class="summary-discount__name"><?= $discountDescription ?  __('Discount (%1)', $discountDescription) : __('Discount ') ?></span>
                         <span class="summary-discount__value"><?= $formattedDiscount ?></span>
                     <?php endif; ?>
                     <span class="summary-shipping__title"><?= __('Shipping') ?></span>
@@ -111,8 +110,8 @@ $paymentLink = $block->getPaymentLink();
                 </div>
             <?php elseif ($shippingMode === 'excluding'): ?>
                 <div class="totals shipping excl flex-content">
-                    <?php if ($displayDiscount): ?>
-                        <span class="summary-discount__name"><?= __('Discount (%1)', $discountDescription) ?></span>
+                    <?php if ($formattedDiscount): ?>
+                        <span class="summary-discount__name"><?= $discountDescription ?  __('Discount (%1)', $discountDescription) : __('Discount ') ?></span>
                         <span class="summary-discount__value"><?= $formattedDiscount ?></span>
                     <?php endif; ?>
                     <span class="summary-shipping__title"><?= __('Shipping') ?></span>

@@ -256,7 +256,7 @@ class PaymentLinkService
      * @param $linkCreatedAt
      * @return bool
      */
-    public function isLinkExpired($linkCreatedAt): bool
+    public function isLinkExpired($linkCreatedAt)
     {
         $currentTimestamp = $this->dateTimeFactory->create()->getTimestamp();
         $linkTimestamp = $this->dateTimeFactory->create($linkCreatedAt)->getTimestamp();
