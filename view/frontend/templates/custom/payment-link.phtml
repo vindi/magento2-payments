@@ -73,7 +73,8 @@ $paymentLink = $block->getPaymentLink();
             <?php
             $shippingMode = $block->getDisplayShippingMode();
             $discountDescription = $order->getDiscountDescription();
-            $formattedDiscount = $block->getFormattedPrice((float) $order->getDiscountAmount());
+            $formattedDiscount = (float) $order->getDiscountAmount() != 0 ?
+                $block->getFormattedPrice((float) $order->getDiscountAmount()) : '';
             $shippingDescription = $order->getShippingDescription();
             $formattedShippingAmount = $block->getFormattedPrice((float) $order->getShippingAmount());
             $formattedShippingInclTax = $block->getFormattedPrice((float) $order->getShippingInclTax());
