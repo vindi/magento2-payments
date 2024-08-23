@@ -1,13 +1,16 @@
 define([], function () {
     'use strict';
-    return async function (sandbox) {
+    return function (sandbox) {
         if (typeof window.yapayFingerprintLoaded == 'undefined') {
-            var fpOptions = {env: 'production'};
-            if (parseInt(sandbox) === 1) {
-                fpOptions.env = 'sandbox';
+            async function loadScript() {
+                let fpOptions = {env: 'production'};
+                if (parseInt(sandbox) === 1) {
+                    fpOptions.env = 'sandbox';
+                }
+                await window?.yapay?.FingerPrint(fpOptions);
+                window.yapayFingerprintLoaded = true;
             }
-            await window?.yapay?.FingerPrint(fpOptions);
-            window.yapayFingerprintLoaded = true;
+            loadScript();
         }
     };
 });
