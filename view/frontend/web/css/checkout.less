@@ -491,17 +491,38 @@
             }
         }
 
-        &-total {
+        &-totals {
             padding-top: 40px;
-
+        }
+        
+        &-total {
             &__title {
-                font-size: 18px;
                 color: #828282;
+                font-size: 18px;
             }
 
             &__amount {
                 font-size: 26px;
+            }
+        }
+
+        &-total,
+        &-shipping,
+        &-discount {
+            &__amount {
                 color: #4f4f4f;
+            }
+
+            &__name {
+                font-size: 16px;
+                color: #4f4f4f;
+            }
+        }
+
+        &-shipping,
+        &-discount {
+            &__amount {
+                font-size: 20px;
             }
         }
     }
@@ -533,5 +554,105 @@
             padding: 15px;
             box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
         }
+    }
+}
+
+// Payment Success Page
+.payment-success {
+    max-width: 1020px;
+    margin: auto;
+
+    &__header {
+        text-align: center;
+        padding-bottom: 25px;
+    }
+
+    &__ico {
+        margin-bottom: 10px;
+    }
+
+    &__title {
+        max-width: 780px;
+        margin: auto auto 15px;
+    }
+
+    &__subtitle {
+        font-weight: 300;
+        font-size: 14px;
+    }
+
+    .button-container {
+        text-align: center;
+        padding-bottom: 25px;
+    }
+
+    &__container {
+        border: 1px solid #c6c6c6;
+        border-radius: 5px;
+        min-height: 376px;
+
+        @media (min-width: 768px) {
+            display: flex;
+        }
+
+        .content {
+            max-width: 550px;
+            margin: auto;
+            padding: 20px 16px 35px;
+        }
+
+        h3 {
+            text-align: center;
+            font-size: 17px;
+            margin: 0 0 30px;
+        }
+
+        strong {
+            font-weight: 600;
+            color: #666;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .vindi-bankslip {
+            flex: 1;
+            padding: 25px;
+    
+            button {
+                margin-top: 20px;
+            }
+        }
+    
+        .vindi-pix {
+            flex: 0 0 400px;
+            padding: 25px;
+            border-top: 1px solid #c6c6c6;
+    
+            @media (min-width: 768px) {
+                border-left: 1px solid #c6c6c6;
+                border-top: 0;
+            }
+    
+            button {
+                margin-top: 25px;
+            }
+        }
+    }
+    
+    .vindi-pix-qrcode {
+        max-width: 150px;
+        margin: auto;
+        display: block;
+    }
+
+    .bankslip-number,
+    .pix-qrcode {
+        word-break: break-word;
+        font-weight: 600;
+    }
+
+    .align-button {
+        text-align: center;
+        padding-top: 25px;
     }
 }
