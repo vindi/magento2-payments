@@ -491,17 +491,38 @@
             }
         }
 
-        &-total {
+        &-totals {
             padding-top: 40px;
-
+        }
+        
+        &-total {
             &__title {
-                font-size: 18px;
                 color: #828282;
+                font-size: 18px;
             }
 
             &__amount {
                 font-size: 26px;
+            }
+        }
+
+        &-total,
+        &-shipping,
+        &-discount {
+            &__amount {
                 color: #4f4f4f;
+            }
+
+            &__name {
+                font-size: 16px;
+                color: #4f4f4f;
+            }
+        }
+
+        &-shipping,
+        &-discount {
+            &__amount {
+                font-size: 20px;
             }
         }
     }

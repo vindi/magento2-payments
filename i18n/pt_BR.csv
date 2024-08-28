@@ -142,7 +142,6 @@ Payload,Payload
 "Number: ", "Número: "
 "Complement: ", "Complemento: "
 "District: ", "Bairro: "
-"District: ", "Bairro: "
 "City: ", "Cidade: "
 "State: ", "Estado: "
 "Shipping Details", "Detalhes da entrega"
@@ -177,3 +176,5 @@ Payload,Payload
 "Customer Details:", "Informações do Cliente:"
 "Order Details:", "Detalhes do Pedido:"
 "Order Number", "Número do Pedido"
+"Discount (%1)","Desconto (%1)"
+"Discount","Desconto"
