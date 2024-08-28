@@ -4,9 +4,10 @@
 define(
     [
         'Magento_Checkout/js/view/payment/default',
-        'Vindi_VP/js/fingerprint'
+        'Vindi_VP/js/fingerprint',
+        'ko'
     ],
-    function (Component, fingerprint) {
+    function (Component, fingerprint, ko) {
         'use strict';
 
         return Component.extend({

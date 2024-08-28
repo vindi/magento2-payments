@@ -7,6 +7,7 @@
 $order = $block->getOrder();
 $payment = $order->getPayment();
 $paymentMethod = $payment->getMethod();
+$paymentTitle = $payment->getMethodInstance()->getTitle();
 $message = $paymentMethod == 'vindi_vp_cc' ? 'Thank you! Your order has been successfully placed and is being processed.' : 'Thank you! Your order has been successfully placed and will be processed after payment.'
 ?>
 <div class="payment-success">

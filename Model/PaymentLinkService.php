@@ -41,6 +41,11 @@ class PaymentLinkService
     public const SALES_EMAIL = 'trans_email/ident_sales/email';
 
     /**
+     * Sales name config path
+     */
+    public const SALES_NAME = 'trans_email/ident_sales/name';
+
+    /**
      * Path to get the payment link template
      */
     public const PAYMENT_LINK_TEMPLATE_PATH = 'vindi_vp/general/payment_link_template';
@@ -184,11 +189,16 @@ class PaymentLinkService
 
             $templateVars = array(
                 'customer_name' => $order->getCustomerFirstname(),
-                'payment_link' => $paymentLink->getLink()
+                'customer_fullname' => $order->getCustomerFirstname() . ' ' . $order->getCustomerLastname(),
+                'payment_link' => $paymentLink->getLink(),
+                'order_id' => $orderId,
+                'order_increment' => $order->getIncrementId(),
+                'customer_email' => $order->getCustomerEmail(),
+                'telephone' => $order->getBillingAddress()->getTelephone()
             );
             $from = array(
                 'email' => $this->scopeConfig->getValue(self::SALES_EMAIL, ScopeInterface::SCOPE_STORE),
-                'name' => $this->scopeConfig->getValue(self::SALES_EMAIL, ScopeInterface::SCOPE_STORE)
+                'name' => $this->scopeConfig->getValue(self::SALES_NAME, ScopeInterface::SCOPE_STORE)
             );
             $emailTemplateId = $this->scopeConfig->getValue(self::PAYMENT_LINK_TEMPLATE_PATH, ScopeInterface::SCOPE_STORE);
             $this->sendEmailService->sendEmailTemplate($emailTemplateId, $order->getCustomerEmail(), $order->getCustomerFirstname(), $from, $templateVars);
@@ -246,7 +256,7 @@ class PaymentLinkService
      * @param $linkCreatedAt
      * @return bool
      */
-    public function isLinkExpired($linkCreatedAt): bool
+    public function isLinkExpired($linkCreatedAt)
     {
         $currentTimestamp = $this->dateTimeFactory->create()->getTimestamp();
         $linkTimestamp = $this->dateTimeFactory->create($linkCreatedAt)->getTimestamp();

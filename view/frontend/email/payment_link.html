@@ -1,4 +1,4 @@
-<!--@subject Email Subject @-->
+<!--@subject {{trans "Payment Link"}} @-->
 <!--@vars
 {"store url=\"\"":"Store Url",
 "skin url=\"images/logo_email.gif\" _area='frontend'":"Email Logo Image"}
@@ -27,7 +27,23 @@ body,td { color:#2f2f2f; font:11px/1.35em Verdana, Arial, Helvetica, sans-serif;
                             </tr>
                             <tr>
                                 <td colspan="2" valign="top" style="font-size:12px;padding:7px 9px 9px 9px;border:1px solid #EAEAEA;">
-                                    {{var payment_link}}
+                                    <a href="{{var payment_link}}" target="_blank">{{var payment_link}}</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" valign="top" style="font-size:12px;padding:7px 9px 9px 9px;border:1px solid #EAEAEA;">
+                                    <h3><strong>{{trans "Customer Details:"}}</strong></h3>
+                                    <p><strong>{{trans "Name"}}: </strong>{{var customer_fullname}}</p>
+                                    <p><strong>{{trans "Email"}}: </strong>{{var customer_email}}</p>
+                                    <p><strong>{{trans "Telephone"}}: </strong>{{var telephone}}</p>
+
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" valign="top" style="font-size:12px;padding:7px 9px 9px 9px;border:1px solid #EAEAEA;">
+                                    <h3><strong>{{trans "Order Details:"}}</strong></h3>
+                                    <p><strong>{{trans "Order Number"}}: </strong>#{{var order_increment}}</p>
+                                    {{layout handle="sales_email_order_items" order_id=$order_id}}
                                 </td>
                             </tr>
                             </tbody>
