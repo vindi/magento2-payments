@@ -1,4 +1,4 @@
-define([], function () {
+define(['uiComponent'], function (Component) {
     'use strict';
     return function (sandbox) {
         if (typeof window.yapayFingerprintLoaded == 'undefined') {
