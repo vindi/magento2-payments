@@ -17,6 +17,7 @@ declare(strict_types=1);
 namespace Vindi\VP\Plugin\Model\Service;
 
 use Vindi\VP\Model\PaymentLinkService;
+use Vindi\VP\Helper\Data as VindiHelper;
 
 class OrderService
 {
@@ -26,12 +27,20 @@ class OrderService
     private PaymentLinkService $paymentLinkService;
 
     /**
+     * @var VindiHelper
+     */
+    private VindiHelper $vindiHelper;
+
+    /**
      * @param PaymentLinkService $paymentLinkService
+     * @param VindiHelper $vindiHelper
      */
     public function __construct(
-        PaymentLinkService  $paymentLinkService
+        PaymentLinkService  $paymentLinkService,
+        VindiHelper $vindiHelper
     ) {
         $this->paymentLinkService = $paymentLinkService;
+        $this->vindiHelper = $vindiHelper;
     }
 
     /**
@@ -41,8 +50,11 @@ class OrderService
      */
     public function afterPlace(\Magento\Sales\Model\Service\OrderService $subject, $result)
     {
-        if (str_contains($result->getPayment()->getMethod(), 'vindi')) {
-            $this->paymentLinkService->createPaymentLink($result->getId(), str_replace('vindi_payment_link_', '', $result->getPayment()->getMethod()));
+        $paymentMethod = $result->getPayment()->getMethod();
+        $allowedMethods = $this->vindiHelper->getAllowedMethods();
+
+        if (in_array($paymentMethod, $allowedMethods)) {
+            $this->paymentLinkService->createPaymentLink($result->getId(), str_replace('vindi_payment_link_', '', $paymentMethod));
             $this->paymentLinkService->sendPaymentLinkEmail($result->getId());
         }
 
