@@ -93,8 +93,14 @@ class SendTransaction implements HttpPostActionInterface
     {
         $resultJson = $this->resultJsonFactory->create();
         $result = ['success' => false];
-        $orderId = $this->httpRequest->getParam('order_id');
+
+        $orderId     = $this->httpRequest->getParam('order_id');
         $paymentData = $this->httpRequest->getParam('payment_data');
+
+        if (!$orderId || !$paymentData) {
+            return $resultJson->setData(['success' => false, 'error' => 'Invalid request parameters.']);
+        }
+
         $order = $this->paymentLinkService->getOrderByOrderId($orderId);
 
         if (isset($paymentData['additional_data']['taxvat'])) {
@@ -117,6 +123,13 @@ class SendTransaction implements HttpPostActionInterface
                     $this->helperOrder->captureOrder($order, Invoice::CAPTURE_ONLINE);
                 }
             }
+
+            $paymentLink = $this->paymentLinkService->getPaymentLinkByOrderId($orderId);
+            if ($paymentLink) {
+                $paymentLink->setStatus('processed');
+                $this->paymentLinkService->savePaymentLink($paymentLink);
+            }
+
             $result['success'] = true;
         } catch (\Exception $e) {
             $this->messageManager->addErrorMessage(__($e->getMessage()));

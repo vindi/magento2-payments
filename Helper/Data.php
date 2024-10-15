@@ -40,6 +40,7 @@ use Vindi\VP\Logger\Logger;
 use Vindi\VP\Api\RequestRepositoryInterface;
 use Vindi\VP\Model\Customer\Company;
 use Vindi\VP\Model\RequestFactory;
+use Magento\Framework\Module\Manager as ModuleManager;
 
 /**
  * Class Data
@@ -136,6 +137,11 @@ class Data extends \Magento\Payment\Helper\Data
      */
     protected $file;
 
+    /**
+     * @var ModuleManager
+     */
+    protected $moduleManager;
+
     public function __construct(
         Context $context,
         LayoutFactory $layoutFactory,
@@ -157,7 +163,8 @@ class Data extends \Magento\Payment\Helper\Data
         DateTime $dateTime,
         DirectoryData $helperDirectory,
         EncryptorInterface $encryptor,
-        File $file
+        File $file,
+        ModuleManager $moduleManager
     ) {
         parent::__construct($context, $layoutFactory, $paymentMethodFactory, $appEmulation, $paymentConfig, $initialConfig);
 
@@ -176,6 +183,7 @@ class Data extends \Magento\Payment\Helper\Data
         $this->helperDirectory = $helperDirectory;
         $this->encryptor = $encryptor;
         $this->file = $file;
+        $this->moduleManager = $moduleManager;
     }
 
     public function getAllowedMethods(): array
@@ -291,11 +299,11 @@ class Data extends \Magento\Payment\Helper\Data
     }
 
     /**
-    * @param $request
-    * @param $response
-    * @param $statusCode
-    * @param $method
-    * @return void
+     * @param $request
+     * @param $response
+     * @param $statusCode
+     * @param $method
+     * @return void
      */
     public function saveRequest($request, $response, $statusCode, string $method = 'vindi_vp'): void
     {
@@ -327,7 +335,7 @@ class Data extends \Magento\Payment\Helper\Data
         string $config,
         string $group = 'vindi_vp_bankslip',
         string $section = 'payment',
-        $scopeCode = null
+               $scopeCode = null
     ): string {
         return (string) $this->scopeConfig->getValue(
             $section . '/' . $group . '/' . $config,
@@ -473,5 +481,20 @@ class Data extends \Magento\Payment\Helper\Data
         }
 
         return $customerData;
+    }
+
+    /**
+     * @param string $moduleName
+     * @return bool
+     */
+    public function checkModuleStatus(string $moduleName): bool
+    {
+        if ($this->moduleManager->isInstalled($moduleName)) {
+            if ($this->moduleManager->isEnabled($moduleName)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

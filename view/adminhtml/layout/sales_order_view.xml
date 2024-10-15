@@ -37,7 +37,7 @@
             </block>
         </referenceContainer>
         <referenceBlock name="order_additional_info">
-            <block class="Vindi\VP\Block\Adminhtml\Order\LinkField" name="admin.link.field" template="Vindi_VP::link-field.phtml" />
+            <block class="Vindi\VP\Block\Adminhtml\Order\LinkField" name="vindi.vp.admin.link.field" template="Vindi_VP::link-field.phtml" />
         </referenceBlock>
     </body>
 </page>

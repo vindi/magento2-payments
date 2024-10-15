@@ -36,6 +36,14 @@
         <plugin name="vindi_order_payment_can_void" type="Vindi\VP\Plugin\Order\Payment" />
     </type>
 
+    <type name="Magento\Framework\Console\CommandList">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="vindi:vp:update-expired-links" xsi:type="object">Vindi\VP\Console\Command\RunUpdateExpiredLinks</item>
+            </argument>
+        </arguments>
+    </type>
+
     <!-- LOG -->
     <type name="Vindi\VP\Logger\Handler\System">
         <arguments>

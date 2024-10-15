@@ -50,11 +50,11 @@ class OrderService
      */
     public function afterPlace(\Magento\Sales\Model\Service\OrderService $subject, $result)
     {
-        $paymentMethod = $result->getPayment()->getMethod();
+        $paymentMethod = str_replace('vindi_payment_link_', '', $result->getPayment()->getMethod());
         $allowedMethods = $this->vindiHelper->getAllowedMethods();
 
         if (in_array($paymentMethod, $allowedMethods)) {
-            $this->paymentLinkService->createPaymentLink($result->getId(), str_replace('vindi_payment_link_', '', $paymentMethod));
+            $this->paymentLinkService->createPaymentLink($result->getId(), $paymentMethod);
             $this->paymentLinkService->sendPaymentLinkEmail($result->getId());
         }
 

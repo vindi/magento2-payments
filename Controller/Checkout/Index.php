@@ -27,6 +27,8 @@ use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\View\Result\Page;
 use Vindi\VP\Model\PaymentLinkService;
+use Magento\Customer\Model\Session as CustomerSession;
+use Magento\Sales\Api\OrderRepositoryInterface;
 
 class Index implements HttpGetActionInterface
 {
@@ -56,24 +58,40 @@ class Index implements HttpGetActionInterface
     private ManagerInterface $messageManager;
 
     /**
+     * @var CustomerSession
+     */
+    private CustomerSession $customerSession;
+
+    /**
+     * @var OrderRepositoryInterface
+     */
+    private OrderRepositoryInterface $orderRepository;
+
+    /**
      * @param PageFactory $resultPageFactory
      * @param PaymentLinkService $paymentLinkService
      * @param RequestInterface $request
      * @param RedirectFactory $redirectFactory
      * @param ManagerInterface $messageManager
+     * @param CustomerSession $customerSession
+     * @param OrderRepositoryInterface $orderRepository
      */
     public function __construct(
         PageFactory        $resultPageFactory,
         PaymentLinkService $paymentLinkService,
         RequestInterface   $request,
         RedirectFactory    $redirectFactory,
-        ManagerInterface   $messageManager
+        ManagerInterface   $messageManager,
+        CustomerSession    $customerSession,
+        OrderRepositoryInterface $orderRepository
     ) {
         $this->resultPageFactory = $resultPageFactory;
         $this->paymentLinkService = $paymentLinkService;
         $this->request = $request;
         $this->redirectFactory = $redirectFactory;
         $this->messageManager = $messageManager;
+        $this->customerSession = $customerSession;
+        $this->orderRepository = $orderRepository;
     }
 
     /**
@@ -87,14 +105,47 @@ class Index implements HttpGetActionInterface
         $paymentLink = $this->paymentLinkService->getPaymentLinkByHash($hash);
         $isLinkExpired = false;
 
-        if ($paymentLink->getData() && $this->paymentLinkService->isLinkExpired($paymentLink->getCreatedAt())) {
-            $this->paymentLinkService->deletePaymentLink($paymentLink);
+        if (!$paymentLink->getData()) {
+            $this->messageManager->addWarningMessage(
+                __('The link you used has expired or does not exist anymore. Please contact support or try again.')
+            );
+            return $this->redirectFactory->create()->setPath('/');
+        }
+
+        if ($this->paymentLinkService->isLinkExpired($paymentLink->getCreatedAt())) {
+            $this->paymentLinkService->updatePaymentLinkStatusToExpired($paymentLink);
             $isLinkExpired = true;
         }
 
-        if (!$paymentLink->getData() || $isLinkExpired) {
-            $this->messageManager->addErrorMessage(__('This link has expired or is no longer available,
-            please try another link or contact the shopkeeper to get a new payment link.'));
+        if ($paymentLink->getData('status') !== 'pending') {
+            $this->messageManager->addWarningMessage(
+                __('Only pending payment links can be accessed.')
+            );
+            return $this->redirectFactory->create()->setPath('/');
+        }
+
+        if (!$this->customerSession->isLoggedIn()) {
+            $this->customerSession->setBeforeAuthUrl($this->request->getUriString());
+
+            $this->messageManager->addWarningMessage(
+                __('You need to log in to access the payment link.')
+            );
+            return $this->redirectFactory->create()->setPath('customer/account/login');
+        }
+
+        $customerId = $paymentLink->getData('customer_id');
+        if (!$customerId) {
+            $orderId = $paymentLink->getData('order_id');
+            $order = $this->orderRepository->get($orderId);
+            $customerId = $order->getCustomerId();
+        }
+
+        $loggedInCustomerId = $this->customerSession->getCustomerId();
+
+        if ($customerId !== $loggedInCustomerId) {
+            $this->messageManager->addWarningMessage(
+                __('Only the customer associated with this payment link can access it.')
+            );
             return $this->redirectFactory->create()->setPath('/');
         }
 
