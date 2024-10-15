@@ -40,7 +40,7 @@ class PaymentLink extends AbstractModel implements PaymentLinkInterface
     }
 
     /**
-     * @ingeritdoc
+     * @inheritDoc
      */
     public function getEntityId()
     {
@@ -48,15 +48,16 @@ class PaymentLink extends AbstractModel implements PaymentLinkInterface
     }
 
     /**
-     * @ingeritdoc
+     * @inheritDoc
      */
     public function setEntityId($entityId)
     {
         $this->setData(self::ENTITY_ID, $entityId);
+        return $this;
     }
 
     /**
-     * @ingeritdoc
+     * @inheritDoc
      */
     public function getLink()
     {
@@ -64,15 +65,16 @@ class PaymentLink extends AbstractModel implements PaymentLinkInterface
     }
 
     /**
-     * @ingeritdoc
+     * @inheritDoc
      */
     public function setLink(string $link)
     {
         $this->setData(self::LINK, $link);
+        return $this;
     }
 
     /**
-     * @ingeritdoc
+     * @inheritDoc
      */
     public function getOrderId()
     {
@@ -80,15 +82,16 @@ class PaymentLink extends AbstractModel implements PaymentLinkInterface
     }
 
     /**
-     * @ingeritdoc
+     * @inheritDoc
      */
     public function setOrderId(int $orderId)
     {
         $this->setData(self::ORDER_ID, $orderId);
+        return $this;
     }
 
     /**
-     * @ingeritdoc
+     * @inheritDoc
      */
     public function getCreatedAt()
     {
@@ -96,15 +99,16 @@ class PaymentLink extends AbstractModel implements PaymentLinkInterface
     }
 
     /**
-     * @ingeritdoc
+     * @inheritDoc
      */
     public function setCreatedAt($createdAt)
     {
         $this->setData(self::CREATED_AT, $createdAt);
+        return $this;
     }
 
     /**
-     * @ingeritdoc
+     * @inheritDoc
      */
     public function getVindiPaymentMethod()
     {
@@ -112,15 +116,16 @@ class PaymentLink extends AbstractModel implements PaymentLinkInterface
     }
 
     /**
-     * @ingeritdoc
+     * @inheritDoc
      */
     public function setVindiPaymentMethod($vindiPaymentMethod)
     {
         $this->setData(self::VINDI_PAYMENT_METHOD, $vindiPaymentMethod);
+        return $this;
     }
 
     /**
-     * @ingeritdoc
+     * @inheritDoc
      */
     public function getCustomerId()
     {
@@ -128,15 +133,16 @@ class PaymentLink extends AbstractModel implements PaymentLinkInterface
     }
 
     /**
-     * @ingeritdoc
+     * @inheritDoc
      */
     public function setCustomerId($customerId)
     {
         $this->setData(self::CUSTOMER_ID, $customerId);
+        return $this;
     }
 
     /**
-     * @ingeritdoc
+     * @inheritDoc
      */
     public function getStatus()
     {
@@ -144,11 +150,11 @@ class PaymentLink extends AbstractModel implements PaymentLinkInterface
     }
 
     /**
-     * @ingeritdoc
+     * @inheritDoc
      */
     public function setStatus(string $status)
     {
         $this->setData(self::STATUS, $status);
+        return $this;
     }
 }
-
