@@ -2,15 +2,12 @@ define(['uiComponent'], function (Component) {
     'use strict';
     return function (sandbox) {
         if (typeof window.yapayFingerprintLoaded == 'undefined') {
-            async function loadScript() {
-                let fpOptions = {env: 'production'};
-                if (parseInt(sandbox) === 1) {
-                    fpOptions.env = 'sandbox';
-                }
-                await window?.yapay?.FingerPrint(fpOptions);
-                window.yapayFingerprintLoaded = true;
+            let fpOptions = {env: 'production'};
+            if (parseInt(sandbox) === 1) {
+                fpOptions.env = 'sandbox';
             }
-            loadScript();
+            window?.yapay?.FingerPrint(fpOptions);
+            window.yapayFingerprintLoaded = true;
         }
     };
 });
