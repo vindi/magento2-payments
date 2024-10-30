@@ -23,6 +23,7 @@ $title = $block->escapeHtml($block->getMethod()->getTitle());
 $payment = $block->getInfo();
 $emv = $block->getEmv();
 $qrCodeImage = $block->getQRCodeImage();
+$hasInvoice = $payment->getOrder()->hasInvoices();
 ?>
 <dl class="payment-method vindi-content vindi-vp-content">
     <dt class="title">
@@ -31,14 +32,14 @@ $qrCodeImage = $block->getQRCodeImage();
 
     <dd class="content">
         <div class="vindi-pix pix">
-            <div class="pix-barcode-container">
-                <div class="pix-img-code">
-                    <?php if ($qrCodeImage): ?>
+            <?php if (!$hasInvoice && $qrCodeImage): ?>
+                <div class="pix-barcode-container">
+                    <div class="pix-img-code">
                         <img alt="<?= $block->escapeHtml(__('QRCode')) ?>" src="<?= $qrCodeImage ?>" class="vindi-pix-qrcode" />
-                    <?php endif; ?>
+                    </div>
                     <div class="pix-qrcode"><?= $emv ?></div>
                 </div>
-            </div>
+            <?php endif; ?>
         </div>
     </dd>
 
@@ -89,4 +90,3 @@ $qrCodeImage = $block->getQRCodeImage();
         overflow-wrap: break-word;
     }
 </style>
-

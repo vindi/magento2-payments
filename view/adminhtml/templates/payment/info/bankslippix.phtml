@@ -30,6 +30,7 @@ $bankSlipNumber = $block->getBankSlipNumber();
 
 $emv = $block->getEmv();
 $qrCodeImage = $block->getQRCodeImage();
+$hasInvoice = $payment->getOrder()->hasInvoices();
 ?>
 <dl class="payment-method vindi-vp-content">
     <dt class="title">
@@ -38,9 +39,9 @@ $qrCodeImage = $block->getQRCodeImage();
     <dd class="content">
         <div class="vindi-bankslip bankslip">
             <span><?= $block->escapeHtml('BankSlip') ?></span>
-            <div class="bankslip-barcode-container">
-                <div class="bankslip-img-code">
-                    <?php if ($bankSlipUrl): ?>
+            <?php if (!$hasInvoice && $bankSlipUrl): ?>
+                <div class="bankslip-barcode-container">
+                    <div class="bankslip-img-code">
                         <a href="<?= $bankSlipUrl ?>"
                            target="_blank"
                            title="<?= $block->escapeHtml(__('Bank Slip')) ?>"
@@ -119,26 +120,26 @@ $qrCodeImage = $block->getQRCodeImage();
                             <?= $block->escapeHtml(__('Download Bank Slip')) ?>
 
                         </a>
-                    <?php endif; ?>
+                    </div>
                     <div class="bankslip-number-container">
                         <div class="bankslip-number"><?= $bankSlipNumber ?></div>
                     </div>
                 </div>
-            </div>
+            <?php endif; ?>
         </div>
     </dd>
 
     <dd class="content">
         <div class="vindi-pix pix">
             <span><?= $block->escapeHtml('PIX') ?></span>
-            <div class="pix-barcode-container">
-                <div class="pix-img-code">
-                    <?php if ($qrCodeImage): ?>
+            <?php if (!$hasInvoice && $qrCodeImage): ?>
+                <div class="pix-barcode-container">
+                    <div class="pix-img-code">
                         <img alt="<?= $block->escapeHtml(__('QRCode')) ?>" src="<?= $qrCodeImage ?>" class="vindi-pix-qrcode" />
-                    <?php endif; ?>
+                    </div>
                     <div class="pix-qrcode"><?= $emv ?></div>
                 </div>
-            </div>
+            <?php endif; ?>
         </div>
     </dd>
 
