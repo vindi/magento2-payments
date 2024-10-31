@@ -12,7 +12,6 @@ declare(strict_types=1);
  * @category    Vindi
  * @package     Vindi_VP
  *
- *
  */
 
 namespace Vindi\VP\Controller\Checkout;
@@ -72,7 +71,8 @@ class Success implements HttpGetActionInterface
         RedirectFactory $redirectFactory,
         Data $helperData,
         ManagerInterface $messageManager
-    ) {
+    )
+    {
         $this->resultPageFactory = $resultPageFactory;
         $this->paymentLinkService = $paymentLinkService;
         $this->request = $request;
@@ -88,39 +88,40 @@ class Success implements HttpGetActionInterface
     {
         $result = $this->resultPageFactory->create();
         $orderId = $this->request->getParam('order_id');
-        $order = $this->paymentLinkService->getOrderByOrderId($orderId);
-
-        if (!$order) {
-            $this->messageManager->addWarningMessage(__('Order does not exist.'));
-            return $this->redirectFactory->create()->setPath('/');
-        }
-
-        $orderStatus = $order->getStatus();
-        $configStatus = $this->helperData->getConfig('order_status', $order->getPayment()->getMethod());
-        $isCcMethod = str_contains($order->getPayment()->getMethod(), 'cc');
-
-        if ($order->hasInvoices()) {
-            $this->messageManager->addWarningMessage(__('Order already has an invoice.'));
-            return $this->redirectFactory->create()->setPath('/');
-        }
-
-        $paymentLink = $this->paymentLinkService->getPaymentLink($orderId);
-        $paymentLinkStatus = $paymentLink->getStatus();
-
-        if ($paymentLinkStatus === 'expired') {
-            $this->messageManager->addWarningMessage(__('This payment link has expired.'));
-            return $this->redirectFactory->create()->setPath('/');
-        }
 
         try {
-            if (!$orderId || (!$isCcMethod && $orderStatus !== $configStatus)) {
+            if (!$orderId) {
+                $this->messageManager->addWarningMessage(
+                    __('The order ID is missing or invalid. Please contact support or try again.')
+                );
                 return $this->redirectFactory->create()->setPath('/');
             }
+
+            $paymentLink = $this->paymentLinkService->getPaymentLinkByOrderId($orderId);
+
+            if ($paymentLink && $paymentLink->getSuccessPageAccessed()) {
+                $this->messageManager->addWarningMessage(
+                    __('The payment success page has already been accessed.')
+                );
+                return $this->redirectFactory->create()->setPath('/');
+            }
+
+            $order = $this->paymentLinkService->getOrderByOrderId($orderId);
+            $orderStatus = $order->getStatus();
+            $configStatus = $this->helperData->getConfig('order_status', $order->getPayment()->getMethod());
+            $isCcMethod = str_contains($order->getPayment()->getMethod(), 'cc');
+
+            if (!$isCcMethod && $orderStatus !== $configStatus) {
+                return $this->redirectFactory->create()->setPath('/');
+            }
+
+            $paymentLink->setSuccessPageAccessed(true);
+            $this->paymentLinkService->savePaymentLink($paymentLink);
+
         } catch (\Exception $e) {
             $this->messageManager->addErrorMessage(
                 __('An error occurred while processing your request. Please try again later.')
             );
-
             return $this->redirectFactory->create()->setPath('/');
         }
 

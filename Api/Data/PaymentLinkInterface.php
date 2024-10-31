@@ -26,6 +26,7 @@ interface PaymentLinkInterface extends ExtensibleDataInterface
     const CREATED_AT = 'created_at';
 
     const STATUS = 'status';
+    const SUCCESS_PAGE_ACCESSED = 'success_page_accessed';
 
     /**
      * @return int
@@ -97,5 +98,19 @@ interface PaymentLinkInterface extends ExtensibleDataInterface
      * @param string $status
      */
     public function setStatus(string $status);
+
+    /**
+     * Check if the success page has been accessed
+     *
+     * @return bool
+     */
+    public function getSuccessPageAccessed();
+
+    /**
+     * Set the success page accessed flag
+     *
+     * @param bool $successPageAccessed
+     */
+    public function setSuccessPageAccessed(bool $successPageAccessed);
 }
 

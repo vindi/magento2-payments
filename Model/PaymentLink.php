@@ -157,4 +157,21 @@ class PaymentLink extends AbstractModel implements PaymentLinkInterface
         $this->setData(self::STATUS, $status);
         return $this;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function getSuccessPageAccessed()
+    {
+        return $this->getData(self::SUCCESS_PAGE_ACCESSED);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setSuccessPageAccessed(bool $successPageAccessed)
+    {
+        $this->setData(self::SUCCESS_PAGE_ACCESSED, $successPageAccessed);
+        return $this;
+    }
 }
