@@ -40,7 +40,7 @@ class RunCancelOrdersWithExpiredLinks extends Command
      */
     protected function configure()
     {
-        $this->setName('vindi:payment:cancel-orders-with-expired-links');
+        $this->setName('vindi:vp:cancel-orders-with-expired-links');
         $this->setDescription('Manually run the cron to cancel orders with expired payment links');
         parent::configure();
     }
