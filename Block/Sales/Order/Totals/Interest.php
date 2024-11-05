@@ -57,7 +57,6 @@ class Interest extends \Magento\Framework\View\Element\Template
                 'value' => $this->getSource()->getVindiInterestAmount(),
                 'label' => __('Interest Rate'),
             ]);
-            //@phpstan-ignore-next-line
             $this->getParentBlock()->addTotalBefore($total, $this->getBeforeCondition());
         }
 

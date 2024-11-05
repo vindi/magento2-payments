@@ -14,15 +14,12 @@
 
 namespace Vindi\VP\Helper;
 
-use Magento\Framework\Encryption\EncryptorInterface;
-use Vindi\VP\Logger\Logger;
-use Vindi\VP\Api\RequestRepositoryInterface;
-use Vindi\VP\Model\RequestFactory;
 use Magento\Catalog\Api\CategoryRepositoryInterface;
 use Magento\Directory\Helper\Data as DirectoryData;
 use Magento\Framework\App\Config\Initial;
 use Magento\Framework\App\Helper\Context;
 use Magento\Framework\Component\ComponentRegistrar;
+use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Filesystem\Io\File;
 use Magento\Framework\Stdlib\DateTime\DateTime;
 use Magento\Framework\UrlInterface;
@@ -39,6 +36,11 @@ use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\HTTP\PhpEnvironment\RemoteAddress;
 use Magento\Customer\Model\Session as CustomerSession;
 use Psr\Log\LoggerInterface;
+use Vindi\VP\Logger\Logger;
+use Vindi\VP\Api\RequestRepositoryInterface;
+use Vindi\VP\Model\Customer\Company;
+use Vindi\VP\Model\RequestFactory;
+use Magento\Framework\Module\Manager as ModuleManager;
 
 /**
  * Class Data
@@ -135,6 +137,11 @@ class Data extends \Magento\Payment\Helper\Data
      */
     protected $file;
 
+    /**
+     * @var ModuleManager
+     */
+    protected $moduleManager;
+
     public function __construct(
         Context $context,
         LayoutFactory $layoutFactory,
@@ -156,7 +163,8 @@ class Data extends \Magento\Payment\Helper\Data
         DateTime $dateTime,
         DirectoryData $helperDirectory,
         EncryptorInterface $encryptor,
-        File $file
+        File $file,
+        ModuleManager $moduleManager
     ) {
         parent::__construct($context, $layoutFactory, $paymentMethodFactory, $appEmulation, $paymentConfig, $initialConfig);
 
@@ -175,6 +183,7 @@ class Data extends \Magento\Payment\Helper\Data
         $this->helperDirectory = $helperDirectory;
         $this->encryptor = $encryptor;
         $this->file = $file;
+        $this->moduleManager = $moduleManager;
     }
 
     public function getAllowedMethods(): array
@@ -290,11 +299,11 @@ class Data extends \Magento\Payment\Helper\Data
     }
 
     /**
-    * @param $request
-    * @param $response
-    * @param $statusCode
-    * @param $method
-    * @return void
+     * @param $request
+     * @param $response
+     * @param $statusCode
+     * @param $method
+     * @return void
      */
     public function saveRequest($request, $response, $statusCode, string $method = 'vindi_vp'): void
     {
@@ -326,7 +335,7 @@ class Data extends \Magento\Payment\Helper\Data
         string $config,
         string $group = 'vindi_vp_bankslip',
         string $section = 'payment',
-        $scopeCode = null
+               $scopeCode = null
     ): string {
         return (string) $this->scopeConfig->getValue(
             $section . '/' . $group . '/' . $config,
@@ -454,5 +463,38 @@ class Data extends \Magento\Payment\Helper\Data
     public function formatDate(string $date): string
     {
         return date('d/m/Y', strtotime($date));
+    }
+
+    public function getCompanyData(OrderInterface $order, array $customerData): array
+    {
+        $company = new Company();
+
+        $this->_eventManager->dispatch(
+            'vindi_payments_get_company_data',
+            ['order' => $order, 'customer_data' => $customerData, 'company' => $company]
+        );
+
+        if ($company->getCnpj()) {
+            $customerData['cnpj'] = $company->getCnpj();
+            $customerData['trade_name'] = $company->getTradeName();
+            $customerData['company_name'] = $company->getCompanyName();
+        }
+
+        return $customerData;
+    }
+
+    /**
+     * @param string $moduleName
+     * @return bool
+     */
+    public function checkModuleStatus(string $moduleName): bool
+    {
+        if ($this->moduleManager->isInstalled($moduleName)) {
+            if ($this->moduleManager->isEnabled($moduleName)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

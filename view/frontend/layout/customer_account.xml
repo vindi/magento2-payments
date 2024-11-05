@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="content">
+            <block class="Vindi\VP\Block\Customer\PaymentLinkNotification" name="payment_link_notification" template="Vindi_VP::customer/payment_link_notification.phtml" before="customer.account.dashboard.info"/>
+        </referenceContainer>
+    </body>
+</page>

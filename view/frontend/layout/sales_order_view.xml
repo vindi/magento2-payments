@@ -5,6 +5,9 @@
         <script src="Vindi_VP::js/payments.js" />
     </head>
     <body>
+        <referenceContainer name="content">
+            <block class="Vindi\VP\Block\Order\View\PaymentLink" name="vp_order_payment_link" template="Vindi_VP::order/view/payment_link.phtml" before="-"/>
+        </referenceContainer>
         <referenceContainer name="order_totals">
             <block class="Vindi\VP\Block\Sales\Order\Totals\Interest" name="vindipayment_interest">
                 <action method="setBeforeCondition">

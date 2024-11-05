@@ -15,11 +15,22 @@
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
     <default>
+        <csp>
+            <policies>
+                <storefront_checkout_index_index>
+                    <scripts>
+                        <inline>1</inline>
+                        <event_handlers>1</event_handlers>
+                    </scripts>
+                </storefront_checkout_index_index>
+            </policies>
+        </csp>
         <vindi_vp>
             <general>
                 <refund_on_cancel>0</refund_on_cancel>
                 <show_payment_info>0</show_payment_info>
                 <reseller_token>4957fbd8f9b9962</reseller_token>
+                <payment_link_template>payment_link_template</payment_link_template>
             </general>
             <address>
                 <street>0</street>
@@ -58,7 +69,7 @@
                 <!-- Method config -->
                 <is_gateway>1</is_gateway>
                 <can_use_checkout>1</can_use_checkout>
-                <can_use_internal>0</can_use_internal>
+                <can_use_internal>1</can_use_internal>
                 <can_order>1</can_order>
                 <can_capture_partial>0</can_capture_partial>
                 <can_refund_partial_per_invoice>0</can_refund_partial_per_invoice>
@@ -67,6 +78,7 @@
                 <paymentInfoKeys>transaction_id,token_transaction,track_transaction_id,status_name,tid,payment_method_id,payment_method_name,split,bank_slip_number</paymentInfoKeys>
                 <privateInfoKeys>transaction_id,token_transaction,track_transaction_id,tid,payment_method_id,payment_method_name,split,bank_slip_number</privateInfoKeys>
                 <debug>1</debug>
+                <payment_link_instructions>PARA PAGAR, COPIE O CÓDIGO DO DOCUMENTO E PAGUE NA SUA INSTITUIÇÃO FINANCEIRA. AO CLICAR EM "VISUALIZAR BOLETO" VOCÊ TAMBÉM PODE VISUALIZAR DETALHES DO BOLETO.</payment_link_instructions>
             </vindi_vp_bankslip>
             <vindi_vp_bankslippix>
                 <active>0</active>
@@ -82,7 +94,7 @@
                 <!-- Method config -->
                 <is_gateway>1</is_gateway>
                 <can_use_checkout>1</can_use_checkout>
-                <can_use_internal>0</can_use_internal>
+                <can_use_internal>1</can_use_internal>
                 <can_order>1</can_order>
                 <can_capture_partial>0</can_capture_partial>
                 <can_refund_partial_per_invoice>0</can_refund_partial_per_invoice>
@@ -91,6 +103,7 @@
                 <paymentInfoKeys>transaction_id,token_transaction,track_transaction_id,status_name,tid,payment_method_id,payment_method_name,split,bank_slip_number</paymentInfoKeys>
                 <privateInfoKeys>transaction_id,token_transaction,track_transaction_id,tid,payment_method_id,payment_method_name,split,bank_slip_number</privateInfoKeys>
                 <debug>1</debug>
+                <payment_link_instructions>PARA PAGAR, IMPRIMA OU ESCANEIE O CÓDIGO OU QR CODE DO DOCUMENTO AO CLICAR EM "VISUALIZAR BOLEPIX". VOCÊ TAMBÉM PODE COPIAR O CÓDIGO DE BARRAS DO BOLEPIX E COLAR NO APLICATIVO DA SUA INSTITUIÇÃO FINANCEIRA.</payment_link_instructions>
             </vindi_vp_bankslippix>
             <vindi_vp_pix>
                 <active>0</active>
@@ -108,7 +121,7 @@
                 <!-- Method config -->
                 <is_gateway>1</is_gateway>
                 <can_use_checkout>1</can_use_checkout>
-                <can_use_internal>0</can_use_internal>
+                <can_use_internal>1</can_use_internal>
                 <can_order>1</can_order>
                 <can_capture>0</can_capture>
                 <can_capture_partial>0</can_capture_partial>
@@ -120,6 +133,7 @@
                 <paymentInfoKeys>transaction_id,token_transaction,track_transaction_id,status_name,tid,payment_method_id,payment_method_name,split</paymentInfoKeys>
                 <privateInfoKeys>transaction_id,token_transaction,track_transaction_id,tid,payment_method_id,payment_method_name,split</privateInfoKeys>
                 <debug>1</debug>
+                <payment_link_instructions>PARA PAGAR, COPIE O CÓDIGO E PAGUE NA SUA INSTITUIÇÃO DE PAGAMENTO OU ESCANEIE O QR CODE DO DOCUMENTO.</payment_link_instructions>
             </vindi_vp_pix>
             <vindi_vp_cc>
                 <active>0</active>
@@ -152,6 +166,7 @@
                 <privateInfoKeys>transaction_id,token_transaction,track_transaction_id,tid,payment_method_id,payment_method_name,split</privateInfoKeys>
                 <debug>1</debug>
                 <debugReplaceKeys>cvv,cc_number</debugReplaceKeys>
+                <payment_link_instructions>Enviamos um email com os detalhes do pedido.</payment_link_instructions>
             </vindi_vp_cc>
         </payment>
     </default>

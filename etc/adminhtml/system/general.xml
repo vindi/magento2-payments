@@ -53,6 +53,13 @@
                 <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 <config_path>vindi_vp/general/debug</config_path>
             </field>
+            <field id="payment_link_template" type="select" translate="label comment" sortOrder="60" showInDefault="1"
+                   showInWebsite="1" showInStore="1">
+                <label>Payment Link Email Template</label>
+                <comment><![CDATA[Select the email template, if the &quot;Default&quot; option is selected, the module's default template will be considered.]]></comment>
+                <source_model>Vindi\VP\Model\Config\Source\EmailTemplate</source_model>
+                <config_path>vindi_vp/general/payment_link_template</config_path>
+            </field>
         </group>
 
         <group id="additional_credentials" translate="label comment" sortOrder="200" showInDefault="1" showInWebsite="1" showInStore="1">

@@ -46,6 +46,15 @@ class Retrieve extends Action implements HttpPostActionInterface, CsrfAwareActio
     /** @var SessionManagerInterface */
     protected $session;
 
+    /**
+     * @param Context $context
+     * @param Json $json
+     * @param Session $checkoutSession
+     * @param SessionManagerInterface $session
+     * @param JsonFactory $resultJsonFactory
+     * @param Installments $helperInstallments
+     * @param HelperData $helperData
+     */
     public function __construct(
         Context $context,
         Json $json,
@@ -61,7 +70,6 @@ class Retrieve extends Action implements HttpPostActionInterface, CsrfAwareActio
         $this->resultJsonFactory = $resultJsonFactory;
         $this->helperData = $helperData;
         $this->helperInstallments = $helperInstallments;
-
         parent::__construct($context);
     }
 
@@ -92,7 +100,7 @@ class Retrieve extends Action implements HttpPostActionInterface, CsrfAwareActio
     public function getInstallments(string $ccType): array
     {
         $this->session->setVindiCcType($ccType);
-        $grandTotal = $this->checkoutSession->getQuote()->getGrandTotal();
+        $grandTotal = $this->getPaymentLinkGrandTotal() ?? $this->checkoutSession->getQuote()->getGrandTotal();
         $storeId = $this->checkoutSession->getQuote()->getStoreId();
         return $this->helperInstallments->getAllInstallments($grandTotal, $ccType, $storeId);
     }
@@ -109,5 +117,15 @@ class Retrieve extends Action implements HttpPostActionInterface, CsrfAwareActio
     public function validateForCsrf(RequestInterface $request): ?bool
     {
         return true;
+    }
+
+    /**
+     * @return mixed|null
+     */
+    public function getPaymentLinkGrandTotal()
+    {
+        $content = $this->getRequest()->getContent();
+        $bodyParams = ($content) ? $this->json->unserialize($content) : [];
+        return $bodyParams['payment_link']['grand_total'] ?? null;
     }
 }

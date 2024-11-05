@@ -56,7 +56,8 @@ class CreditCard extends AbstractInfo
      */
     protected function _prepareSpecificInformation($transport = null)
     {
-        $installments = $this->getInfo()->getAdditionalInformation('installments');
+        $installments = $this->getInfo()->getAdditionalInformation('installments') ??
+            (int) $this->getInfo()->getAdditionalInformation('additional_data')['installments'] ;
 
         /** @var \Magento\Sales\Model\Order $order */
         $order = $this->getInfo()->getOrder();

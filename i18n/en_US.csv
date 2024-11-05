@@ -41,7 +41,7 @@ Authorize,Authorize
 "What is this?","What is this?"
 "Card Installments","Card Installments"
 "Insert your card number to see installments options","Insert your card number to see installments options"
-"Customer Taxvat","Customer Taxvat"
+"Buyer Taxvat","Buyer Taxvat"
 "Place Order","Place Order"
 "Select Brand","Select Brand"
 Month,Month
@@ -142,3 +142,6 @@ Payload,Payload
 "Insert here the Consumer Key for your transaction, that key can be found in your Vindi Account","Insert here the Consumer Key for your transaction, that key can be found in your Vindi Account"
 "Consumer Secret","Consumer Secret"
 "Insert here the Consumer Secret for your transaction, that key can be found in your Vindi Account","Insert here the Consumer Secret for your transaction, that key can be found in your Vindi Account"
+"Payment method","Payment method"
+"Total amount: ","Total amount:"
+"%1 items","%1 items"

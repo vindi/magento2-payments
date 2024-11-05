@@ -1,0 +1,207 @@
+<?php
+
+/**
+ * @var \Vindi\VP\Block\Custom\PaymentLink $block
+ */
+
+$paymentLink = $block->getPaymentLink();
+
+?>
+<?php if($paymentLink): ?>
+<?php
+    $paymentMethodCode = str_replace('vindi_vp_','', $paymentLink->getVindiPaymentMethod());
+    $order = $block->getOrder();
+    $customer = $block->getCustomerById($order->getCustomerId());
+    $billingAddress = $order->getBillingAddress();
+    $instructions = $block->getInstructions();
+?>
+<div class="vindi-link-container">
+    <div class="customer-data">
+        <div class="customer-information">
+            <h2><?= __('Customer Infomation') ?></h2>
+            <div>
+                <p><strong><?= __('Name: ') ?></strong><span><?= $order->getCustomerFirstname() ?></span></p>
+                <p><strong><?= __('Email: ') ?></strong><span><?= $order->getCustomerEmail() ?></span></p>
+                <p><strong><?= __('Telephone: ') ?></strong><span><?= $billingAddress->getTelephone() ?></span></p>
+            </div>
+        </div>
+        <div class="customer-shipping">
+            <h2><?= __('Shipping Details') ?></h2>
+            <div>
+                <?php $streets = [
+                    'Street: ',
+                    'Number: ',
+                    'Complement: ',
+                    'District: '
+                ]
+                ?>
+                <?php foreach ($streets as $key => $street): ?>
+                    <?php if (!empty($billingAddress->getStreet()[$key])): ?>
+                        <p><strong><?= __($street) ?></strong><span><?= $billingAddress->getStreet()[$key] ?></span></p>
+                    <?php endif; ?>
+                <?php endforeach ?>
+                <p><strong><?= __('City: ') ?></strong><span><?= $billingAddress->getCity() ?></span></p>
+                <p><strong><?= __('State: ') ?></strong><span><?= $billingAddress->getRegionCode() ?></span></p>
+                <p><strong><?= __('Telephone: ') ?></strong><span><?= $billingAddress->getTelephone() ?></span></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="payment-container" data-bind="scope: 'payment-method'">
+        <h2><?= __('Payment method') ?></h2>
+        <!-- ko template: getTemplate() --><!-- /ko -->
+    </div>
+
+    <div class="summary">
+        <h2><?= __('Order Summary') ?></h2>
+        <div class="summary__content">
+            <details open>
+                <summary>
+                    <?= count($order->getItems()) == 1 ? __('1 item') : __('%1 items', count($order->getItems())); ?>
+                </summary>
+                <div>
+                    <?php foreach ($order->getItems() as $id => $item): ?>
+                        <div class="summary-item flex-content">
+                            <span class="summary-item__name"><?= $item->getName() ?></span>
+                            <span class="summary-item__value"><?= $block->getFormattedPrice((float) $item->getPrice()) ?></span>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </details>
+
+            <?php
+                $shippingMode = $block->getDisplayShippingMode();
+                $discountDescription = $order->getDiscountDescription();
+                $formattedDiscount = (float) $order->getDiscountAmount() != 0 ?
+                $block->getFormattedPrice((float) $order->getDiscountAmount()) : '';
+                $shippingDescription = $order->getShippingDescription();
+                $formattedShippingAmount = $block->getFormattedPrice((float) $order->getShippingAmount());
+                $formattedShippingInclTax = $block->getFormattedPrice((float) $order->getShippingInclTax());
+            ?>
+            <div class="summary-totals">
+                <?php if ($shippingMode === 'both'): ?>
+                    <div class="totals shipping excl">
+                        <?php if ($formattedDiscount): ?>
+                            <div class="summary-discount flex-content">
+                                <span class="summary-discount__name"><?= $discountDescription ?  __('Discount (%1)', $discountDescription) : __('Discount') ?></span>
+                                <span class="summary-discount__amount"><strong><?= $formattedDiscount ?></strong></span>
+                            </div>
+                        <?php endif; ?>
+                        <div class="summary-shipping flex-content">
+                            <span class="summary-shipping__title">
+                                <?= __('Shipping Excl. Tax') ?>:
+                                <span class="summary-shipping__name"><?= $shippingDescription ?></span>
+                            </span>
+                            <span class="summary-shipping__amount">
+                                <strong><?= $formattedShippingAmount ?></strong>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="totals shipping incl">
+                        <?php if ($formattedDiscount): ?>
+                            <div class="summary-discount flex-content">
+                                <span class="summary-discount__name"><?= $discountDescription ?  __('Discount (%1)', $discountDescription) : __('Discount') ?></span>
+                                <span class="summary-discount__amount"><strong><?= $formattedDiscount ?></strong></span>
+                            </div>
+                        <?php endif; ?>
+                        <div class="summary-shipping flex-content">
+                            <span class="summary-shipping__title">
+                                <?= __('Shipping Incl. Tax') ?>:
+                                <span class="summary-shipping__name"><?= $shippingDescription ?></span>
+                            </span>
+                            <span class="summary-shipping__amount">
+                                <strong><?= $formattedShippingInclTax ?></strong>
+                            </span>
+                        </div>
+                    </div>
+                <?php elseif ($shippingMode === 'including'): ?>
+                    <div class="totals shipping incl">
+                        <?php if ($formattedDiscount): ?>
+                            <div class="summary-discount flex-content">
+                                <span class="summary-discount__name"><?= $discountDescription ?  __('Discount (%1)', $discountDescription) : __('Discount') ?></span>
+                                <span class="summary-discount__amount"><strong><?= $formattedDiscount ?></strong></span>
+                            </div>
+                        <?php endif; ?>
+                        <div class="summary-shipping flex-content">
+                            <span class="summary-shipping__title">
+                                <?= __('Shipping') ?>:
+                                <span class="summary-shipping__name"><?= $shippingDescription ?></span>
+                            </span>
+                            <span class="summary-shipping__amount">
+                                <strong><?= $formattedShippingInclTax ?></strong>
+                            </span>
+                        </div>
+                    </div>
+                <?php elseif ($shippingMode === 'excluding'): ?>
+                    <div class="totals shipping excl">
+                        <?php if ($formattedDiscount): ?>
+                            <div class="summary-discount flex-content">
+                                <span class="summary-discount__name"><?= $discountDescription ?  __('Discount (%1)', $discountDescription) : __('Discount') ?></span>
+                                <span class="summary-discount__amount"><strong><?= $formattedDiscount ?></strong></span>
+                            </div>
+                        <?php endif; ?>
+                        <div class="summary-shipping flex-content">
+                            <span class="summary-shipping__title">
+                                <span class="summary-shipping__name"><?= __('Shipping') ?>: <?= $shippingDescription ?></span>
+                            </span>
+                            <span class="summary-shipping__amount">
+                                <strong><?= $formattedShippingAmount ?></strong>
+                            </span>
+                        </div>
+                    </div>
+                <?php endif; ?>
+                <?php if ($block->isTaxDisplayedInGrandTotal()): ?>
+                    <div class="summary-total incl flex-content">
+                        <strong class="summary-total__title"><?= __('Order Total Incl. Tax: ') ?></strong>
+                        <span class="summary-totals-incl__value"><?= $block->getFormattedPrice($order->getGrandTotal()) ?></span>
+                    </div>
+                    <div class="summary-total excl flex-content">
+                        <strong class="summary-total__title"><?= __('Order Total Excl. Tax: ') ?></strong>
+                        <?php $amount = $order->getGrandTotal() - $order->getTaxAmount() ?>
+                        <strong class="summary-totals-excl__value"><?= $amount >= 0 ? $block->getFormattedPrice($amount) : $block->getFormattedPrice(0) ?></strong>
+                    </div>
+                <?php else: ?>
+                    <div class="summary-total flex-content">
+                        <strong class="summary-total__title"><?= __('Total amount: ') ?></strong>
+                        <strong class="summary-total__amount"><?= $block->getFormattedPrice($order->getGrandTotal()) ?></strong>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+        <div class="actions-toolbar" data-bind="scope: 'payment-method'">
+            <button class="action primary checkout"
+                    type="submit"
+                    data-bind="
+                        click: sendPayment,
+                        attr: {title: $t('Place Order')}
+                        ">
+                <span data-bind="i18n: 'Place Order'"></span>
+            </button>
+        </div>
+    </div>
+    <script>
+        window.ccIcons = '<?= $block->getIcons() ?>';
+    </script>
+    <script type="text/x-magento-init">
+        {
+            "*": {
+                "Magento_Ui/js/core/app": {
+                    "components": {
+                        "payment-method": {
+                            "component": "Vindi_VP/js/view/custom/<?=  'payment-link-' . $paymentMethodCode ?>",
+                            "methodCode": "<?= $paymentLink->getVindiPaymentMethod() ?>",
+                            "methodTitle": "<?= $order->getPayment()->getMethodInstance()->getTitle() ?>",
+                            "customerTaxvat": "<?= $customer->getTaxvat() ?>",
+                            "formKey": "<?= $block->getFormKey() ?>",
+                            "isSandbox": "<?= $block->isSandbox() ?>",
+                            "orderId": "<?= $order->getId() ?>",
+                            "grandTotal": "<?= $order->getGrandTotal() ?>",
+                            "instructions": "<?= $instructions ?>"
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</div>
+<?php endif;?>

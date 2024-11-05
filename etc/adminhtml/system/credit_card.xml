@@ -101,5 +101,10 @@
             <config_path>payment/vindi_vp_cc/max_order_total</config_path>
         </field>
 
+        <field id="payment_link_instructions" translate="label comment" type="textarea" sortOrder="20200" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Payment Link Instructions</label>
+            <config_path>payment/vindi_vp_cc/payment_link_instructions</config_path>
+            <comment><![CDATA[Instructions to be shown in payment link success page, it can be HTML]]></comment>
+        </field>
     </group>
 </include>

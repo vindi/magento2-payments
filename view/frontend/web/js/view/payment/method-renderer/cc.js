@@ -67,7 +67,8 @@ define(
                 hasInstallments: ko.observable(false),
                 installmentsUrl: '',
                 showInstallmentsWarning: ko.observable(true),
-                debounceTimer: null
+                debounceTimer: null,
+                isCheckoutPage: ko.observable(true)
             },
 
             /** @inheritdoc */
