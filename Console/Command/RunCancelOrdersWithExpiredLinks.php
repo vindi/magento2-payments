@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Vindi\VP\Console\Command;
 
-use Vindi\Payment\Cron\CancelOrdersWithExpiredLinks;
+use Vindi\VP\Cron\CancelOrdersWithExpiredLinks;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
