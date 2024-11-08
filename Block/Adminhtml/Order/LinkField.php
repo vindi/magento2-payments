@@ -76,4 +76,26 @@ class LinkField extends Template
         }
         return null;
     }
+
+    /**
+     * Check if the payment link status is "processed"
+     *
+     * @return bool
+     */
+    public function isLinkPaid(): bool
+    {
+        $paymentLink = $this->paymentLinkService->getPaymentLink($this->getOrderId());
+        return $paymentLink->getStatus() === 'processed';
+    }
+
+    /**
+     * Check if the payment link is expired
+     *
+     * @return bool
+     */
+    public function isLinkExpired(): bool
+    {
+        $paymentLink = $this->paymentLinkService->getPaymentLink($this->getOrderId());
+        return $paymentLink->getStatus() === 'expired';
+    }
 }

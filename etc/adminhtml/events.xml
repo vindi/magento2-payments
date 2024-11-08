@@ -19,4 +19,7 @@
     <event name="sales_order_invoice_save_after">
         <observer name="vindi_vp_invoice_payment_link_observer" instance="Vindi\VP\Observer\InvoicePaymentLinkObserver" />
     </event>
+    <event name="sales_order_save_after">
+        <observer name="vindi_vp_cancel_order_observer" instance="Vindi\VP\Observer\CancelOrderObserver" />
+    </event>
 </config>
