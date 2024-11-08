@@ -142,23 +142,6 @@ $hasInvoice = $payment->getOrder()->hasInvoices();
             <?php endif; ?>
         </div>
     </dd>
-
-    <?php if ($specificInfo):?>
-        <dd>
-            <table class="data table admin__table-primary vindi-vp-data-table">
-                <?php foreach ($specificInfo as $label => $value):?>
-                    <tr>
-                        <th scope="row"><?= $block->escapeHtml($label) ?></th>
-                        <td>
-                            <?= /* @noEscape */ nl2br($block->escapeHtml(
-                                implode("\n", $block->getValueAsArray($value, false)), ['a'])
-                            ) ?>
-                        </td>
-                    </tr>
-                <?php endforeach; ?>
-            </table>
-        </dd>
-    <?php endif;?>
 </dl>
 
 <?= $block->getChildHtml() ?>
