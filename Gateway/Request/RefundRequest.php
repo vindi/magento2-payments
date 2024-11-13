@@ -65,9 +65,10 @@ class RefundRequest implements BuilderInterface
         /** @var Order $order */
         $order = $payment->getOrder();
         $amountValue = $buildSubject['amount'] ?? $order->getGrandTotal();
+        $accessToken = $this->helper->getAccessToken();
 
         $request = [
-            'access_token' => $this->helper->getToken(),
+            'access_token' => $accessToken,
             'transaction_id' => (string) $payment->getAdditionalInformation('transaction_id'),
             'amount' => (string) $amountValue
         ];

@@ -26,6 +26,9 @@
     <preference for="Vindi\VP\Api\Data\PaymentLinkInterface" type="Vindi\VP\Model\PaymentLink"/>
     <preference for="Vindi\VP\Api\PaymentLinkRepositoryInterface" type="Vindi\VP\Model\ResourceModel\PaymentLinkRepository"/>
 
+    <preference for="Vindi\VP\Api\Data\AccessTokenInterface" type="Vindi\VP\Model\AccessToken"/>
+    <preference for="Vindi\VP\Api\AccessTokenRepositoryInterface" type="Vindi\VP\Model\ResourceModel\AccessTokenRepository"/>
+
     <preference for="Vindi\VP\Api\Data\CompanyInterface" type="Vindi\VP\Model\Customer\Company"/>
 
     <type name="Magento\Sales\Model\Service\OrderService">

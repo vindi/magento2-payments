@@ -52,6 +52,26 @@
         </index>
     </table>
 
+    <table name="vindi_vp_access_tokens" resource="default" engine="innodb" comment="Vindi Requests">
+        <column xsi:type="int" name="entity_id" padding="10" unsigned="true" nullable="false" identity="true" comment="ID"/>
+        <column xsi:type="int" name="store_id" padding="10" unsigned="true" nullable="false" default="0" comment="Store ID"/>
+        <column xsi:type="text" name="access_token" nullable="false" comment="Access Token"/>
+        <column xsi:type="text" name="refresh_token" nullable="false" comment="Refresh Token"/>
+        <column xsi:type="timestamp" name="access_token_expiration" nullable="false" comment="Access Token Expration"/>
+        <column xsi:type="timestamp" name="refresh_token_expiration" nullable="false" comment="Refresh Token Expration"/>
+        <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP" on_update="false" comment="Created Datetime"/>
+        <column xsi:type="timestamp" name="updated_at" nullable="false" default="CURRENT_TIMESTAMP" on_update="true" comment="Updated Datetime"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+        <index referenceId="VINDI_ACCESS_TOKEN_EXPIRATION" indexType="btree">
+            <column name="access_token_expiration"/>
+        </index>
+        <index referenceId="VINDI_REFRESH_TOKEN_EXPIRATION" indexType="btree">
+            <column name="refresh_token_expiration"/>
+        </index>
+    </table>
+
     <table name="sales_order">
         <column xsi:type="decimal"
                 name="vindi_interest_amount"

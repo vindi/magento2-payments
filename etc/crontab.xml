@@ -5,5 +5,8 @@
         <job name="vindi_vp_update_expired_links" instance="Vindi\VP\Cron\UpdateExpiredLinks" method="execute">
             <schedule>30 3 * * *</schedule>
         </job>
+        <job name="vindi_vp_update_expired_access_token" instance="Vindi\VP\Cron\ClearOldAccessTokens" method="execute">
+            <schedule>30 6 * * *</schedule>
+        </job>
     </group>
 </config>

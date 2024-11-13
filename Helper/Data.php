@@ -30,16 +30,15 @@ use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order;
 use Magento\Store\Model\App\Emulation;
 use Magento\Store\Model\ScopeInterface;
-use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Store\Model\StoreManagerInterface;
-use Magento\Framework\HTTP\PhpEnvironment\RemoteAddress;
 use Magento\Customer\Model\Session as CustomerSession;
-use Psr\Log\LoggerInterface;
-use Vindi\VP\Logger\Logger;
-use Vindi\VP\Api\RequestRepositoryInterface;
+use Vindi\VP\Api\AccessTokenRepositoryInterface;
+use Vindi\VP\Gateway\Http\Client\Api;
+use Vindi\VP\Model\AccessTokenFactory;
+use Vindi\VP\Helper\Logger as HelperLogger;
+use Vindi\VP\Helper\Config as HelperConfig;
 use Vindi\VP\Model\Customer\Company;
-use Vindi\VP\Model\RequestFactory;
 use Magento\Framework\Module\Manager as ModuleManager;
 
 /**
@@ -82,29 +81,20 @@ class Data extends \Magento\Payment\Helper\Data
         '89' => 'failed'
     ];
 
-    /** @var \Vindi\VP\Logger\Logger */
-    protected $logger;
+    /** @var HelperLogger */
+    protected $helperLogger;
+
+    /** @var HelperConfig */
+    protected $helperConfig;
 
     /** @var OrderInterface  */
     protected $order;
-
-    /** @var RequestRepositoryInterface  */
-    protected $requestRepository;
-
-    /** @var RequestFactory  */
-    protected $requestFactory;
-
-    /** @var WriterInterface */
-    private $configWriter;
 
     /** @var Json */
     private $json;
 
     /** @var StoreManagerInterface */
     private $storeManager;
-
-    /** @var RemoteAddress */
-    private $remoteAddress;
 
     /** @var CategoryRepositoryInterface  */
     protected $categoryRepository;
@@ -142,6 +132,18 @@ class Data extends \Magento\Payment\Helper\Data
      */
     protected $moduleManager;
 
+    /**
+     * @var AccessTokenRepositoryInterface
+     */
+    protected $accessTokenRepository;
+
+    /**
+     * @var AccessTokenFactory
+     */
+    protected $accessTokenFactory;
+
+    protected $api;
+
     public function __construct(
         Context $context,
         LayoutFactory $layoutFactory,
@@ -149,34 +151,31 @@ class Data extends \Magento\Payment\Helper\Data
         Emulation $appEmulation,
         Config $paymentConfig,
         Initial $initialConfig,
-        Logger $logger,
-        WriterInterface $configWriter,
+        HelperLogger $helperLogger,
+        HelperConfig $helperConfig,
         Json $json,
         StoreManagerInterface $storeManager,
-        RemoteAddress $remoteAddress,
         CustomerSession $customerSession,
         CategoryRepositoryInterface $categoryRepository,
-        RequestRepositoryInterface $requestRepository,
-        RequestFactory $requestFactory,
         OrderInterface $order,
         ComponentRegistrar $componentRegistrar,
         DateTime $dateTime,
         DirectoryData $helperDirectory,
         EncryptorInterface $encryptor,
         File $file,
-        ModuleManager $moduleManager
+        ModuleManager $moduleManager,
+        AccessTokenRepositoryInterface $accessTokenRepository,
+        AccessTokenFactory $accessTokenFactory,
+        Api $api
     ) {
         parent::__construct($context, $layoutFactory, $paymentMethodFactory, $appEmulation, $paymentConfig, $initialConfig);
 
-        $this->logger = $logger;
-        $this->configWriter = $configWriter;
+        $this->helperLogger = $helperLogger;
+        $this->helperConfig = $helperConfig;
         $this->json = $json;
         $this->storeManager = $storeManager;
-        $this->remoteAddress = $remoteAddress;
         $this->customerSession = $customerSession;
         $this->categoryRepository = $categoryRepository;
-        $this->requestRepository = $requestRepository;
-        $this->requestFactory = $requestFactory;
         $this->order = $order;
         $this->componentRegistrar = $componentRegistrar;
         $this->dateTime = $dateTime;
@@ -184,6 +183,9 @@ class Data extends \Magento\Payment\Helper\Data
         $this->encryptor = $encryptor;
         $this->file = $file;
         $this->moduleManager = $moduleManager;
+        $this->accessTokenRepository = $accessTokenRepository;
+        $this->accessTokenFactory = $accessTokenFactory;
+        $this->api = $api;
     }
 
     public function getAllowedMethods(): array
@@ -205,32 +207,79 @@ class Data extends \Magento\Payment\Helper\Data
      */
     public function log($message, string $name = 'vindi_vp'): void
     {
-        if ($this->getGeneralConfig('debug')) {
-            try {
-                if (!is_string($message)) {
-                    $message = $this->json->serialize($message);
-                }
-
-                $this->logger->setName($name);
-                $this->logger->debug($this->mask($message));
-            } catch (\Exception $e) {
-                $this->logger->error($e->getMessage());
-            }
-        }
+        $this->helperLogger->execute($message, $name);
     }
 
     public function getToken($storeId = null): string
     {
-        $token = $this->encryptor->decrypt($this->getGeneralConfig('token', $storeId));
+        $token = $this->encryptor->decrypt(
+            $this->helperConfig->getGeneralConfig('token', $storeId)
+        );
         if (empty($token)) {
             $this->log('Private key is empty');
         }
         return $token;
     }
 
+    /**
+     * @param $storeId
+     * @return string
+     * @throws \Exception
+     */
+    public function getAccessToken($storeId = null): string
+    {
+        try {
+            $accessToken = $this->accessTokenRepository->getValidAccessToken($storeId);
+        } catch (\Exception $e) {
+            $tokens = $this->accessTokenRepository->getLastRefreshToken($storeId);
+            //If not empty, rfresh token, otherwise first access token or refresh token expired
+            if (!empty($tokens)) {
+                $newToken = $this->api->token()->updateAccessToken(
+                    $tokens['access_token'],
+                    $tokens['refresh_token'],
+                    $storeId
+                );
+            } else {
+                //Generate Code
+                $resellerToken = $this->getResellerToken($storeId);
+                $tokenAccount = $this->getToken($storeId);
+                $consumerKey = $this->getConsumerKey($storeId);
+                $consumerSecret = $this->getConsumerSecret($storeId);
+                $code = $this->api->token()->generateCode(
+                    $resellerToken,
+                    $tokenAccount,
+                    $consumerKey,
+                    $consumerSecret,
+                    $storeId
+                );
+
+                $newToken = $this->api->token()->generateAccessToken(
+                    $code,
+                    $consumerKey,
+                    $consumerSecret,
+                    $storeId
+                );
+            }
+
+            $accessToken = $newToken['access_token'];
+            $this->accessTokenRepository->saveNewAccessToken(
+                $accessToken,
+                $newToken['refresh_token'],
+                $newToken['access_token_expiration'],
+                $newToken['refresh_token_expiration'],
+                $storeId
+            );
+        }
+
+        return $accessToken;
+    }
+
     public function getConsumerKey($storeId = null): string
     {
-        $key = $this->encryptor->decrypt($this->getGeneralConfig('consumer_key', $storeId));
+        $key = $this->encryptor->decrypt(
+            $this->helperConfig->getGeneralConfig('consumer_key', $storeId)
+        );
+
         if (empty($key)) {
             $this->log('Consumer key is empty');
         }
@@ -239,7 +288,9 @@ class Data extends \Magento\Payment\Helper\Data
 
     public function getConsumerSecret($storeId = null): string
     {
-        $secret = $this->encryptor->decrypt($this->getGeneralConfig('consumer_secret', $storeId));
+        $secret = $this->encryptor->decrypt(
+            $this->helperConfig->getGeneralConfig('consumer_secret', $storeId)
+        );
         if (empty($secret)) {
             $this->log('Secret key is empty');
         }
@@ -248,31 +299,12 @@ class Data extends \Magento\Payment\Helper\Data
 
     public function getResellerToken($storeId = null): string
     {
-        if ((bool) $this->getGeneralConfig('use_sandbox', $storeId)) {
-            return '';
-        }
-        return $this->getGeneralConfig('reseller_token', $storeId);
-    }
-
-    /**
-     * @param string $message
-     * @return string
-     */
-    public function mask(string $message): string
-    {
-        $message = preg_replace('/"token_account":\s?"([^"]+)"/', '"token_account":"*********"', $message);
-        $message = preg_replace('/"reseller_token":\s?"([^"]+)"/', '"reseller_token":"*********"', $message);
-        $message = preg_replace('/"hash":\s?"([^"]+)"/', '"hash":"*********"', $message);
-        $message = preg_replace('/"card_cvv":\s?"([^"]+)"/', '"card_cvv":"***"', $message);
-        $message = preg_replace('/"card_expdate_month":\s?"([^"]+)"/', '"card_expdate_month":"**"', $message);
-        $message = preg_replace('/"card_expdate_year":\s?"([^"]+)"/', '"card_expdate_year":"****"', $message);
-        $message = preg_replace('/"notification_url":\s?\["([^"]+)"\]/', '"notification_url":["*****************"]', $message);
-        return preg_replace('/"card_number":\s?"(\d{6})\d{3,9}(\d{4})"/', '"card_number":"$1******$2"', $message);
+        return $this->helperConfig->getGeneralConfig('reseller_token', $storeId);
     }
 
     /**
      * @param $message
-     * @return bool|string
+     * @return string
      */
     public function jsonEncode($message): string
     {
@@ -307,41 +339,16 @@ class Data extends \Magento\Payment\Helper\Data
      */
     public function saveRequest($request, $response, $statusCode, string $method = 'vindi_vp'): void
     {
-        if ($this->getGeneralConfig('debug')) {
-            try {
-                if (!is_string($request)) {
-                    $request = $this->json->serialize($request);
-                }
-                if (!is_string($response)) {
-                    $response = $this->json->serialize($response);
-                }
-                $request = $this->mask($request);
-                $response = $this->mask($response);
-
-                $requestModel = $this->requestFactory->create();
-                $requestModel->setRequest($request);
-                $requestModel->setResponse($response);
-                $requestModel->setMethod($method);
-                $requestModel->setStatusCode($statusCode);
-
-                $this->requestRepository->save($requestModel);
-            } catch (\Exception $e) {
-                $this->log($e->getMessage());
-            }
-        }
+        $this->helperLogger->saveRequest($request, $response, $statusCode, $method);
     }
 
     public function getConfig(
         string $config,
         string $group = 'vindi_vp_bankslip',
         string $section = 'payment',
-               $scopeCode = null
+        $scopeCode = null
     ): string {
-        return (string) $this->scopeConfig->getValue(
-            $section . '/' . $group . '/' . $config,
-            ScopeInterface::SCOPE_STORE,
-            $scopeCode
-        );
+        return $this->helperConfig->getConfig($config, $group, $section, $scopeCode);
     }
 
     public function saveConfig(
@@ -350,10 +357,7 @@ class Data extends \Magento\Payment\Helper\Data
         string $group = 'general',
         string $section = 'vindi_vp'
     ): void {
-        $this->configWriter->save(
-            $section . '/' . $group . '/' . $config,
-            $value
-        );
+        $this->helperConfig->saveConfig($value, $config, $group, $section);
     }
 
     public function getGeneralConfig(string $config, $scopeCode = null): string
@@ -394,11 +398,6 @@ class Data extends \Magento\Payment\Helper\Data
     public function getUrl(string $route, array $params = []): string
     {
         return $this->_getUrl($route, $params);
-    }
-
-    public function getLogger(): LoggerInterface
-    {
-        return $this->_logger;
     }
 
     public function digits(string $string): string
@@ -481,20 +480,5 @@ class Data extends \Magento\Payment\Helper\Data
         }
 
         return $customerData;
-    }
-
-    /**
-     * @param string $moduleName
-     * @return bool
-     */
-    public function checkModuleStatus(string $moduleName): bool
-    {
-        if ($this->moduleManager->isInstalled($moduleName)) {
-            if ($this->moduleManager->isEnabled($moduleName)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 }

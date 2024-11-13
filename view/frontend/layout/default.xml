@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!--
+/**
+ *
+ * @category    Vindi
+ * @package     Vindi_VP
+ */
+ -->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <!-- It's calling all pages because loading first time on checkout in slow internet connections was blocking the vindi's checkout -->
+        <referenceContainer name="after.body.start">
+            <block class="Vindi\VP\Block\Checkout\Fingerprint" template="Vindi_VP::checkout/fingerprint.phtml" name="vindi.payment.fingerprint" before="-"/>
+        </referenceContainer>
+    </body>
+</page>
