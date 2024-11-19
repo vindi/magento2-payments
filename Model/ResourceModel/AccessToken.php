@@ -52,7 +52,7 @@ class AccessToken extends AbstractDb
     {
         $this->getConnection()->delete(
             $this->getMainTable(),
-            ['expiration < ?' => time() - 365 * 24 * 60 * 60]
+            ['access_token_expiration < ?' => time() - 365 * 24 * 60 * 60]
         );
     }
 
