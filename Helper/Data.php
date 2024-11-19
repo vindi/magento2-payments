@@ -233,14 +233,8 @@ class Data extends \Magento\Payment\Helper\Data
         } catch (\Exception $e) {
             $tokens = $this->accessTokenRepository->getLastRefreshToken($storeId);
             //If not empty, rfresh token, otherwise first access token or refresh token expired
-            if (!empty($tokens)) {
-                $newToken = $this->api->token()->updateAccessToken(
-                    $tokens['access_token'],
-                    $tokens['refresh_token'],
-                    $storeId
-                );
-            } else {
-                //Generate Code
+            if (empty($tokens)) {
+                //@TODO Generate Code - It'll get from the user login
                 $resellerToken = $this->getResellerToken($storeId);
                 $tokenAccount = $this->getToken($storeId);
                 $consumerKey = $this->getConsumerKey($storeId);
@@ -259,7 +253,15 @@ class Data extends \Magento\Payment\Helper\Data
                     $consumerSecret,
                     $storeId
                 );
+
+                throw new \Exception('Access token not found');
             }
+
+            $newToken = $this->api->token()->updateAccessToken(
+                $tokens['access_token'],
+                $tokens['refresh_token'],
+                $storeId
+            );
 
             $accessToken = $newToken['access_token'];
             $this->accessTokenRepository->saveNewAccessToken(
