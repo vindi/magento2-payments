@@ -188,6 +188,11 @@ class Data extends \Magento\Payment\Helper\Data
         $this->api = $api;
     }
 
+    /**
+     * Retrieve the allowed payment methods
+     *
+     * @return array
+     */
     public function getAllowedMethods(): array
     {
         return [
@@ -210,6 +215,10 @@ class Data extends \Magento\Payment\Helper\Data
         $this->helperLogger->execute($message, $name);
     }
 
+    /**
+     * @param $storeId
+     * @return string
+     */
     public function getToken($storeId = null): string
     {
         $token = $this->encryptor->decrypt(
@@ -224,58 +233,103 @@ class Data extends \Magento\Payment\Helper\Data
     /**
      * @param $storeId
      * @return string
-     * @throws \Exception
      */
     public function getAccessToken($storeId = null): string
     {
         try {
             $accessToken = $this->accessTokenRepository->getValidAccessToken($storeId);
+            return $accessToken;
         } catch (\Exception $e) {
-            $tokens = $this->accessTokenRepository->getLastRefreshToken($storeId);
-            //If not empty, rfresh token, otherwise first access token or refresh token expired
-            if (empty($tokens)) {
-                //@TODO Generate Code - It'll get from the user login
-                $resellerToken = $this->getResellerToken($storeId);
-                $tokenAccount = $this->getToken($storeId);
-                $consumerKey = $this->getConsumerKey($storeId);
-                $consumerSecret = $this->getConsumerSecret($storeId);
-                $code = $this->api->token()->generateCode(
-                    $resellerToken,
-                    $tokenAccount,
-                    $consumerKey,
-                    $consumerSecret,
-                    $storeId
-                );
+            $this->log('Valid access token not found: ' . $e->getMessage());
+        }
 
-                $newToken = $this->api->token()->generateAccessToken(
-                    $code,
-                    $consumerKey,
-                    $consumerSecret,
-                    $storeId
-                );
+        $tokens = $this->accessTokenRepository->getLastRefreshToken($storeId);
 
-                throw new \Exception('Access token not found');
-            }
+        if (empty($tokens)) {
+            return $this->generateNewAccessToken($storeId);
+        }
 
+        try {
             $newToken = $this->api->token()->updateAccessToken(
                 $tokens['access_token'],
                 $tokens['refresh_token'],
                 $storeId
             );
 
-            $accessToken = $newToken['access_token'];
-            $this->accessTokenRepository->saveNewAccessToken(
-                $accessToken,
-                $newToken['refresh_token'],
-                $newToken['access_token_expiration'],
-                $newToken['refresh_token_expiration'],
-                $storeId
-            );
+            $this->saveAccessToken($newToken, $storeId);
+            return $newToken['access_token'];
+        } catch (\Exception $e) {
+            $this->log('Failed to refresh access token: ' . $e->getMessage());
+            return $this->generateNewAccessToken($storeId);
         }
-
-        return $accessToken;
     }
 
+    /**
+     * @param null $storeId
+     * @return string
+     * @throws \Exception
+     */
+    private function generateNewAccessToken($storeId = null): string
+    {
+        try {
+            $resellerToken = $this->getResellerToken($storeId);
+            $tokenAccount = $this->getToken($storeId);
+            $consumerKey = $this->getConsumerKey($storeId);
+            $consumerSecret = $this->getConsumerSecret($storeId);
+
+            $code = $this->getSavedCode($storeId);
+
+            if (empty($code)) {
+                throw new \Exception('Authorization code is not available. Please complete the authentication process.');
+            }
+
+            $newToken = $this->api->token()->generateAccessToken(
+                $code,
+                $consumerKey,
+                $consumerSecret,
+                $storeId
+            );
+
+            $this->saveAccessToken($newToken, $storeId);
+            return $newToken['access_token'];
+        } catch (\Exception $e) {
+            $this->log('Failed to generate new access token: ' . $e->getMessage());
+            throw new \Exception('Unable to generate a new access token');
+        }
+    }
+
+    /**
+     * Retrieve the saved authorization code
+     *
+     * @param int|null $storeId
+     * @return string|null
+     */
+    public function getSavedCode(?int $storeId = null): ?string
+    {
+        return $this->helperConfig->getVindiCode($storeId);
+    }
+
+    /**
+     * @param array $tokenData
+     * @param null $storeId
+     */
+    private function saveAccessToken(array $tokenData, $storeId = null): void
+    {
+        $this->accessTokenRepository->saveNewAccessToken(
+            $tokenData['access_token'],
+            $tokenData['refresh_token'],
+            $tokenData['access_token_expiration'],
+            $tokenData['refresh_token_expiration'],
+            $storeId
+        );
+
+        $this->log('New access token saved successfully');
+    }
+
+    /**
+     * @param $storeId
+     * @return string
+     */
     public function getConsumerKey($storeId = null): string
     {
         $key = $this->encryptor->decrypt(
@@ -288,6 +342,10 @@ class Data extends \Magento\Payment\Helper\Data
         return $key;
     }
 
+    /**
+     * @param $storeId
+     * @return string
+     */
     public function getConsumerSecret($storeId = null): string
     {
         $secret = $this->encryptor->decrypt(
@@ -299,6 +357,10 @@ class Data extends \Magento\Payment\Helper\Data
         return $secret;
     }
 
+    /**
+     * @param $storeId
+     * @return string
+     */
     public function getResellerToken($storeId = null): string
     {
         return $this->helperConfig->getGeneralConfig('reseller_token', $storeId);

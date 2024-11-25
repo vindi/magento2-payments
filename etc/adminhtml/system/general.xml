@@ -60,6 +60,11 @@
                 <source_model>Vindi\VP\Model\Config\Source\EmailTemplate</source_model>
                 <config_path>vindi_vp/general/payment_link_template</config_path>
             </field>
+            <field id="auth_button" translate="label comment" type="button" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Authorize Application</label>
+                <comment><![CDATA[Click the button to authenticate and generate the authorization code for Yapay. Ensure the <b>Consumer Key</b> is configured.]]></comment>
+                <frontend_model>Vindi\VP\Block\System\Config\AuthenticateButton</frontend_model>
+            </field>
         </group>
 
         <group id="additional_credentials" translate="label comment" sortOrder="200" showInDefault="1" showInWebsite="1" showInStore="1">

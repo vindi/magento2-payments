@@ -18,30 +18,37 @@ use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Framework\App\Config\Storage\WriterInterface;
+use Magento\Framework\Encryption\EncryptorInterface;
 
 /**
- * Class Data
+ * Class Config
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class Config extends AbstractHelper
 {
+    private const VINDI_CODE_PATH = 'vindi_vp/authorization/code';
+
     /** @var WriterInterface */
     private $configWriter;
 
+    /** @var EncryptorInterface */
+    private $encryptor;
+
     public function __construct(
         Context $context,
-        WriterInterface $configWriter
+        WriterInterface $configWriter,
+        EncryptorInterface $encryptor
     ) {
         parent::__construct($context);
         $this->configWriter = $configWriter;
+        $this->encryptor = $encryptor;
     }
-
 
     public function getConfig(
         string $config,
         string $group = 'vindi_vp_bankslip',
         string $section = 'payment',
-        $scopeCode = null
+               $scopeCode = null
     ): string {
         return (string) $this->scopeConfig->getValue(
             $section . '/' . $group . '/' . $config,
@@ -70,5 +77,35 @@ class Config extends AbstractHelper
     public function getEndpointConfig(string $config, $scopeCode = null): string
     {
         return $this->getConfig($config, 'endpoints', 'vindi_vp', $scopeCode);
+    }
+
+    /**
+     * Save the Vindi authorization code (encrypted)
+     *
+     * @param string $code
+     * @param int|null $storeId
+     * @return void
+     */
+    public function saveVindiCode(string $code, ?int $storeId = null): void
+    {
+        $encryptedCode = $this->encryptor->encrypt($code);
+        $this->configWriter->save(self::VINDI_CODE_PATH, $encryptedCode, ScopeInterface::SCOPE_STORES, $storeId);
+    }
+
+    /**
+     * Retrieve the Vindi authorization code (decrypted)
+     *
+     * @param int|null $storeId
+     * @return string|null
+     */
+    public function getVindiCode(?int $storeId = null): ?string
+    {
+        $encryptedCode = $this->scopeConfig->getValue(self::VINDI_CODE_PATH, ScopeInterface::SCOPE_STORES, $storeId);
+
+        if ($encryptedCode) {
+            return $this->encryptor->decrypt($encryptedCode);
+        }
+
+        return null;
     }
 }

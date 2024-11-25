@@ -191,3 +191,8 @@ Payload,Payload
 "A payment link has been generated for you.","Um link de pagamento foi gerado para você."
 "to be able to manage them.","para poder gerenciá-los."
 "Payment Link (VP)","Link de Pagamento (VP)"
+"Consumer Key is generated when registering your application in Yapay. To register this application, you need to send an email to <b>integracao@yapay.com.br</b> with the following details: <br/><br/> ➢ Nome completo <br/> ➢ Email cadastrado no Yapay <br/> ➢ CPF / CNPJ <br/> ➢ Telefone de contato <br/> ➢ URL da empresa <br/> ➢ Nome da aplicação <br/> ➢ Descrição da aplicação <br/> ➢ URL de redirecionamento <br/><br/> Note: The redirect URL should follow this structure: <br/> <b>https://your_store_url/vindi_vp/auth/</b>","A consumer key é gerada ao registrar sua aplicação na Yapay. Para registrar esta aplicação, é necessário enviar um e-mail para <b>integracao@yapay.com.br</b> com as seguintes informações: <br/><br/> ➢ Nome completo <br/> ➢ E-mail cadastrado na Yapay <br/> ➢ CPF / CNPJ <br/> ➢ Telefone de contato <br/> ➢ URL da empresa <br/> ➢ Nome da aplicação <br/> ➢ Descrição da aplicação <br/> ➢ URL de redirecionamento <br/><br/> Observação: A URL de redirecionamento deve seguir esta estrutura: <br/> <b>https://your_store_url/vindi_vp/auth/</b>"
+"Authorize Application","Autorizar Aplicação"
+"Please configure the Consumer Key before proceeding.","Por favor, configure a Consumer Key antes de prosseguir."
+"Click the button to authenticate and generate the authorization code for Yapay. Ensure the <b>Consumer Key</b> is configured.","Clique no botão para autenticar e gerar o código de autorização para a Yapay. Certifique-se de que a <b>Consumer Key</b> está configurada."
+"Authenticate Application","Autenticar Aplicação"

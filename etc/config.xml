@@ -60,6 +60,9 @@
                 </payments>
                 <installments>v1/transactions/simulate_splitting</installments>
             </endpoints>
+            <authorization>
+                <code />
+            </authorization>
         </vindi_vp>
         <payment>
             <vindi_vp_bankslip>
