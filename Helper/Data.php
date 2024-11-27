@@ -144,6 +144,11 @@ class Data extends \Magento\Payment\Helper\Data
 
     protected $api;
 
+    /**
+     * @var bool
+     */
+    private $isDebugEnabled;
+
     public function __construct(
         Context $context,
         LayoutFactory $layoutFactory,
@@ -186,6 +191,7 @@ class Data extends \Magento\Payment\Helper\Data
         $this->accessTokenRepository = $accessTokenRepository;
         $this->accessTokenFactory = $accessTokenFactory;
         $this->api = $api;
+        $this->isDebugEnabled = $helperConfig->isDebugEnabled();
     }
 
     /**
@@ -216,31 +222,49 @@ class Data extends \Magento\Payment\Helper\Data
     }
 
     /**
+     * Retrieve the token
+     *
      * @param $storeId
      * @return string
+     * @throws \Exception
      */
     public function getToken($storeId = null): string
     {
-        $token = $this->encryptor->decrypt(
-            $this->helperConfig->getGeneralConfig('token', $storeId)
-        );
-        if (empty($token)) {
-            $this->log('Private key is empty');
+        $this->logDebug('getToken: Attempting to retrieve token.');
+
+        try {
+            $token = $this->encryptor->decrypt(
+                $this->helperConfig->getGeneralConfig('token', $storeId)
+            );
+
+            if (empty($token)) {
+                $this->logDebug('getToken: Private key is empty.', [], 'error');
+            }
+
+            $this->logDebug('getToken: Token retrieved successfully.');
+            return $token;
+        } catch (\Exception $e) {
+            $this->logDebug('getToken: Error retrieving token.', ['exception' => $e->getMessage()], 'error');
+            throw new \Exception('Unable to retrieve token');
         }
-        return $token;
     }
 
     /**
+     * Retrieve the access token
+     *
      * @param $storeId
      * @return string
      */
     public function getAccessToken($storeId = null): string
     {
+        $this->logDebug('getAccessToken: Attempting to retrieve access token.');
+
         try {
             $accessToken = $this->accessTokenRepository->getValidAccessToken($storeId);
+            $this->logDebug('getAccessToken: Access token retrieved successfully.');
             return $accessToken;
         } catch (\Exception $e) {
-            $this->log('Valid access token not found: ' . $e->getMessage());
+            $this->logDebug('getAccessToken: Valid access token not found.', ['exception' => $e->getMessage()], 'error');
         }
 
         $tokens = $this->accessTokenRepository->getLastRefreshToken($storeId);
@@ -250,6 +274,7 @@ class Data extends \Magento\Payment\Helper\Data
         }
 
         try {
+            $this->logDebug('getAccessToken: Attempting to refresh access token.');
             $newToken = $this->api->token()->updateAccessToken(
                 $tokens['access_token'],
                 $tokens['refresh_token'],
@@ -257,29 +282,35 @@ class Data extends \Magento\Payment\Helper\Data
             );
 
             $this->saveAccessToken($newToken, $storeId);
+            $this->logDebug('getAccessToken: Access token refreshed successfully.');
             return $newToken['access_token'];
         } catch (\Exception $e) {
-            $this->log('Failed to refresh access token: ' . $e->getMessage());
+            $this->logDebug('getAccessToken: Failed to refresh access token.', ['exception' => $e->getMessage()], 'error');
             return $this->generateNewAccessToken($storeId);
         }
     }
 
     /**
+     * Generate a new access token
+     *
      * @param null $storeId
      * @return string
      * @throws \Exception
      */
     private function generateNewAccessToken($storeId = null): string
     {
+        $this->logDebug('generateNewAccessToken: Attempting to generate a new access token.');
+
         try {
-            $resellerToken = $this->getResellerToken($storeId);
-            $tokenAccount = $this->getToken($storeId);
-            $consumerKey = $this->getConsumerKey($storeId);
+            $resellerToken  = $this->getResellerToken($storeId);
+            $tokenAccount   = $this->getToken($storeId);
+            $consumerKey    = $this->getConsumerKey($storeId);
             $consumerSecret = $this->getConsumerSecret($storeId);
 
             $code = $this->getSavedCode($storeId);
 
             if (empty($code)) {
+                $this->logDebug('generateNewAccessToken: Authorization code is not available.', [], 'error');
                 throw new \Exception('Authorization code is not available. Please complete the authentication process.');
             }
 
@@ -291,9 +322,10 @@ class Data extends \Magento\Payment\Helper\Data
             );
 
             $this->saveAccessToken($newToken, $storeId);
+            $this->logDebug('generateNewAccessToken: New access token generated successfully.');
             return $newToken['access_token'];
         } catch (\Exception $e) {
-            $this->log('Failed to generate new access token: ' . $e->getMessage());
+            $this->logDebug('generateNewAccessToken: Failed to generate new access token.', ['exception' => $e->getMessage()], 'error');
             throw new \Exception('Unable to generate a new access token');
         }
     }
@@ -544,5 +576,23 @@ class Data extends \Magento\Payment\Helper\Data
         }
 
         return $customerData;
+    }
+
+    /**
+     * Logs debug messages if debug is enabled.
+     *
+     * @param string $message
+     * @param array|string $data
+     * @param string $type
+     */
+    private function logDebug(string $message, $data = [], string $type = 'info'): void
+    {
+        if ($this->isDebugEnabled) {
+            if ($type === 'error') {
+                $this->logger->error($message, is_array($data) ? $data : ['data' => $data]);
+            } else {
+                $this->logger->info($message, is_array($data) ? $data : ['data' => $data]);
+            }
+        }
     }
 }

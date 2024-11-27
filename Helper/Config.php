@@ -108,4 +108,19 @@ class Config extends AbstractHelper
 
         return null;
     }
+
+    /**
+     * Retrieve the debug configuration value
+     *
+     * @param int|null $storeId
+     * @return bool
+     */
+    public function isDebugEnabled(?int $storeId = null): bool
+    {
+        return $this->scopeConfig->isSetFlag(
+            'vindi_vp/general/debug',
+            ScopeInterface::SCOPE_STORES,
+            $storeId
+        );
+    }
 }
