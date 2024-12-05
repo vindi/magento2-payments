@@ -244,7 +244,7 @@ class PaymentsRequest
 
     public function getStreetField(string $config): int
     {
-        return (int) $this->helper->getConfig($config, 'address', 'vindi') + 1;
+        return (int) $this->helper->getConfig($config, 'address', 'vindi_vp') + 1;
     }
 
     protected function getItemsData(Order $order): array
