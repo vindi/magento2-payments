@@ -205,3 +205,6 @@ Payload,Payload
 "Error sending the payment link.","Erro ao enviar o link de pagamento."
 "Payment Link Notification (VP) - [Default]","Notificação de Link de Pagamento (VP) - [Padrão]"
 "Select the email template. If the 'Default' option is selected, the default template for payment link notification will be used. Alternatively, you can choose custom templates created from the default template.","Selecione o modelo de e-mail. Se a opção 'Padrão' for selecionada, será utilizado o template padrão para notificação de link de pagamento. Alternativamente, você pode escolher templates customizados criados a partir do template padrão."
+"Confirmation","Confirmação"
+"records","registros"
+"%1 records","%1 registros"
