@@ -27,6 +27,11 @@ interface PaymentLinkInterface extends ExtensibleDataInterface
 
     public const STATUS = 'status';
 
+    public const SUCCESS_PAGE_ACCESSED = 'success_page_accessed';
+
+    public const EXPIRED_AT = 'expired_at';
+
+
     /**
      * @return int
      */
@@ -97,5 +102,33 @@ interface PaymentLinkInterface extends ExtensibleDataInterface
      * @param string $status
      */
     public function setStatus(string $status);
+
+    /**
+     * Check if the success page has been accessed
+     *
+     * @return bool
+     */
+    public function getSuccessPageAccessed();
+
+    /**
+     * Set the success page accessed flag
+     *
+     * @param bool $successPageAccessed
+     */
+    public function setSuccessPageAccessed(bool $successPageAccessed);
+
+    /**
+     * Get the expiration date of the payment link
+     *
+     * @return string|null
+     */
+    public function getExpiredAt();
+
+    /**
+     * Set the expiration date of the payment link
+     *
+     * @param string|null $expiredAt
+     */
+    public function setExpiredAt($expiredAt);
 }
 
