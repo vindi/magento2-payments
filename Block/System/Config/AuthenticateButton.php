@@ -76,7 +76,7 @@ class AuthenticateButton extends Field
         }
 
         $baseUrl = $isSandbox
-            ? 'https://tc.intermediador.sandbox.yapay.com.br/authentication'
+                ? 'https://tc-intermediador-sandbox.yapay.com.br/authentication'
             : 'https://tc.intermediador.yapay.com.br/authentication';
 
         return $baseUrl . '?consumer_key=' . urlencode($consumerKey);
