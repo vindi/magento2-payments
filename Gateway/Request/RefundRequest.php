@@ -75,7 +75,9 @@ class RefundRequest implements BuilderInterface
 
         $this->logDebug('RefundRequest: Retrieved amount value.');
 
-        $accessToken = $this->configHelper->getVindiCode();
+        $storeId = $order->getStoreId();
+
+        $accessToken = $this->configHelper->getVindiCode($storeId);
 
         if (empty($accessToken)) {
             $this->logDebug('RefundRequest: Unable to retrieve a valid access token.', 'error');
@@ -89,7 +91,7 @@ class RefundRequest implements BuilderInterface
         $request = [
             'access_token' => $accessToken,
             'transaction_id' => (string) $payment->getAdditionalInformation('transaction_id'),
-            'amount' => (string) $amountValue
+            'refund_amount' => (string) $amountValue
         ];
 
         $this->logDebug('RefundRequest: Prepared request data.');
@@ -97,7 +99,7 @@ class RefundRequest implements BuilderInterface
         $clientConfig = [
             'order_id' => $payment->getAdditionalInformation('order_id'),
             'status'   => $payment->getAdditionalInformation('status'),
-            'store_id' => $order->getStoreId()
+            'store_id' => $storeId
         ];
 
         $this->logDebug('RefundRequest: Prepared client configuration.');
