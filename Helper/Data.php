@@ -40,6 +40,7 @@ use Vindi\VP\Helper\Logger as HelperLogger;
 use Vindi\VP\Helper\Config as HelperConfig;
 use Vindi\VP\Model\Customer\Company;
 use Magento\Framework\Module\Manager as ModuleManager;
+use Vindi\VP\Logger\Logger;
 
 /**
  * Class Data
@@ -149,6 +150,38 @@ class Data extends \Magento\Payment\Helper\Data
      */
     private $isDebugEnabled;
 
+    /**
+     * @var Logger
+     */
+    private $logger;
+
+    /**
+     * Data constructor.
+     *
+     * @param Context $context
+     * @param LayoutFactory $layoutFactory
+     * @param Factory $paymentMethodFactory
+     * @param Emulation $appEmulation
+     * @param Config $paymentConfig
+     * @param Initial $initialConfig
+     * @param HelperLogger $helperLogger
+     * @param HelperConfig $helperConfig
+     * @param Json $json
+     * @param StoreManagerInterface $storeManager
+     * @param CustomerSession $customerSession
+     * @param CategoryRepositoryInterface $categoryRepository
+     * @param OrderInterface $order
+     * @param ComponentRegistrar $componentRegistrar
+     * @param DateTime $dateTime
+     * @param DirectoryData $helperDirectory
+     * @param EncryptorInterface $encryptor
+     * @param File $file
+     * @param ModuleManager $moduleManager
+     * @param AccessTokenRepositoryInterface $accessTokenRepository
+     * @param AccessTokenFactory $accessTokenFactory
+     * @param Api $api
+     * @param Logger $logger
+     */
     public function __construct(
         Context $context,
         LayoutFactory $layoutFactory,
@@ -171,7 +204,8 @@ class Data extends \Magento\Payment\Helper\Data
         ModuleManager $moduleManager,
         AccessTokenRepositoryInterface $accessTokenRepository,
         AccessTokenFactory $accessTokenFactory,
-        Api $api
+        Api $api,
+        Logger $logger
     ) {
         parent::__construct($context, $layoutFactory, $paymentMethodFactory, $appEmulation, $paymentConfig, $initialConfig);
 
@@ -192,6 +226,7 @@ class Data extends \Magento\Payment\Helper\Data
         $this->accessTokenFactory = $accessTokenFactory;
         $this->api = $api;
         $this->isDebugEnabled = $helperConfig->isDebugEnabled();
+        $this->logger = $logger;
     }
 
     /**
