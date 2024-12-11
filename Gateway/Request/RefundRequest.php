@@ -98,6 +98,7 @@ class RefundRequest implements BuilderInterface
         $this->logDebug('=======================');
         $this->logDebug('TESTE:');
         $this->logDebug(json_encode($request));
+        $this->logDebug($payment->getAdditionalInformation('token_transaction'));
         $this->logDebug('=======================');
 
         $clientConfig = [
