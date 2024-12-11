@@ -84,26 +84,24 @@ class Config extends AbstractHelper
      *
      * @param string $code
      * @param int|null $storeId
-     * @return void
      */
     public function saveVindiCode(string $code, ?int $storeId = null): void
     {
-        $encryptedCode = $this->encryptor->encrypt($code);
-        $this->configWriter->save(self::VINDI_CODE_PATH, $encryptedCode, ScopeInterface::SCOPE_STORES, $storeId);
+        $this->configWriter->save(self::VINDI_CODE_PATH, $code, ScopeInterface::SCOPE_STORES, $storeId);
     }
 
     /**
-     * Retrieve the Vindi authorization code (decrypted)
+     * Retrieve the Vindi authorization code
      *
      * @param int|null $storeId
      * @return string|null
      */
     public function getVindiCode(?int $storeId = null): ?string
     {
-        $encryptedCode = $this->scopeConfig->getValue(self::VINDI_CODE_PATH, ScopeInterface::SCOPE_STORES, $storeId);
+        $code = $this->scopeConfig->getValue(self::VINDI_CODE_PATH, ScopeInterface::SCOPE_STORES, $storeId);
 
-        if ($encryptedCode) {
-            return $this->encryptor->decrypt($encryptedCode);
+        if ($code) {
+            return $code;
         }
 
         return null;

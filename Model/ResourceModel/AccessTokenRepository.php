@@ -132,6 +132,7 @@ class AccessTokenRepository implements AccessTokenRepositoryInterface
         $storeId = null
     ): void {
         $accessTokenModel = $this->accessTokenFactory->create();
+        $storeId = $storeId !== null ? (int) $storeId : 0;
         $accessTokenModel->setStoreId($storeId);
         $accessTokenModel->setAccessToken($accessToken);
         $accessTokenModel->setRefreshToken($refreshToken);

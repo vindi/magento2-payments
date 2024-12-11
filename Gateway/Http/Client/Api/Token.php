@@ -96,18 +96,21 @@ class Token extends Client
         $data = [
             'consumer_key' => $consumerKey,
             'consumer_secret' => $consumerSecret,
-            'code' => $code,
-            'type_response' => 'J'
+            'code' => $code
         ];
         $path = $this->getEndpointPath('payments/auth/token');
         $method = Request::METHOD_POST;
 
-        $response = $this->makeRequest($path, $method, 'payments', $data, $storeId);
+        $response = $this->makeRequest($path, $method, 'payments', $data, $storeId, 'xml');
 
-        if ($response['authorization']['message_response']['message'] != 'success') {
+        if (isset($response["response"])) {
+            $response = $response["response"];
+        }
+
+        if ($response["message_response"]["message"] != 'success') {
             throw new \Exception('Error generating access token');
         }
 
-        return $response['data_response']['authorization'];
+        return $response["data_response"]["authorization"];
     }
 }
