@@ -9,6 +9,7 @@ use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Store\Model\StoreManagerInterface;
 use Vindi\VP\Logger\Logger;
 use Magento\Framework\App\ResponseInterface;
+use Vindi\VP\Helper\Data as HelperData;
 
 class Index extends Action
 {
@@ -27,12 +28,26 @@ class Index extends Action
     /** @var bool */
     protected $isDebugEnabled;
 
+    /** @var HelperData */
+    protected $helperData;
+
+   /**
+     * Index constructor.
+     *
+     * @param Context $context
+     * @param ConfigHelper $configHelper
+     * @param JsonFactory $jsonFactory
+     * @param StoreManagerInterface $storeManager
+     * @param Logger $logger
+     * @param HelperData $helperData
+     */
     public function __construct(
         Context $context,
         ConfigHelper $configHelper,
         JsonFactory $jsonFactory,
         StoreManagerInterface $storeManager,
-        Logger $logger
+        Logger $logger,
+        HelperData $helperData
     ) {
         parent::__construct($context);
         $this->configHelper = $configHelper;
@@ -40,6 +55,7 @@ class Index extends Action
         $this->storeManager = $storeManager;
         $this->logger = $logger;
         $this->isDebugEnabled = $this->configHelper->isDebugEnabled();
+        $this->helperData = $helperData;
     }
 
     /**
@@ -70,13 +86,21 @@ class Index extends Action
 
             $this->logDebug('Auth/Index: Authorization code saved successfully.');
 
-            return $result->setData(['success' => true, 'message' => 'Authorization code saved successfully.']);
+            $accessToken = $this->helperData->generateNewAccessToken($storeId);
+
+            if ($accessToken) {
+                $this->logDebug('Auth/Index: Access token generated and saved successfully.');
+
+                return $result->setData(['success' => true, 'message' => 'Authorization and access token saved successfully.']);
+            } else {
+                throw new \Exception('Failed to generate access token.');
+            }
         } catch (\Exception $e) {
-            $this->logDebug('Auth/Index: Failed to save authorization code.', ['exception' => $e->getMessage()], 'error');
+            $this->logDebug('Auth/Index: Failed to save authorization code or access token.', ['exception' => $e->getMessage()], 'error');
 
             return $result->setData([
                 'success' => false,
-                'message' => 'Failed to save authorization code: ' . $e->getMessage()
+                'message' => 'Failed to save authorization code or access token: ' . $e->getMessage()
             ]);
         } finally {
             $this->logDebug('Auth/Index: Execution completed.');

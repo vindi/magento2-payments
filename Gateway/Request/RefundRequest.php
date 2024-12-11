@@ -3,6 +3,7 @@
 namespace Vindi\VP\Gateway\Request;
 
 use Vindi\VP\Helper\Config;
+use Vindi\VP\Helper\Data;
 use Vindi\VP\Logger\Logger;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Payment\Gateway\Data\PaymentDataObjectInterface;
@@ -33,18 +34,26 @@ class RefundRequest implements BuilderInterface
     private $isDebugEnabled;
 
     /**
+     * @var Data
+     */
+    protected $helperData;
+
+    /**
      * RefundRequest constructor.
      *
      * @param Config $configHelper
      * @param Logger $logger
+     * @param Data $helperData
      */
     public function __construct(
         Config $configHelper,
-        Logger $logger
+        Logger $logger,
+        Data $helperData
     ) {
         $this->configHelper = $configHelper;
         $this->logger = $logger;
         $this->isDebugEnabled = $this->configHelper->isDebugEnabled();
+        $this->helperData = $helperData;
     }
 
     /**
@@ -77,7 +86,7 @@ class RefundRequest implements BuilderInterface
 
         $storeId = $order->getStoreId();
 
-        $accessToken = $this->configHelper->getVindiCode($storeId);
+        $accessToken = $this->helperData->getAccessToken($storeId);
 
         if (empty($accessToken)) {
             $this->logDebug('RefundRequest: Unable to retrieve a valid access token.', 'error');
@@ -95,11 +104,6 @@ class RefundRequest implements BuilderInterface
         ];
 
         $this->logDebug('RefundRequest: Prepared request data.');
-        $this->logDebug('=======================');
-        $this->logDebug('TESTE:');
-        $this->logDebug(json_encode($request));
-        $this->logDebug($payment->getAdditionalInformation('token_transaction'));
-        $this->logDebug('=======================');
 
         $clientConfig = [
             'order_id' => $payment->getAdditionalInformation('order_id'),

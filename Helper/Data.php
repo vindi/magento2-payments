@@ -332,13 +332,11 @@ class Data extends \Magento\Payment\Helper\Data
      * @return string
      * @throws \Exception
      */
-    private function generateNewAccessToken($storeId = null): string
+    public function generateNewAccessToken($storeId = null): string
     {
         $this->logDebug('generateNewAccessToken: Attempting to generate a new access token.');
 
         try {
-            $resellerToken  = $this->getResellerToken($storeId);
-            $tokenAccount   = $this->getToken($storeId);
             $consumerKey    = $this->getConsumerKey($storeId);
             $consumerSecret = $this->getConsumerSecret($storeId);
 
