@@ -97,7 +97,7 @@ class RefundRequest implements BuilderInterface
         $this->logDebug('RefundRequest: Prepared request data.');
         $this->logDebug('=======================');
         $this->logDebug('TESTE:');
-        $this->logDebug($request);
+        $this->logDebug(json_encode($request));
         $this->logDebug('=======================');
 
         $clientConfig = [
