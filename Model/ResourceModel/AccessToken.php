@@ -79,13 +79,20 @@ class AccessToken extends AbstractDb
     {
         $currentTimestamp = (new DateTimeImmutable())->getTimestamp();
         $select = $this->getConnection()->select()
-            ->from($this->getMainTable(), $field === 'refresh' ? ['access_token', 'refresh_token'] : ['access_token'])
-            ->where($field . '_expiration > ?', $currentTimestamp + self::BUFFER_TIME_SECONDS)
+            ->from(
+                $this->getMainTable(),
+                $field === 'refresh'
+                    ? ['access_token', 'refresh_token']
+                    : ['access_token']
+            )
+            ->where($field . '_token_expiration > ?', $currentTimestamp + self::BUFFER_TIME_SECONDS)
             ->where('store_id = ?', $storeId ?? '0')
             ->order('entity_id DESC')
             ->limit(1);
 
-        $token = $field === 'refresh' ? $this->getConnection()->fetchAssoc($select) : $this->getConnection()->fetchOne($select);
+        $token = $field === 'refresh'
+            ? $this->getConnection()->fetchAssoc($select)
+            : $this->getConnection()->fetchOne($select);
 
         if (empty($token)) {
             throw new \Exception('No valid ' . $field . ' token found');

@@ -32,7 +32,6 @@ class AccessTokenTest extends TestCase
     {
         $this->connectionMock = $this->createMock(AdapterInterface::class);
 
-        // Criar um mock para o recurso que retorna o connectionMock
         $resourceMock = $this->getMockBuilder(\Magento\Framework\App\ResourceConnection::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -42,7 +41,6 @@ class AccessTokenTest extends TestCase
 
         $this->contextMock = $this->createMock(Context::class);
 
-        // Retornar o recurso mockado quando getResources for chamado
         $this->contextMock->method('getResources')
             ->willReturn($resourceMock);
 
@@ -51,7 +49,6 @@ class AccessTokenTest extends TestCase
             ->onlyMethods(['getMainTable'])
             ->getMock();
 
-        // Simular o retorno de getMainTable para "vindi_vp_access_tokens"
         $this->accessToken->method('getMainTable')
             ->willReturn('vindi_vp_access_tokens');
     }
@@ -72,7 +69,7 @@ class AccessTokenTest extends TestCase
         $selectMock->expects($this->exactly(2))
             ->method('where')
             ->withConsecutive(
-                ['access_expiration > ?', $this->greaterThan(0)],
+                ['access_token_expiration > ?', $this->greaterThan(0)],
                 ['store_id = ?', '0']
             )
             ->willReturnSelf();
@@ -113,7 +110,7 @@ class AccessTokenTest extends TestCase
         $selectMock->expects($this->exactly(2))
             ->method('where')
             ->withConsecutive(
-                ['refresh_expiration > ?', $this->greaterThan(0)],
+                ['refresh_token_expiration > ?', $this->greaterThan(0)],
                 ['store_id = ?', '0']
             )
             ->willReturnSelf();

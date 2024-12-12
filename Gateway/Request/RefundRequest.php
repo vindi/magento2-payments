@@ -84,7 +84,7 @@ class RefundRequest implements BuilderInterface
 
         $this->logDebug('RefundRequest: Retrieved amount value.');
 
-        $storeId = $order->getStoreId();
+        $storeId = (int) $order->getStoreId();
 
         $accessToken = $this->helperData->getAccessToken($storeId);
 
