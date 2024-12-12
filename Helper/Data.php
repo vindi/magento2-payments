@@ -41,6 +41,7 @@ use Vindi\VP\Helper\Config as HelperConfig;
 use Vindi\VP\Model\Customer\Company;
 use Magento\Framework\Module\Manager as ModuleManager;
 use Vindi\VP\Logger\Logger;
+use Magento\Framework\Exception\LocalizedException;
 
 /**
  * Class Data
@@ -287,11 +288,16 @@ class Data extends \Magento\Payment\Helper\Data
     /**
      * Retrieve the access token
      *
-     * @param $storeId
+     * @param int|null $storeId
      * @return string
+     * @throws LocalizedException
      */
     public function getAccessToken($storeId = null): string
     {
+        if (!is_null($storeId) && !is_int($storeId)) {
+            throw new LocalizedException(__('Invalid store ID provided.'));
+        }
+
         $this->logDebug('getAccessToken: Attempting to retrieve access token.');
 
         try {

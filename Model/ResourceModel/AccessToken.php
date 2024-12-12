@@ -12,11 +12,11 @@ declare(strict_types=1);
  * @category    Vindi
  * @package     Vindi_VP
  *
- *
  */
 
 namespace Vindi\VP\Model\ResourceModel;
 
+use DateTimeImmutable;
 use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
 use Magento\Framework\Model\ResourceModel\Db\Context;
 
@@ -28,6 +28,16 @@ class AccessToken extends AbstractDb
     protected $_idFieldName = 'entity_id';
 
     /**
+     * Buffer time in seconds to anticipate expiration
+     */
+    private const BUFFER_TIME_SECONDS = 600;
+
+    /**
+     * Expiration time in seconds for access tokens
+     */
+    private const TOKEN_EXPIRATION_SECONDS = 365 * 24 * 60 * 60;
+
+    /**
      * Construct.
      *
      * @param Context $context
@@ -35,7 +45,7 @@ class AccessToken extends AbstractDb
      */
     public function __construct(
         Context $context,
-        $resourcePrefix = null
+                $resourcePrefix = null
     ) {
         parent::__construct($context, $resourcePrefix);
     }
@@ -50,52 +60,61 @@ class AccessToken extends AbstractDb
 
     public function deleteExpired(): void
     {
+        $currentTimestamp = (new DateTimeImmutable())->getTimestamp();
         $this->getConnection()->delete(
             $this->getMainTable(),
-            ['access_token_expiration < ?' => time() - 365 * 24 * 60 * 60]
+            ['access_token_expiration < ?' => $currentTimestamp - self::TOKEN_EXPIRATION_SECONDS]
         );
     }
 
     /**
-     * Get valid access token.
+     * Retrieve a token based on expiration and type.
      *
-     * @return string
+     * @param string $field
+     * @param int|null $storeId
+     * @return string|array
      * @throws \Exception
      */
-    public function getValidAccessToken($storeId = null): string
+    private function getTokenByType(string $field, ?int $storeId)
     {
+        $currentTimestamp = (new DateTimeImmutable())->getTimestamp();
         $select = $this->getConnection()->select()
-            ->from($this->getMainTable(), ['access_token'])
-            ->where('access_token_expiration > ?', time() + 600)
+            ->from($this->getMainTable(), $field === 'refresh' ? ['access_token', 'refresh_token'] : ['access_token'])
+            ->where($field . '_expiration > ?', $currentTimestamp + self::BUFFER_TIME_SECONDS)
             ->where('store_id = ?', $storeId ?? '0')
             ->order('entity_id DESC')
             ->limit(1);
-        $token = $this->getConnection()->fetchOne($select);
+
+        $token = $field === 'refresh' ? $this->getConnection()->fetchAssoc($select) : $this->getConnection()->fetchOne($select);
+
         if (empty($token)) {
-            throw new \Exception('No valid access token found');
+            throw new \Exception('No valid ' . $field . ' token found');
         }
+
         return $token;
     }
 
     /**
      * Get valid access token.
      *
+     * @param int|null $storeId
+     * @return string
+     * @throws \Exception
+     */
+    public function getValidAccessToken($storeId = null): string
+    {
+        return $this->getTokenByType('access', $storeId);
+    }
+
+    /**
+     * Get the last refresh token.
+     *
+     * @param int|null $storeId
      * @return array
+     * @throws \Exception
      */
     public function getLastRefreshToken($storeId = null): array
     {
-        $select = $this->getConnection()->select()
-            ->from($this->getMainTable(), ['access_token', 'refresh_token'])
-            ->where('refresh_token_expiration > ?', time() + 600)
-            ->where('store_id = ?', $storeId ?? '0')
-            ->order('entity_id DESC')
-            ->limit(1);
-        $lastToken = $this->getConnection()->fetchAssoc($select);
-
-        if (!empty($lastToken)) {
-            return $lastToken;
-        }
-
-        return [];
+        return $this->getTokenByType('refresh', $storeId);
     }
 }
