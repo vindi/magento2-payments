@@ -58,14 +58,31 @@ class AccessToken extends AbstractDb
         $this->_init('vindi_vp_access_tokens', 'entity_id');
     }
 
+    /**
+     * Delete expired tokens.
+     */
     public function deleteExpired(): void
     {
-        $currentTimestamp = (new DateTimeImmutable())->getTimestamp();
-        $this->getConnection()->delete(
-            $this->getMainTable(),
-            ['access_token_expiration < ?' => $currentTimestamp - self::TOKEN_EXPIRATION_SECONDS]
-        );
+        try {
+            $currentTimestamp = (new DateTimeImmutable())->getTimestamp();
+
+            $connection = $this->getConnection();
+
+            $conditions = [
+                $connection->quoteInto('UNIX_TIMESTAMP(access_token_expiration) < ?', $currentTimestamp - self::TOKEN_EXPIRATION_SECONDS),
+                $connection->quoteInto('UNIX_TIMESTAMP(refresh_token_expiration) < ?', $currentTimestamp),
+            ];
+
+            $whereCondition = $conditions[0] . ' OR ' . $conditions[1];
+
+            $connection->delete(
+                $this->getMainTable(),
+                $whereCondition
+            );
+        } catch (\Exception $e) {
+        }
     }
+
 
     /**
      * Retrieve a token based on expiration and type.
