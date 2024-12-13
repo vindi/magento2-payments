@@ -56,9 +56,5 @@
                 </argument>
             </arguments>
         </referenceBlock>
-
-        <referenceContainer name="after.body.start">
-            <block class="Vindi\VP\Block\Checkout\Fingerprint" template="Vindi_VP::checkout/fingerprint.phtml" name="vindi.payment.fingerprint" before="-"/>
-        </referenceContainer>
     </body>
 </page>
