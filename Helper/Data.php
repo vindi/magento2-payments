@@ -302,32 +302,62 @@ class Data extends \Magento\Payment\Helper\Data
 
         try {
             $accessToken = $this->accessTokenRepository->getValidAccessToken($storeId);
-            $this->logDebug('getAccessToken: Access token retrieved successfully.');
+            $this->logDebug('getAccessToken: Valid access token retrieved successfully.');
             return $accessToken;
         } catch (\Exception $e) {
-            $this->logDebug('getAccessToken: Valid access token not found.', ['exception' => $e->getMessage()], 'error');
+            $this->logDebug('getAccessToken: No valid access token found.', ['exception' => $e->getMessage()], 'error');
         }
 
-        $tokens = $this->accessTokenRepository->getLastRefreshToken($storeId);
+        $this->logDebug('getAccessToken: Checking for a refresh token.');
 
-        if (empty($tokens)) {
-            return $this->generateNewAccessToken($storeId);
+        $tokens = null;
+        try {
+            $tokens = $this->accessTokenRepository->getLastRefreshToken($storeId);
+            $this->logDebug('getAccessToken: Refresh token found.');
+        } catch (\Exception $e) {
+            $this->logDebug('getAccessToken: Failed to retrieve refresh token.', ['exception' => $e->getMessage()], 'error');
+        }
+
+        if (!empty($tokens)) {
+            try {
+                $this->logDebug('getAccessToken: Attempting to update access token using refresh token.');
+
+                $newToken = $this->api->token()->updateAccessToken(
+                    $tokens['access_token'],
+                    $tokens['refresh_token'],
+                    $storeId
+                );
+
+                $this->saveAccessToken($newToken, $storeId);
+                $this->logDebug('getAccessToken: Access token updated successfully.');
+                return $newToken['access_token'];
+            } catch (\Exception $e) {
+                $this->logDebug('getAccessToken: Failed to update access token using refresh token.', ['exception' => $e->getMessage()], 'error');
+            }
+        }
+
+        $this->logDebug('getAccessToken: No refresh token available, checking for an authorization code.');
+
+        $vindiCode = $this->helperConfig->getVindiCode($storeId);
+
+        if (empty($vindiCode)) {
+            $this->logDebug('getAccessToken: Authorization code is not available.', 'error');
+            throw new LocalizedException(
+                __('Authorization code is not available. Please authenticate the application.')
+            );
         }
 
         try {
-            $this->logDebug('getAccessToken: Attempting to refresh access token.');
-            $newToken = $this->api->token()->updateAccessToken(
-                $tokens['access_token'],
-                $tokens['refresh_token'],
-                $storeId
-            );
+            $this->logDebug('getAccessToken: Attempting to generate a new access token using authorization code.');
 
-            $this->saveAccessToken($newToken, $storeId);
-            $this->logDebug('getAccessToken: Access token refreshed successfully.');
-            return $newToken['access_token'];
+            $accessToken = $this->generateNewAccessToken($storeId);
+            $this->logDebug('getAccessToken: New access token generated successfully.');
+            return $accessToken;
         } catch (\Exception $e) {
-            $this->logDebug('getAccessToken: Failed to refresh access token.', ['exception' => $e->getMessage()], 'error');
-            return $this->generateNewAccessToken($storeId);
+            $this->logDebug('getAccessToken: Failed to generate new access token.', ['exception' => $e->getMessage()], 'error');
+            throw new LocalizedException(
+                __('Failed to generate a new access token: %1', $e->getMessage())
+            );
         }
     }
 

@@ -213,3 +213,5 @@ Payload,Payload
 "Confirmation","Confirmação"
 "records","registros"
 "%1 records","%1 registros"
+"Failed to generate access token.","Falha ao gerar o token de acesso."
+"The customer must authenticate the application in 'Stores > Payment Methods > Vindi Payments (VP) > General > Credentials and General Settings > Authenticate Application'.","Para pode realizar o reembolso, primeiro deve-se autenticar a aplicação em 'Lojas > Métodos de Pagamento > Vindi Payments (VP) > Geral > Credenciais e Configurações Gerais > Autorizar Aplicação'."

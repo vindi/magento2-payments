@@ -86,16 +86,31 @@ class RefundRequest implements BuilderInterface
 
         $storeId = (int) $order->getStoreId();
 
-        $accessToken = $this->helperData->getAccessToken($storeId);
+        $vindiCode = $this->configHelper->getVindiCode($storeId);
 
-        if (empty($accessToken)) {
-            $this->logDebug('RefundRequest: Unable to retrieve a valid access token.', 'error');
+        if (empty($vindiCode)) {
+            $this->logDebug('RefundRequest: Vindi code not found.', 'error');
             throw new \Magento\Framework\Exception\LocalizedException(
-                __('Unable to retrieve a valid access token.')
+                __("The customer must authenticate the application in 'Stores > Payment Methods > Vindi Payments (VP) > General > Credentials and General Settings > Authenticate Application'.")
             );
         }
 
-        $this->logDebug('RefundRequest: Access token retrieved successfully.');
+        $this->logDebug('RefundRequest: Vindi code found successfully.');
+
+        try {
+            $accessToken = $this->helperData->getAccessToken($storeId);
+
+            if (empty($accessToken)) {
+                throw new \Exception('Failed to generate access token.');
+            }
+
+            $this->logDebug('RefundRequest: Access token retrieved successfully.');
+        } catch (\Exception $e) {
+            $this->logDebug('RefundRequest: Error generating access token.', ['exception' => $e->getMessage()], 'error');
+            throw new \Magento\Framework\Exception\LocalizedException(
+                __('Error generating access token: %1', $e->getMessage())
+            );
+        }
 
         $request = [
             'access_token' => $accessToken,
