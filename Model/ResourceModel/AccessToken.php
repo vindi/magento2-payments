@@ -85,11 +85,11 @@ class AccessToken extends AbstractDb
 
 
     /**
-     * Retrieve a token based on expiration and type.
+     * Get token by type.
      *
      * @param string $field
      * @param int|null $storeId
-     * @return string|array
+     * @return array|string
      * @throws \Exception
      */
     private function getTokenByType(string $field, ?int $storeId)
@@ -102,13 +102,13 @@ class AccessToken extends AbstractDb
                     ? ['access_token', 'refresh_token']
                     : ['access_token']
             )
-            ->where($field . '_token_expiration > ?', $currentTimestamp + self::BUFFER_TIME_SECONDS)
+            ->where($field . '_token_expiration > FROM_UNIXTIME(?)', $currentTimestamp)
             ->where('store_id = ?', $storeId ?? '0')
             ->order('entity_id DESC')
             ->limit(1);
 
         $token = $field === 'refresh'
-            ? $this->getConnection()->fetchAssoc($select)
+            ? $this->getConnection()->fetchRow($select)
             : $this->getConnection()->fetchOne($select);
 
         if (empty($token)) {

@@ -37,11 +37,15 @@ class Token extends Client
         $method = Request::METHOD_POST;
         $response = $this->makeRequest($path, $method, 'payments', $data, $storeId, 'xml');
 
-        if ($response['authorization']['message_response']['message'] != 'success') {
+        if (isset($response["response"])) {
+            $response = $response["response"];
+        }
+
+        if ($response["message_response"]["message"] != 'success') {
             throw new \Exception('Error updating access token');
         }
 
-        return $response['data_response']['authorization'];
+        return $response["data_response"]["authorization"];
     }
 
     /**
@@ -72,11 +76,15 @@ class Token extends Client
 
         $response = $this->makeRequest($path, $method, 'payments', $data, $storeId);
 
-        if ($response['authorization']['message_response']['message'] != 'success') {
+        if (isset($response["response"])) {
+            $response = $response["response"];
+        }
+
+        if ($response["message_response"]["message"] != 'success') {
             throw new \Exception('Error generating code');
         }
 
-        return $response['data_response']['authorization']['code'];
+        return $response["data_response"]["authorization"];
     }
 
     /**

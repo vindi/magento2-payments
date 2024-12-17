@@ -10,6 +10,7 @@ use Magento\Store\Model\StoreManagerInterface;
 use Vindi\VP\Logger\Logger;
 use Magento\Framework\App\ResponseInterface;
 use Vindi\VP\Helper\Data as HelperData;
+use Magento\Framework\App\Cache\Manager as CacheManager;
 
 class Index extends Action
 {
@@ -31,7 +32,10 @@ class Index extends Action
     /** @var HelperData */
     protected $helperData;
 
-   /**
+    /** @var CacheManager */
+    protected $cacheManager;
+
+    /**
      * Index constructor.
      *
      * @param Context $context
@@ -40,6 +44,7 @@ class Index extends Action
      * @param StoreManagerInterface $storeManager
      * @param Logger $logger
      * @param HelperData $helperData
+     * @param CacheManager $cacheManager
      */
     public function __construct(
         Context $context,
@@ -47,7 +52,8 @@ class Index extends Action
         JsonFactory $jsonFactory,
         StoreManagerInterface $storeManager,
         Logger $logger,
-        HelperData $helperData
+        HelperData $helperData,
+        CacheManager $cacheManager
     ) {
         parent::__construct($context);
         $this->configHelper = $configHelper;
@@ -56,6 +62,7 @@ class Index extends Action
         $this->logger = $logger;
         $this->isDebugEnabled = $this->configHelper->isDebugEnabled();
         $this->helperData = $helperData;
+        $this->cacheManager = $cacheManager;
     }
 
     /**
@@ -90,6 +97,9 @@ class Index extends Action
 
             if ($accessToken) {
                 $this->logDebug('Auth/Index: Access token generated and saved successfully.');
+
+                $this->cacheManager->clean(['config']);
+                $this->logDebug('Auth/Index: Cache de configuração do banco de dados limpo com sucesso.');
 
                 return $result->setData(['success' => true, 'message' => 'Authorization and access token saved successfully.']);
             } else {
