@@ -56,7 +56,7 @@
             <field id="payment_link_template" type="select" translate="label comment" sortOrder="60" showInDefault="1"
                    showInWebsite="1" showInStore="1">
                 <label>Payment Link Email Template</label>
-                <comment><![CDATA[Select the email template, if the &quot;Default&quot; option is selected, the module's default template will be considered.]]></comment>
+                <comment><![CDATA[Select the email template. If the 'Default' option is selected, the default template for payment link notification will be used. Alternatively, you can choose custom templates created from the default template.]]></comment>
                 <source_model>Vindi\VP\Model\Config\Source\EmailTemplate</source_model>
                 <config_path>vindi_vp/general/payment_link_template</config_path>
             </field>

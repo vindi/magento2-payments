@@ -1,39 +1,52 @@
 <?php
-/**
- *
- *
- *
- *
- *
- *
- * DISCLAIMER
- *
- * Do not edit or add to this file if you wish to upgrade this extension to newer
- * version in the future.
- *
- * @category    Vindi
- * @package     Vindi_VP
- *
- *
- */
-
 namespace Vindi\VP\Model\Config\Source;
 
+use Magento\Framework\Data\OptionSourceInterface;
+use Magento\Email\Model\ResourceModel\Template\CollectionFactory as TemplateCollectionFactory;
 
-use Magento\Email\Model\Template\Config;
-class EmailTemplate implements \Magento\Framework\Data\OptionSourceInterface
+class EmailTemplate implements OptionSourceInterface
 {
+    /**
+     * @var TemplateCollectionFactory
+     */
+    private $templateCollectionFactory;
 
-    private $emailTemplateConfig;
-
-    public function __construct(Config $emailTemplateConfig)
-    {
-        $this->emailTemplateConfig = $emailTemplateConfig;
+    /**
+     * EmailTemplate constructor.
+     * @param TemplateCollectionFactory $templateCollectionFactory
+     */
+    public function __construct(
+        TemplateCollectionFactory $templateCollectionFactory
+    ) {
+        $this->templateCollectionFactory = $templateCollectionFactory;
     }
 
-
+    /**
+     * Get available email templates including custom templates based on 'payment_link_template'
+     *
+     * @return array
+     */
     public function toOptionArray()
     {
-        return $this->emailTemplateConfig->getAvailableTemplates();
+        $options = [];
+
+        $collection = $this->templateCollectionFactory->create();
+        $collection->load();
+
+        $options[] = [
+            'value' => 'payment_link_template',
+            'label' => __('Payment Link Notification (VP) - [Default]'),
+        ];
+
+        foreach ($collection as $template) {
+            if ($template->getOrigTemplateCode() == 'payment_link_template') {
+                $options[] = [
+                    'value' => $template->getTemplateId(),
+                    'label' => $template->getTemplateCode(),
+                ];
+            }
+        }
+
+        return $options;
     }
 }
