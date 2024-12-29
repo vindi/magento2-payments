@@ -69,7 +69,7 @@
 
         <group id="additional_credentials" translate="label comment" sortOrder="200" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>Additional Credentials</label>
-            <comment>To refund is necessary to add consumer key and consumer secret</comment>
+            <comment>To refund is necessary to add consumer key and consumer secret, if you don't have it, create a new app at Vindi with the return URL as 'URL_LOJA/vindi_vp/auth/'</comment>
 
             <field id="reseller_token" translate="label comment" type="obscure" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
                 <label>Reseller Token</label>
