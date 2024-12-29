@@ -24,14 +24,14 @@ interface RequestInterface extends \Magento\Framework\Api\ExtensibleDataInterfac
     /**
      * Constants for keys of data array. Identical to the name of the getter in snake case.
      */
-    const ENTITY_ID = 'entity_id';
-    const INCREMENT_ID = 'increment_id';
-    const REQUEST = 'request';
-    const RESPONSE = 'response';
-    const METHOD = 'method';
-    const STATUS_CODE = 'status_code';
-    const CREATED_AT = 'created_at';
-    const UPDATED_AT = 'updated_at';
+    public const ENTITY_ID = 'entity_id';
+    public const INCREMENT_ID = 'increment_id';
+    public const REQUEST = 'request';
+    public const RESPONSE = 'response';
+    public const METHOD = 'method';
+    public const STATUS_CODE = 'status_code';
+    public const CREATED_AT = 'created_at';
+    public const UPDATED_AT = 'updated_at';
 
     /**
      * Get EntityId.
