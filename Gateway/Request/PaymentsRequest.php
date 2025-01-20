@@ -157,7 +157,7 @@ class PaymentsRequest
         if ($transactionAmount > $orderAmount) {
             $discountAmount = $transactionAmount - $orderAmount;
         }
-        return abs($discountAmount);
+        return round(abs($discountAmount), 2);
     }
 
     protected function getPriceAdditional(Order $order, float $orderAmount): float
