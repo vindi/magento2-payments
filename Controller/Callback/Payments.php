@@ -72,7 +72,7 @@ class Payments extends Callback
             }
         } catch (\Exception $e) {
             $statusCode = 500;
-            $this->helperData->getLogger()->error($e->getMessage());
+            $this->helperData->log($e->getMessage());
         }
 
         $result->setHttpResponseCode($statusCode);

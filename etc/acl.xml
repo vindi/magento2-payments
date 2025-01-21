@@ -23,6 +23,7 @@
                         <resource id="Vindi_VP::settings" title="Settings"/>
                     </resource>
                 </resource>
+                <resource id="Vindi_VP::auth" title="Authorization" translate="title" sortOrder="1010"/>
             </resource>
         </resources>
     </acl>

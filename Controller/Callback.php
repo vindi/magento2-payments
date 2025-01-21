@@ -163,7 +163,7 @@ abstract class Callback extends Action implements \Magento\Framework\App\CsrfAwa
                 $content = $request->getContent();
                 $this->requestContent = ($content) ? $this->json->unserialize($content) : [];
             } catch (\Exception $e) {
-                $this->helperData->getLogger()->critical($e->getMessage());
+                $this->helperData->log($e->getMessage());
             }
         }
         return $this->requestContent;

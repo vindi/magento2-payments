@@ -24,13 +24,13 @@ interface CallbackInterface extends \Magento\Framework\Api\ExtensibleDataInterfa
     /**
      * Constants for keys of data array. Identical to the name of the getter in snake case.
      */
-    const ENTITY_ID = 'entity_id';
-    const INCREMENT_ID = 'increment_id';
-    const STATUS = 'status';
-    const METHOD = 'method';
-    const PAYLOAD = 'payload';
-    const CREATED_AT = 'created_at';
-    const UPDATED_AT = 'updated_at';
+    public const ENTITY_ID = 'entity_id';
+    public const INCREMENT_ID = 'increment_id';
+    public const STATUS = 'status';
+    public const METHOD = 'method';
+    public const PAYLOAD = 'payload';
+    public const CREATED_AT = 'created_at';
+    public const UPDATED_AT = 'updated_at';
 
     /**
      * Get EntityId.

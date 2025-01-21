@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!--
 /**
- * This script has been called every page beause the script must be cached on browser at checkout page
  * @category    Vindi
  * @package     Vindi_VP
  */

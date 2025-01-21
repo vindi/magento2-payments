@@ -18,16 +18,19 @@ use Magento\Framework\Api\ExtensibleDataInterface;
 
 interface PaymentLinkInterface extends ExtensibleDataInterface
 {
-    const ENTITY_ID = 'entity_id';
-    const LINK = 'link';
-    const ORDER_ID = 'order_id';
-    const VINDI_PAYMENT_METHOD = 'vindi_payment_method';
-    const CUSTOMER_ID = 'customer_id';
-    const CREATED_AT = 'created_at';
+    public const ENTITY_ID = 'entity_id';
+    public const LINK = 'link';
+    public const ORDER_ID = 'order_id';
+    public const VINDI_PAYMENT_METHOD = 'vindi_payment_method';
+    public const CUSTOMER_ID = 'customer_id';
+    public const CREATED_AT = 'created_at';
 
-    const STATUS = 'status';
-    const SUCCESS_PAGE_ACCESSED = 'success_page_accessed';
-    const EXPIRED_AT = 'expired_at';
+    public const STATUS = 'status';
+
+    public const SUCCESS_PAGE_ACCESSED = 'success_page_accessed';
+
+    public const EXPIRED_AT = 'expired_at';
+
 
     /**
      * @return int

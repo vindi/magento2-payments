@@ -60,11 +60,16 @@
                 <source_model>Vindi\VP\Model\Config\Source\EmailTemplate</source_model>
                 <config_path>vindi_vp/general/payment_link_template</config_path>
             </field>
+            <field id="auth_button" translate="label comment" type="button" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Authorize Application</label>
+                <comment><![CDATA[Click the button to authenticate and generate the authorization code for Yapay. Ensure the <b>Consumer Key</b> is configured.]]></comment>
+                <frontend_model>Vindi\VP\Block\System\Config\AuthenticateButton</frontend_model>
+            </field>
         </group>
 
         <group id="additional_credentials" translate="label comment" sortOrder="200" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>Additional Credentials</label>
-<!--            <comment>To refund is necessary to add consumer key and consumer secret</comment>-->
+            <comment>To refund is necessary to add consumer key and consumer secret, if you don't have it, create a new app at Vindi with the return URL as 'URL_LOJA/vindi_vp/auth/'</comment>
 
             <field id="reseller_token" translate="label comment" type="obscure" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
                 <label>Reseller Token</label>
@@ -72,19 +77,19 @@
                 <config_path>vindi_vp/general/reseller_token</config_path>
             </field>
 
-<!--            <field id="consumer_key" translate="label comment" type="obscure" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">-->
-<!--                <label>Consumer Key</label>-->
-<!--                <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>-->
-<!--                <config_path>vindi_vp/general/consumer_key</config_path>-->
-<!--                <comment>Insert here the Consumer Key for your transaction, that key can be found in your Vindi Account</comment>-->
-<!--            </field>-->
+            <field id="consumer_key" translate="label comment" type="obscure" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                <label>Consumer Key</label>
+                <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                <config_path>vindi_vp/general/consumer_key</config_path>
+                <comment>Insert here the Consumer Key for your transaction, that key can be found in your Vindi Account</comment>
+            </field>
 
-<!--            <field id="consumer_secret" translate="label comment" type="obscure" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">-->
-<!--                <label>Consumer Secret</label>-->
-<!--                <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>-->
-<!--                <config_path>vindi_vp/general/consumer_secret</config_path>-->
-<!--                <comment>Insert here the Secret Key for your transaction, that key can be found in your Vindi Account</comment>-->
-<!--            </field>-->
+            <field id="consumer_secret" translate="label comment" type="obscure" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                <label>Consumer Secret</label>
+                <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                <config_path>vindi_vp/general/consumer_secret</config_path>
+                <comment>Insert here the Secret Key for your transaction, that key can be found in your Vindi Account</comment>
+            </field>
         </group>
 
         <group id="vindi_address" translate="label comment" sortOrder="300" showInDefault="1" showInWebsite="1" showInStore="1">

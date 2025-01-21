@@ -13,7 +13,7 @@ namespace Vindi\VP\Gateway\Http;
 use Magento\Framework\Encryption\EncryptorInterface;
 use Laminas\Http\Client as HttpClient;
 use Magento\Framework\Serialize\Serializer\Json;
-use Vindi\VP\Helper\Data;
+use Vindi\VP\Helper\Config;
 
 class Client
 {
@@ -27,9 +27,9 @@ class Client
     public const STATUS_REASON_FIRST_PAYMENT = 'FirstPayment';
 
     /**
-     * @var Data
+     * @var Config
      */
-    protected $helper;
+    protected $helperConfig;
 
     /**
      * @var HttpClient
@@ -53,16 +53,16 @@ class Client
 
 
     /**
-     * @param Data $helper
+     * @param Config $helperConfig
      * @param EncryptorInterface $encryptor
      * @param Json $json
      */
     public function __construct(
-        Data $helper,
+        Config $helperConfig,
         EncryptorInterface $encryptor,
         Json $json
     ) {
-        $this->helper = $helper;
+        $this->helperConfig = $helperConfig;
         $this->encryptor = $encryptor;
         $this->json = $json;
     }
@@ -94,7 +94,7 @@ class Client
      */
     public function getEndpointPath($endpoint, $orderId = null, $token = null): string
     {
-        $fullEndpoint = $this->helper->getEndpointConfig($endpoint);
+        $fullEndpoint = $this->helperConfig->getEndpointConfig($endpoint);
         return str_replace(
             ['{order_id}', '{token}'],
             [$orderId, $token],
@@ -104,10 +104,10 @@ class Client
 
     public function getApi($path, $type = 'payments', $storeId = null): HttpClient
     {
-        $uri = $this->helper->getEndpointConfig($type . '_uri');
+        $uri = $this->helperConfig->getEndpointConfig($type . '_uri');
 
-        if ($this->helper->getGeneralConfig('use_sandbox')) {
-            $uri = $this->helper->getEndpointConfig($type . '_uri_sandbox');
+        if ($this->helperConfig->getGeneralConfig('use_sandbox')) {
+            $uri = $this->helperConfig->getEndpointConfig($type . '_uri_sandbox');
         }
 
         $this->api = new HttpClient(
@@ -128,8 +128,14 @@ class Client
      * @param int|null $storeId
      * @return array
      */
-    protected function makeRequest(string $path, string $method, $type = 'payments', $data = [], $storeId = null): array
-    {
+    protected function makeRequest(
+        string $path,
+        string $method,
+        $type = 'auth',
+        $data = [],
+        $storeId = null,
+        $responseType = 'json'
+    ): array {
         $api = $this->getApi($path, $type, $storeId);
         $api->setMethod($method);
         if (!empty($data)) {
@@ -138,7 +144,12 @@ class Client
         $response = $api->send();
         $content = $response->getBody();
         if ($content && $response->getStatusCode() != 204) {
-            $content = $this->json->unserialize($content);
+            if ($responseType == 'xml') {
+                $content = simplexml_load_string($content);
+                $content = $this->json->unserialize($this->json->serialize($content));
+            } else {
+                $content = $this->json->unserialize($content);
+            }
         }
 
         return [
