@@ -512,4 +512,25 @@
             <argument name="resourceModel" xsi:type="string">Vindi\VP\Model\ResourceModel\Request</argument>
         </arguments>
     </virtualType>
+
+    <!-- Vindi Credit Card -->
+    <preference for="Vindi\VP\Api\Data\CreditCardInterface" type="Vindi\VP\Model\CreditCard"/>
+    <preference for="Vindi\VP\Api\Data\CreditCardSearchResultInterface" type="Magento\Framework\Api\SearchResults"/>
+    <preference for="Vindi\VP\Api\CreditCardRepositoryInterface" type="Vindi\VP\Model\CreditCardRepository"/>
+
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="vindi_credit_card_listing_data_source" xsi:type="string">Vindi\VP\Model\ResourceModel\CreditCard\Grid\Collection</item>
+                <item name="vindi_credit_card_data_source" xsi:type="string">Vindi\VP\Model\ResourceModel\CreditCard\Form\DataProvider</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <virtualType name="Vindi\VP\Model\ResourceModel\CreditCard\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">vindi_vp_credit_cards</argument>
+            <argument name="resourceModel" xsi:type="string">Vindi\VP\Model\ResourceModel\CreditCard</argument>
+        </arguments>
+    </virtualType>
 </config>
