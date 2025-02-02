@@ -166,7 +166,6 @@
         <column xsi:type="text" name="card_token" nullable="false" comment="Token for Credit Card Reference"/>
         <column xsi:type="varchar" length="255" name="customer_email" nullable="false" comment="Customer Email"/>
         <column xsi:type="varchar" length="255" name="status" nullable="false" comment="Status of the Credit Card"/>
-        <column xsi:type="varchar" length="255" name="type" nullable="false" comment="Type of the Credit Card"/>
         <column xsi:type="varchar" length="255" name="cc_type" nullable="false" comment="Credit Card Type"/>
         <column xsi:type="varchar" length="4" name="cc_last_4" nullable="false" comment="Last 4 Digits of Credit Card Number"/>
         <column xsi:type="varchar" length="255" name="cc_name" nullable="false" comment="Credit Card Holder Name"/>

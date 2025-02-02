@@ -66,9 +66,11 @@ define(
                 installments: ko.observableArray([]),
                 hasInstallments: ko.observable(false),
                 installmentsUrl: '',
-                showInstallmentsWarning: ko.observable(true),
+                showInstallmentsWarning: ko.observable(false),
                 debounceTimer: null,
-                isCheckoutPage: ko.observable(true)
+                isCheckoutPage: ko.observable(true),
+                paymentProfiles: [],
+                selectedPaymentProfile: ''
             },
 
             /** @inheritdoc */
@@ -86,7 +88,8 @@ define(
                         'creditCardVerificationNumber',
                         'selectedCardType',
                         'creditCardOwner',
-                        'creditCardInstallments'
+                        'creditCardInstallments',
+                        'selectedPaymentProfile',
                     ]);
 
                 this.creditCardVerificationNumber('');
@@ -99,14 +102,8 @@ define(
                     self.updateInstallmentsValues();
                 });
 
-                //Set credit card number to credit card data object
                 this.vindiCreditCardNumber.subscribe(function (value) {
                     let result;
-
-                    self.installments.removeAll();
-                    self.hasInstallments(false);
-                    self.showInstallmentsWarning(true);
-                    self.selectedCardType(null);
 
                     if (value === '' || value === null) {
                         return false;
@@ -130,6 +127,7 @@ define(
                     self.updateInstallmentsValues();
                 });
 
+                this.updateInstallmentsValues();
 
                 return this;
             },
@@ -169,6 +167,7 @@ define(
                 return {
                     'method': this.item.method,
                     'additional_data': {
+                        'payment_profile': this.selectedPaymentProfile(),
                         'taxvat': this.taxvat(),
                         'cc_cid': this.creditCardVerificationNumber(),
                         'cc_type': this.creditCardType(),
@@ -177,15 +176,11 @@ define(
                         'cc_number': this.vindiCreditCardNumber(),
                         'cc_owner': this.creditCardOwner(),
                         'installments': this.creditCardInstallments(),
-                        'fingerprint': window.yapay?.FingerPrint()?.getFingerPrint() || ''
+                        'fingerprint': window.yapay?.FingerPrint()?.getFingerPrint() || '',
                     }
                 };
             },
 
-            /**
-             * Get list of available credit card types
-             * @returns {Object}
-             */
             getCcAvailableTypes: function () {
                 return window.checkoutConfig.payment[this.getCode()].availableTypes;
             },
@@ -196,26 +191,15 @@ define(
                     : false;
             },
 
-            /**
-             * Check if payment is active
-             *
-             * @returns {Boolean}
-             */
             isActive: function () {
                 return this.getCode() === this.isChecked();
             },
 
-            /**
-             * @return {Boolean}
-             */
             validate: function () {
                 const $form = $('#' + 'form_' + this.getCode());
                 return ($form.validation() && $form.validation('isValid'));
             },
 
-            /**
-             * @returns {boolean|*}
-             */
             retrieveInstallmentsUrl: function () {
                 try {
                     this.installmentsUrl = window.checkoutConfig.payment.ccform.urls[this.getCode()].retrieve_installments;
@@ -231,35 +215,51 @@ define(
             },
 
             updateInstallmentsValues: function () {
-
                 var self = this;
-                if (self.vindiCreditCardNumber().length > 6) {
-                    if (self.debounceTimer !== null) {
-                        clearTimeout(self.debounceTimer);
-                    }
 
-                    //I need to change it to a POST with body
-                    self.debounceTimer = setTimeout(() => {
-                        fetch(self.retrieveInstallmentsUrl(), {
-                            method: 'POST',
-                            cache: 'no-cache',
-                            headers: {'Content-Type': 'application/json'},
-                            body: JSON.stringify({
-                                form_key: window.checkoutConfig.formKey,
-                                cc_type: self.creditCardType()
-                            })
-                        }).then((response) => {
-                            self.installments.removeAll();
-                            return response.json();
-                        }).then(json => {
-                            json.forEach(function (installment) {
-                                self.installments.push(installment);
-                                self.hasInstallments(true);
-                                self.showInstallmentsWarning(false);
-                            });
-                        });
-                    }, 500);
+                if (self.debounceTimer !== null) {
+                    clearTimeout(self.debounceTimer);
                 }
+
+                self.debounceTimer = setTimeout(() => {
+                    fetch(self.retrieveInstallmentsUrl(), {
+                        method: 'POST',
+                        cache: 'no-cache',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({
+                            form_key: window.checkoutConfig.formKey,
+                            cc_type: self.creditCardType()
+                        })
+                    }).then((response) => {
+                        self.installments.removeAll();
+                        return response.json();
+                    }).then(json => {
+                        json.forEach(function (installment) {
+                            self.installments.push(installment);
+                            self.hasInstallments(true);
+                        });
+                    });
+                }, 500);
+            },
+
+            getPaymentProfiles: function () {
+                let paymentProfiles = [];
+                const savedCards = window.checkoutConfig.payment?.vindi_vp_cc?.saved_cards;
+
+                if (savedCards) {
+                    savedCards.forEach(function (card) {
+                        paymentProfiles.push({
+                            'value': card.id,
+                            'text': `${card.card_type} xxxx-${card.card_number}`
+                        });
+                    });
+                }
+
+                return paymentProfiles;
+            },
+
+            hasPaymentProfiles: function () {
+                return this.getPaymentProfiles().length > 0;
             }
         });
     }

@@ -71,6 +71,7 @@ class CreditCardAssignObserver extends AbstractDataAssignObserver
                 $ccBin = substr((string) $additionalData['cc_number'], 0, 6);
                 $ccExpMonth = $additionalData['cc_exp_month'] ?? null;
                 $ccExpYear = $additionalData['cc_exp_year'] ?? null;
+                $paymentProfile = $additionalData["payment_profile"] ?? null;
 
                 $this->updateInterest((int) $installments);
 
@@ -91,6 +92,7 @@ class CreditCardAssignObserver extends AbstractDataAssignObserver
                 $paymentInfo->setAdditionalInformation('cc_installments', $installments);
                 $paymentInfo->setAdditionalInformation('cc_bin', $ccBin);
                 $paymentInfo->setAdditionalInformation('payment_method', $this->helper->getMethodName($ccType));
+                $paymentInfo->setAdditionalInformation('payment_profile', $paymentProfile);
             }
         }
     }

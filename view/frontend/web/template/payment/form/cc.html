@@ -31,7 +31,7 @@
                 <span data-bind="text: getTitle()"></span>
             </label>
         </div>
-    
+
         <div data-bind="attr: {class: 'payment-method-content container-' + getCode()}">
             <form data-bind="attr: {id: 'form_' + getCode()}">
                 <fieldset data-bind="attr: {class: 'fieldset payment items ccard ' + getCode(), id: 'payment_form_' + getCode()}, visible: showCardData">
@@ -40,8 +40,27 @@
                         <span><!-- ko i18n: 'Card Information'--><!-- /ko --></span>
                     </legend><br />
                     <!-- /ko -->
-    
-                    <div class="field number cc-number required vindi-cc-number-container">
+
+                    <!-- ko if: (hasPaymentProfiles()) -->
+                    <div class="field number required">
+                        <label data-bind="attr: {for: getCode() + '_cc_payment_profile'}" class="label">
+                            <span><!-- ko i18n: 'Seus cartões salvos' --><!-- /ko --></span>
+                        </label>
+                        <div class="control">
+                            <select name="payment[payment_profile]"
+                                    class="input-text select"
+                                    data-bind="attr: {id: getCode() + '_cc_payment_profile'},
+                                                enable: isActive($parents),
+                                                options: getPaymentProfiles(),
+                                                optionsValue: 'value',
+                                                optionsText: 'text',
+                                                optionsCaption: $t('Novo Cartão'),
+                                                value: selectedPaymentProfile"></select>
+                        </div>
+                    </div>
+                    <!-- /ko -->
+
+                    <div class="field number cc-number required vindi-cc-number-container" data-bind="visible: !selectedPaymentProfile()">
                         <div class="credit-card-types-container">
                             <ul class="credit-card-types">
                                 <!-- ko foreach: {data: getCcAvailableTypesValues(), as: 'item'} -->
@@ -66,7 +85,7 @@
                                    value=""
                                    data-bind="attr: {id: getCode() + '_cc_type', 'data-container': getCode() + '-cc-type'}, value: creditCardType">
                         </div>
-    
+
                         <div class="control">
                             <input name="payment[cc_number]"
                                    type="number"
@@ -84,12 +103,12 @@
                                           enable: isActive($parents),
                                           value: vindiCreditCardNumber,
                                           valueUpdate: 'keyup' "/>
-    
+
                         </div>
                     </div>
-    
-                    <div class="field number required" data-bind="attr: {id: getCode() + '-cc-owner-container'}">
-                        <div class="control">
+
+                    <div class="field number required" data-bind="attr: {id: getCode() + '-cc-owner-container'}" data-bind="visible: !selectedPaymentProfile()">
+                        <div class="control" data-bind="visible: !selectedPaymentProfile()">
                             <input type="text"
                                    name="payment[cc_owner]"
                                    class="input-text-vindi"
@@ -106,9 +125,9 @@
                                           valueUpdate: 'keyup' "/>
                         </div>
                     </div>
-    
-    
-                    <div class="field number required vindi-cc-exp-cvv" >
+
+
+                    <div class="field number required vindi-cc-exp-cvv" data-bind="visible: !selectedPaymentProfile()">
                         <span data-bind="attr: {id: getCode() + '-cc-exp-date-container'}">
                             <input type="text"
                                    name="payment[cc_exp_date]"
@@ -145,9 +164,9 @@
                                 value: creditCardVerificationNumber" />
                         </span>
                     </div>
-    
-                    <div class="field number required" data-bind="attr: {id: getCode() + '_taxat'}">
-                        <div class="control">
+
+                    <div class="field number required" data-bind="attr: {id: getCode() + '_taxat'}" data-bind="visible: !selectedPaymentProfile()">
+                        <div class="control" data-bind="visible: !selectedPaymentProfile()">
                             <input type="text"
                                    name="payment[taxvat]"
                                    class="input-text-vindi cpf"
@@ -164,7 +183,7 @@
                                           valueUpdate: 'keyup' "/>
                         </div>
                     </div>
-    
+
                     <div class="field installments required" data-bind="attr: {id: getCode() + '_installments_div'}">
                         <div class="control">
                             <select name="payment[installments]"
@@ -182,8 +201,8 @@
                             </div>
                         </div>
                     </div>
-    
-                    <div class="vindi-vp-cc-container vind-cc-preload">
+
+                    <div class="vindi-vp-cc-container vind-cc-preload" data-bind="visible: !selectedPaymentProfile()">
                         <div class="vind-cc-creditcard">
                             <div id="vindi-vp-cc-front" class="vindi-vp-cc-front">
                                 <div id="vindi-vp-cc-ccsingle"></div>
@@ -191,25 +210,25 @@
                             <div id="vindi-vp-cc-back" class="vindi-vp-cc-back"></div>
                         </div>
                     </div>
-    
+
                     <!-- ko foreach: getRegion('messages') -->
                         <!-- ko template: getTemplate() --><!-- /ko -->
                     <!--/ko-->
-    
+
                     <!-- ko if: isCheckoutPage() -->
                         <div class="payment-method-billing-address">
                             <!-- ko foreach: $parent.getRegion(getBillingAddressFormName()) -->
                             <!-- ko template: getTemplate() --><!-- /ko -->
                             <!--/ko-->
                         </div>
-    
+
                         <div class="checkout-agreements-block">
                             <!-- ko foreach: $parent.getRegion('before-place-order') -->
                             <!-- ko template: getTemplate() --><!-- /ko -->
                             <!--/ko-->
                         </div>
                     <!--/ko-->
-    
+
                 </fieldset>
                 <div afterRender="loadCard"></div>
             </form>
