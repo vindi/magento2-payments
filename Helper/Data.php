@@ -30,17 +30,18 @@ use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order;
 use Magento\Store\Model\App\Emulation;
 use Magento\Store\Model\ScopeInterface;
-use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Store\Model\StoreManagerInterface;
-use Magento\Framework\HTTP\PhpEnvironment\RemoteAddress;
 use Magento\Customer\Model\Session as CustomerSession;
-use Psr\Log\LoggerInterface;
-use Vindi\VP\Logger\Logger;
-use Vindi\VP\Api\RequestRepositoryInterface;
+use Vindi\VP\Api\AccessTokenRepositoryInterface;
+use Vindi\VP\Gateway\Http\Client\Api;
+use Vindi\VP\Model\AccessTokenFactory;
+use Vindi\VP\Helper\Logger as HelperLogger;
+use Vindi\VP\Helper\Config as HelperConfig;
 use Vindi\VP\Model\Customer\Company;
-use Vindi\VP\Model\RequestFactory;
 use Magento\Framework\Module\Manager as ModuleManager;
+use Vindi\VP\Logger\Logger;
+use Magento\Framework\Exception\LocalizedException;
 
 /**
  * Class Data
@@ -82,29 +83,20 @@ class Data extends \Magento\Payment\Helper\Data
         '89' => 'failed'
     ];
 
-    /** @var \Vindi\VP\Logger\Logger */
-    protected $logger;
+    /** @var HelperLogger */
+    protected $helperLogger;
+
+    /** @var HelperConfig */
+    protected $helperConfig;
 
     /** @var OrderInterface  */
     protected $order;
-
-    /** @var RequestRepositoryInterface  */
-    protected $requestRepository;
-
-    /** @var RequestFactory  */
-    protected $requestFactory;
-
-    /** @var WriterInterface */
-    private $configWriter;
 
     /** @var Json */
     private $json;
 
     /** @var StoreManagerInterface */
     private $storeManager;
-
-    /** @var RemoteAddress */
-    private $remoteAddress;
 
     /** @var CategoryRepositoryInterface  */
     protected $categoryRepository;
@@ -142,6 +134,55 @@ class Data extends \Magento\Payment\Helper\Data
      */
     protected $moduleManager;
 
+    /**
+     * @var AccessTokenRepositoryInterface
+     */
+    protected $accessTokenRepository;
+
+    /**
+     * @var AccessTokenFactory
+     */
+    protected $accessTokenFactory;
+
+    protected $api;
+
+    /**
+     * @var bool
+     */
+    private $isDebugEnabled;
+
+    /**
+     * @var Logger
+     */
+    private $logger;
+
+    /**
+     * Data constructor.
+     *
+     * @param Context $context
+     * @param LayoutFactory $layoutFactory
+     * @param Factory $paymentMethodFactory
+     * @param Emulation $appEmulation
+     * @param Config $paymentConfig
+     * @param Initial $initialConfig
+     * @param HelperLogger $helperLogger
+     * @param HelperConfig $helperConfig
+     * @param Json $json
+     * @param StoreManagerInterface $storeManager
+     * @param CustomerSession $customerSession
+     * @param CategoryRepositoryInterface $categoryRepository
+     * @param OrderInterface $order
+     * @param ComponentRegistrar $componentRegistrar
+     * @param DateTime $dateTime
+     * @param DirectoryData $helperDirectory
+     * @param EncryptorInterface $encryptor
+     * @param File $file
+     * @param ModuleManager $moduleManager
+     * @param AccessTokenRepositoryInterface $accessTokenRepository
+     * @param AccessTokenFactory $accessTokenFactory
+     * @param Api $api
+     * @param Logger $logger
+     */
     public function __construct(
         Context $context,
         LayoutFactory $layoutFactory,
@@ -149,34 +190,32 @@ class Data extends \Magento\Payment\Helper\Data
         Emulation $appEmulation,
         Config $paymentConfig,
         Initial $initialConfig,
-        Logger $logger,
-        WriterInterface $configWriter,
+        HelperLogger $helperLogger,
+        HelperConfig $helperConfig,
         Json $json,
         StoreManagerInterface $storeManager,
-        RemoteAddress $remoteAddress,
         CustomerSession $customerSession,
         CategoryRepositoryInterface $categoryRepository,
-        RequestRepositoryInterface $requestRepository,
-        RequestFactory $requestFactory,
         OrderInterface $order,
         ComponentRegistrar $componentRegistrar,
         DateTime $dateTime,
         DirectoryData $helperDirectory,
         EncryptorInterface $encryptor,
         File $file,
-        ModuleManager $moduleManager
+        ModuleManager $moduleManager,
+        AccessTokenRepositoryInterface $accessTokenRepository,
+        AccessTokenFactory $accessTokenFactory,
+        Api $api,
+        Logger $logger
     ) {
         parent::__construct($context, $layoutFactory, $paymentMethodFactory, $appEmulation, $paymentConfig, $initialConfig);
 
-        $this->logger = $logger;
-        $this->configWriter = $configWriter;
+        $this->helperLogger = $helperLogger;
+        $this->helperConfig = $helperConfig;
         $this->json = $json;
         $this->storeManager = $storeManager;
-        $this->remoteAddress = $remoteAddress;
         $this->customerSession = $customerSession;
         $this->categoryRepository = $categoryRepository;
-        $this->requestRepository = $requestRepository;
-        $this->requestFactory = $requestFactory;
         $this->order = $order;
         $this->componentRegistrar = $componentRegistrar;
         $this->dateTime = $dateTime;
@@ -184,8 +223,18 @@ class Data extends \Magento\Payment\Helper\Data
         $this->encryptor = $encryptor;
         $this->file = $file;
         $this->moduleManager = $moduleManager;
+        $this->accessTokenRepository = $accessTokenRepository;
+        $this->accessTokenFactory = $accessTokenFactory;
+        $this->api = $api;
+        $this->isDebugEnabled = $helperConfig->isDebugEnabled();
+        $this->logger = $logger;
     }
 
+    /**
+     * Retrieve the allowed payment methods
+     *
+     * @return array
+     */
     public function getAllowedMethods(): array
     {
         return [
@@ -205,74 +254,222 @@ class Data extends \Magento\Payment\Helper\Data
      */
     public function log($message, string $name = 'vindi_vp'): void
     {
-        if ($this->getGeneralConfig('debug')) {
-            try {
-                if (!is_string($message)) {
-                    $message = $this->json->serialize($message);
-                }
-
-                $this->logger->setName($name);
-                $this->logger->debug($this->mask($message));
-            } catch (\Exception $e) {
-                $this->logger->error($e->getMessage());
-            }
-        }
+        $this->helperLogger->execute($message, $name);
     }
 
+    /**
+     * Retrieve the token
+     *
+     * @param $storeId
+     * @return string
+     * @throws \Exception
+     */
     public function getToken($storeId = null): string
     {
-        $token = $this->encryptor->decrypt($this->getGeneralConfig('token', $storeId));
-        if (empty($token)) {
-            $this->log('Private key is empty');
+        $this->logDebug('getToken: Attempting to retrieve token.');
+
+        try {
+            $token = $this->encryptor->decrypt(
+                $this->helperConfig->getGeneralConfig('token', $storeId)
+            );
+
+            if (empty($token)) {
+                $this->logDebug('getToken: Private key is empty.', [], 'error');
+            }
+
+            $this->logDebug('getToken: Token retrieved successfully.');
+            return $token;
+        } catch (\Exception $e) {
+            $this->logDebug('getToken: Error retrieving token.', ['exception' => $e->getMessage()], 'error');
+            throw new \Exception('Unable to retrieve token');
         }
-        return $token;
     }
 
+    /**
+     * Retrieve the access token
+     *
+     * @param int|null $storeId
+     * @return string
+     * @throws LocalizedException
+     */
+    public function getAccessToken($storeId = null): string
+    {
+        if (!is_null($storeId) && !is_int($storeId)) {
+            throw new LocalizedException(__('Invalid store ID provided.'));
+        }
+
+        $this->logDebug('getAccessToken: Attempting to retrieve access token.');
+
+        try {
+            $accessToken = $this->accessTokenRepository->getValidAccessToken($storeId);
+            $this->logDebug('getAccessToken: Valid access token retrieved successfully.');
+            return $accessToken;
+        } catch (\Exception $e) {
+            $this->logDebug('getAccessToken: No valid access token found.', ['exception' => $e->getMessage()], 'error');
+        }
+
+        $this->logDebug('getAccessToken: Checking for a refresh token.');
+
+        $tokens = null;
+        try {
+            $tokens = $this->accessTokenRepository->getLastRefreshToken($storeId);
+            $this->logDebug('getAccessToken: Refresh token found.');
+        } catch (\Exception $e) {
+            $this->logDebug('getAccessToken: Failed to retrieve refresh token.', ['exception' => $e->getMessage()], 'error');
+        }
+
+        if (!empty($tokens)) {
+            try {
+                $this->logDebug('getAccessToken: Attempting to update access token using refresh token.');
+
+                $newToken = $this->api->token()->updateAccessToken(
+                    $tokens['access_token'],
+                    $tokens['refresh_token'],
+                    $storeId
+                );
+
+                $this->saveAccessToken($newToken, $storeId);
+                $this->logDebug('getAccessToken: Access token updated successfully.');
+                return $newToken['access_token'];
+            } catch (\Exception $e) {
+                $this->logDebug('getAccessToken: Failed to update access token using refresh token.', ['exception' => $e->getMessage()], 'error');
+            }
+        }
+
+        $this->logDebug('getAccessToken: No refresh token available, checking for an authorization code.');
+
+        $vindiCode = $this->helperConfig->getVindiCode($storeId);
+
+        if (empty($vindiCode)) {
+            $this->logDebug('getAccessToken: Authorization code is not available.', 'error');
+            throw new LocalizedException(
+                __('Authorization code is not available. Please authenticate the application.')
+            );
+        }
+
+        try {
+            $this->logDebug('getAccessToken: Attempting to generate a new access token using authorization code.');
+
+            $accessToken = $this->generateNewAccessToken($storeId);
+            $this->logDebug('getAccessToken: New access token generated successfully.');
+            return $accessToken;
+        } catch (\Exception $e) {
+            $this->logDebug('getAccessToken: Failed to generate new access token.', ['exception' => $e->getMessage()], 'error');
+            throw new LocalizedException(
+                __('Failed to generate a new access token: %1', $e->getMessage())
+            );
+        }
+    }
+
+    /**
+     * Generate a new access token
+     *
+     * @param null $storeId
+     * @return string
+     * @throws \Exception
+     */
+    public function generateNewAccessToken($storeId = null): string
+    {
+        $this->logDebug('generateNewAccessToken: Attempting to generate a new access token.');
+
+        try {
+            $consumerKey    = $this->getConsumerKey($storeId);
+            $consumerSecret = $this->getConsumerSecret($storeId);
+
+            $code = $this->getSavedCode($storeId);
+
+            if (empty($code)) {
+                $this->logDebug('generateNewAccessToken: Authorization code is not available.', [], 'error');
+                throw new \Exception('Authorization code is not available. Please complete the authentication process.');
+            }
+
+            $newToken = $this->api->token()->generateAccessToken(
+                $code,
+                $consumerKey,
+                $consumerSecret,
+                $storeId
+            );
+
+            $this->saveAccessToken($newToken, $storeId);
+            $this->logDebug('generateNewAccessToken: New access token generated successfully.');
+            return $newToken['access_token'];
+        } catch (\Exception $e) {
+            $this->logDebug('generateNewAccessToken: Failed to generate new access token.', ['exception' => $e->getMessage()], 'error');
+            throw new \Exception('Unable to generate a new access token');
+        }
+    }
+
+    /**
+     * Retrieve the saved authorization code
+     *
+     * @param int|null $storeId
+     * @return string|null
+     */
+    public function getSavedCode(?int $storeId = null): ?string
+    {
+        return $this->helperConfig->getVindiCode($storeId);
+    }
+
+    /**
+     * @param array $tokenData
+     * @param null $storeId
+     */
+    private function saveAccessToken(array $tokenData, $storeId = null): void
+    {
+        $this->accessTokenRepository->saveNewAccessToken(
+            $tokenData['access_token'],
+            $tokenData['refresh_token'],
+            $tokenData['access_token_expiration'],
+            $tokenData['refresh_token_expiration'],
+            $storeId
+        );
+
+        $this->log('New access token saved successfully');
+    }
+
+    /**
+     * @param $storeId
+     * @return string
+     */
     public function getConsumerKey($storeId = null): string
     {
-        $key = $this->encryptor->decrypt($this->getGeneralConfig('consumer_key', $storeId));
+        $key = $this->encryptor->decrypt(
+            $this->helperConfig->getGeneralConfig('consumer_key', $storeId)
+        );
+
         if (empty($key)) {
             $this->log('Consumer key is empty');
         }
         return $key;
     }
 
+    /**
+     * @param $storeId
+     * @return string
+     */
     public function getConsumerSecret($storeId = null): string
     {
-        $secret = $this->encryptor->decrypt($this->getGeneralConfig('consumer_secret', $storeId));
+        $secret = $this->encryptor->decrypt(
+            $this->helperConfig->getGeneralConfig('consumer_secret', $storeId)
+        );
         if (empty($secret)) {
             $this->log('Secret key is empty');
         }
         return $secret;
     }
 
-    public function getResellerToken($storeId = null): string
-    {
-        if ((bool) $this->getGeneralConfig('use_sandbox', $storeId)) {
-            return '';
-        }
-        return $this->getGeneralConfig('reseller_token', $storeId);
-    }
-
     /**
-     * @param string $message
+     * @param $storeId
      * @return string
      */
-    public function mask(string $message): string
+    public function getResellerToken($storeId = null): string
     {
-        $message = preg_replace('/"token_account":\s?"([^"]+)"/', '"token_account":"*********"', $message);
-        $message = preg_replace('/"reseller_token":\s?"([^"]+)"/', '"reseller_token":"*********"', $message);
-        $message = preg_replace('/"hash":\s?"([^"]+)"/', '"hash":"*********"', $message);
-        $message = preg_replace('/"card_cvv":\s?"([^"]+)"/', '"card_cvv":"***"', $message);
-        $message = preg_replace('/"card_expdate_month":\s?"([^"]+)"/', '"card_expdate_month":"**"', $message);
-        $message = preg_replace('/"card_expdate_year":\s?"([^"]+)"/', '"card_expdate_year":"****"', $message);
-        $message = preg_replace('/"notification_url":\s?\["([^"]+)"\]/', '"notification_url":["*****************"]', $message);
-        return preg_replace('/"card_number":\s?"(\d{6})\d{3,9}(\d{4})"/', '"card_number":"$1******$2"', $message);
+        return $this->helperConfig->getGeneralConfig('reseller_token', $storeId);
     }
 
     /**
      * @param $message
-     * @return bool|string
+     * @return string
      */
     public function jsonEncode($message): string
     {
@@ -307,41 +504,16 @@ class Data extends \Magento\Payment\Helper\Data
      */
     public function saveRequest($request, $response, $statusCode, string $method = 'vindi_vp'): void
     {
-        if ($this->getGeneralConfig('debug')) {
-            try {
-                if (!is_string($request)) {
-                    $request = $this->json->serialize($request);
-                }
-                if (!is_string($response)) {
-                    $response = $this->json->serialize($response);
-                }
-                $request = $this->mask($request);
-                $response = $this->mask($response);
-
-                $requestModel = $this->requestFactory->create();
-                $requestModel->setRequest($request);
-                $requestModel->setResponse($response);
-                $requestModel->setMethod($method);
-                $requestModel->setStatusCode($statusCode);
-
-                $this->requestRepository->save($requestModel);
-            } catch (\Exception $e) {
-                $this->log($e->getMessage());
-            }
-        }
+        $this->helperLogger->saveRequest($request, $response, $statusCode, $method);
     }
 
     public function getConfig(
         string $config,
         string $group = 'vindi_vp_bankslip',
         string $section = 'payment',
-               $scopeCode = null
+        $scopeCode = null
     ): string {
-        return (string) $this->scopeConfig->getValue(
-            $section . '/' . $group . '/' . $config,
-            ScopeInterface::SCOPE_STORE,
-            $scopeCode
-        );
+        return $this->helperConfig->getConfig($config, $group, $section, $scopeCode);
     }
 
     public function saveConfig(
@@ -350,10 +522,7 @@ class Data extends \Magento\Payment\Helper\Data
         string $group = 'general',
         string $section = 'vindi_vp'
     ): void {
-        $this->configWriter->save(
-            $section . '/' . $group . '/' . $config,
-            $value
-        );
+        $this->helperConfig->saveConfig($value, $config, $group, $section);
     }
 
     public function getGeneralConfig(string $config, $scopeCode = null): string
@@ -394,11 +563,6 @@ class Data extends \Magento\Payment\Helper\Data
     public function getUrl(string $route, array $params = []): string
     {
         return $this->_getUrl($route, $params);
-    }
-
-    public function getLogger(): LoggerInterface
-    {
-        return $this->_logger;
     }
 
     public function digits(string $string): string
@@ -484,17 +648,20 @@ class Data extends \Magento\Payment\Helper\Data
     }
 
     /**
-     * @param string $moduleName
-     * @return bool
+     * Logs debug messages if debug is enabled.
+     *
+     * @param string $message
+     * @param array|string $data
+     * @param string $type
      */
-    public function checkModuleStatus(string $moduleName): bool
+    private function logDebug(string $message, $data = [], string $type = 'info'): void
     {
-        if ($this->moduleManager->isInstalled($moduleName)) {
-            if ($this->moduleManager->isEnabled($moduleName)) {
-                return true;
+        if ($this->isDebugEnabled) {
+            if ($type === 'error') {
+                $this->logger->error($message, is_array($data) ? $data : ['data' => $data]);
+            } else {
+                $this->logger->info($message, is_array($data) ? $data : ['data' => $data]);
             }
         }
-
-        return false;
     }
 }

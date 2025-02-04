@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  *
@@ -21,7 +22,6 @@ namespace Vindi\VP\Gateway\Http\Client;
 
 use Magento\Payment\Gateway\Http\ClientInterface;
 use Magento\Payment\Gateway\Http\TransferInterface;
-use Vindi\VP\Helper\Data;
 
 class Refund implements ClientInterface
 {
@@ -33,7 +33,6 @@ class Refund implements ClientInterface
     private $api;
 
     /**
-     * @param Data $helper
      * @param Api $api
      */
     public function __construct(

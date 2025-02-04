@@ -26,11 +26,10 @@
     <preference for="Vindi\VP\Api\Data\PaymentLinkInterface" type="Vindi\VP\Model\PaymentLink"/>
     <preference for="Vindi\VP\Api\PaymentLinkRepositoryInterface" type="Vindi\VP\Model\ResourceModel\PaymentLinkRepository"/>
 
-    <preference for="Vindi\VP\Api\Data\CompanyInterface" type="Vindi\VP\Model\Customer\Company"/>
+    <preference for="Vindi\VP\Api\Data\AccessTokenInterface" type="Vindi\VP\Model\AccessToken"/>
+    <preference for="Vindi\VP\Api\AccessTokenRepositoryInterface" type="Vindi\VP\Model\ResourceModel\AccessTokenRepository"/>
 
-    <type name="Magento\Sales\Model\Service\OrderService">
-        <plugin name="after_place_order_plugin" type="Vindi\VP\Plugin\Model\Service\OrderService" />
-    </type>
+    <preference for="Vindi\VP\Api\Data\CompanyInterface" type="Vindi\VP\Model\Customer\Company"/>
 
     <type name="Magento\Sales\Model\Order\Payment">
         <plugin name="vindi_order_payment_can_void" type="Vindi\VP\Plugin\Order\Payment" />
@@ -41,6 +40,7 @@
             <argument name="commands" xsi:type="array">
                 <item name="vindi:vp:update-expired-links" xsi:type="object">Vindi\VP\Console\Command\RunUpdateExpiredLinks</item>
                 <item name="vindi:vp:cancel-orders-with-expired-links" xsi:type="object">Vindi\VP\Console\Command\RunCancelOrdersWithExpiredLinks</item>
+                <item name="vindi:vp:clear-old-access-tokens" xsi:type="object">Vindi\VP\Console\Command\ClearOldAccessTokensCommand</item>
             </argument>
         </arguments>
     </type>

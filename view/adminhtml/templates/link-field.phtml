@@ -34,18 +34,6 @@ $paymentLink = $block->getPaymentLink();
                     echo $param = $request->getParam('order_id'); ?>"/>
 
                     <span class="link" style="display: none"><?= $paymentLink; ?></span>
-
-                    <input type="text"
-                           class="admin__control-text"
-                           value="<?php echo $paymentLink; ?>"
-                           style="margin-right: 10px"
-                           readonly>
-                    <button class="pix-copy-button"
-                            style="margin-right: 10px"
-                            data-text="<?= $block->escapeHtml(__('Copied!')) ?>"
-                            onclick="vindiVp.copyCode(this, '.link', false)">
-                        <?= $block->escapeHtml(__('Copy link')) ?>
-                    </button>
                 </fieldset>
                 <button id="send" class="action-default action-secondary action-send"><?php /* @escapeNotVerified */ echo $buttonLabel ?></button>
             <?php endif; ?>

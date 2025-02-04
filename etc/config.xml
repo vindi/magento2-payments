@@ -29,7 +29,6 @@
             <general>
                 <refund_on_cancel>0</refund_on_cancel>
                 <show_payment_info>0</show_payment_info>
-                <reseller_token>4957fbd8f9b9962</reseller_token>
                 <payment_link_template>payment_link_template</payment_link_template>
             </general>
             <address>
@@ -43,8 +42,16 @@
                 <payments_uri_sandbox>https://api.intermediador.sandbox.yapay.com.br/</payments_uri_sandbox>
                 <installments_uri>https://api.intermediador.yapay.com.br/</installments_uri>
                 <installments_uri_sandbox>https://api.intermediador.sandbox.yapay.com.br/</installments_uri_sandbox>
+                <resellers>
+                    <auth>
+                    </auth>
+                </resellers>
                 <payments>
-                    <auth>api/v1/authorizations/access_token</auth>
+                    <auth>
+                        <create>api/v1/reseller/authorizations/create</create>
+                        <token>api/v1/authorizations/access_token</token>
+                        <refresh>api/v1/authorizations/refresh</refresh>
+                    </auth>
                     <create>api/v3/transactions/payment</create>
                     <get><![CDATA[api/v3/transactions/get_by_token_brief/?token_account={token}&token_transaction={order_id}]]></get>
                     <cancel>api/v3/transactions/cancel</cancel>
@@ -53,6 +60,9 @@
                 </payments>
                 <installments>v1/transactions/simulate_splitting</installments>
             </endpoints>
+            <authorization>
+                <code />
+            </authorization>
         </vindi_vp>
         <payment>
             <vindi_vp_bankslip>
@@ -156,9 +166,9 @@
                 <can_capture_partial>0</can_capture_partial>
                 <can_use_internal>1</can_use_internal>
                 <can_refund_partial_per_invoice>0</can_refund_partial_per_invoice>
-                <can_cancel>0</can_cancel>
-                <can_refund>0</can_refund>
-                <can_void>0</can_void>
+                <can_cancel>1</can_cancel>
+                <can_refund>1</can_refund>
+                <can_void>1</can_void>
                 <can_edit>0</can_edit>
                 <masked_fields>cvv,cc_number</masked_fields>
                 <useccv>1</useccv>

@@ -20,14 +20,15 @@ use Vindi\VP\Gateway\Http\Client\Api\Query;
 use Vindi\VP\Gateway\Http\Client\Api\Refund;
 use Vindi\VP\Gateway\Http\Client\Api\Installments;
 use Vindi\VP\Gateway\Http\Client\Api\Track;
-use Vindi\VP\Helper\Data;
+use Vindi\VP\Gateway\Http\Client\Api\Token;
+use Vindi\VP\Helper\Logger;
 
 class Api
 {
     /**
-     * @var Data
+     * @var Logger
      */
-    private $helper;
+    private $logger;
 
     /**
      * @var Create
@@ -54,20 +55,27 @@ class Api
      */
     private $track;
 
+    /**
+     * @var Token
+     */
+    private $token;
+
     public function __construct(
-        Data $helper,
+        Logger $logger,
         Create $create,
         Refund $refund,
         Installments $installments,
         Query $query,
-        Track $track
+        Track $track,
+        Token $token
     ) {
-        $this->helper = $helper;
+        $this->logger = $logger;
         $this->create = $create;
         $this->refund = $refund;
         $this->installments = $installments;
         $this->query = $query;
         $this->track = $track;
+        $this->token = $token;
     }
 
     public function create(): Create
@@ -95,14 +103,19 @@ class Api
         return $this->installments;
     }
 
+    public function token(): Token
+    {
+        return $this->token;
+    }
+
     /**
      * @param $request
      * @param string $name
      */
     public function logRequest($request, $name = 'vindi-vp'): void
     {
-        $this->helper->log('Request', $name);
-        $this->helper->log($request, $name);
+        $this->logger->execute('Request', $name);
+        $this->logger->execute($request, $name);
     }
 
     /**
@@ -111,8 +124,8 @@ class Api
      */
     public function logResponse($response, $name = 'vindi-vp'): void
     {
-        $this->helper->log('RESPONSE', $name);
-        $this->helper->log($response, $name);
+        $this->logger->execute('RESPONSE', $name);
+        $this->logger->execute($response, $name);
     }
 
     /**
@@ -127,6 +140,6 @@ class Api
         $statusCode,
         $method = \Vindi\VP\Model\Ui\CreditCard\ConfigProvider::CODE
     ): void {
-        $this->helper->saveRequest($request, $response, $statusCode, $method);
+        $this->logger->saveRequest($request, $response, $statusCode, $method);
     }
 }
