@@ -140,9 +140,11 @@ class TransactionRequest extends PaymentsRequest implements BuilderInterface
         $savedCard = $this->creditCardRepository->getById($paymentProfileId);
         $order = $payment->getOrder();
 
+        $methodName = strtolower(str_replace(' ', '', $savedCard->getCcType()));
+
         return [
             'card_token' => $savedCard->getCardToken(),
-            'payment_method_id' => '4',
+            'payment_method_id' => $this->helper->getMethodIdByName($methodName),
             'split' => (string) $this->getInstallments($order)
         ];
     }

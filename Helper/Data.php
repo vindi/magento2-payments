@@ -74,6 +74,18 @@ class Data extends \Magento\Payment\Helper\Data
         'BANKSLIPPIX' => '28'
     ];
 
+    protected array $methodIdsByName = [
+        'mastercard' => '4',
+        'visa' => '3',
+        'elo' => '16',
+        'americanexpress' => '5',
+        'hipercard' => '28',
+        'hiper' => '25',
+        'pix' => '27',
+        'bankslip' => '6',
+        'bankslippix' => '28'
+    ];
+
     protected array $transactionStatus = [
         '4' => 'waiting_payment',
         '6' => 'approved',
@@ -592,6 +604,14 @@ class Data extends \Magento\Payment\Helper\Data
             $brandName = $this->methodNames[$ccType];
         }
         return $brandName;
+    }
+
+    public function getMethodIdByName(string $ccType): string
+    {
+        if (isset($this->methodIdsByName[$ccType])) {
+            $methodId = $this->methodIdsByName[$ccType];
+        }
+        return $methodId ?? '0';
     }
 
     public function getMethodId(string $ccType): string
