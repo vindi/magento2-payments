@@ -36,7 +36,7 @@ define(
         'Magento_Checkout/js/model/payment/additional-validators',
         'mage/mage',
         'mage/validation',
-        'vindi_vp/validation',
+        'vindi_vp/validation'
     ],
     function (
         _,
@@ -57,7 +57,7 @@ define(
         return Component.extend({
             defaults: {
                 template: 'Vindi_VP/payment/form/cc',
-                taxvat: window.checkoutConfig.payment.vindi_vp_cc.customer_taxvat.replace(/[^0-9]/g, ""),
+                taxvat: (window.checkoutConfig && window.checkoutConfig.payment && window.checkoutConfig.payment.vindi_vp_cc && window.checkoutConfig.payment.vindi_vp_cc.customer_taxvat) ? window.checkoutConfig.payment.vindi_vp_cc.customer_taxvat.replace(/[^0-9]/g, "") : "",
                 creditCardOwner: '',
                 creditCardInstallments: '',
                 vindiCreditCardNumber: '',
@@ -70,27 +70,27 @@ define(
                 debounceTimer: null,
                 isCheckoutPage: ko.observable(true),
                 paymentProfiles: [],
-                selectedPaymentProfile: ''
+                selectedPaymentProfile: '',
+                installmentsDisabled: ko.observable(true)
             },
 
             /** @inheritdoc */
             initObservable: function () {
                 var self = this;
-                this._super()
-                    .observe([
-                        'taxvat',
-                        'creditCardType',
-                        'creditCardExpDate',
-                        'creditCardExpYear',
-                        'creditCardExpMonth',
-                        'vindiCreditCardNumber',
-                        'creditCardType',
-                        'creditCardVerificationNumber',
-                        'selectedCardType',
-                        'creditCardOwner',
-                        'creditCardInstallments',
-                        'selectedPaymentProfile',
-                    ]);
+                this._super().observe([
+                    'taxvat',
+                    'creditCardType',
+                    'creditCardExpDate',
+                    'creditCardExpYear',
+                    'creditCardExpMonth',
+                    'vindiCreditCardNumber',
+                    'creditCardType',
+                    'creditCardVerificationNumber',
+                    'selectedCardType',
+                    'creditCardOwner',
+                    'creditCardInstallments',
+                    'selectedPaymentProfile'
+                ]);
 
                 this.creditCardVerificationNumber('');
 
@@ -103,45 +103,52 @@ define(
                 });
 
                 this.vindiCreditCardNumber.subscribe(function (value) {
-                    let result;
-
-                    if (value === '' || value === null) {
+                    if (!value) {
                         return false;
                     }
-
-                    result = cardNumberValidator(value);
-                    if (!result.isValid) {
+                    var result = cardNumberValidator(value);
+                    if (!result || !result.isValid) {
                         return false;
                     }
-
                     if (result.card !== null) {
                         self.selectedCardType(result.card.type);
                         creditCardData.creditCard = result.card;
                     }
-
-                    if (result.isValid) {
-                        creditCardData.vindiCreditCardNumber = value;
-                        self.creditCardType(result.card.type);
-                    }
-
+                    creditCardData.vindiCreditCardNumber = value;
+                    self.creditCardType(result.card.type);
                     self.updateInstallmentsValues();
                 });
 
+                this.selectedPaymentProfile.subscribe(function (value) {
+                    if (value) {
+                        var cardProfiles = self.getPaymentProfiles();
+                        var selectedCard = cardProfiles.find(function (card) {
+                            return card.value == value;
+                        });
+                        if (selectedCard && selectedCard.card_type) {
+                            self.creditCardType(selectedCard.card_type);
+                        }
+                    }
+                    self.updateInstallmentsValues();
+                });
+
+                self.installmentsDisabled(true);
                 this.updateInstallmentsValues();
 
                 return this;
             },
 
             loadCard: function () {
-                let ccName = document.getElementById(this.getCode() + '_cc_owner');
-                let ccNumber = document.getElementById(this.getCode() + '_cc_number');
-                let ccExpDate = document.getElementById(this.getCode() + '_cc_exp_date');
-                let ccCvv = document.getElementById(this.getCode() + '_cc_cid');
-                let ccSingle = document.getElementById('vindi-vp-cc-ccsingle');
-                let ccFront = document.getElementById('vindi-vp-cc-front');
-                let ccBack = document.getElementById('vindi-vp-cc-back');
-
-                creditCardForm(ccName, ccNumber, ccExpDate, ccCvv, ccSingle, ccFront, ccBack);
+                var ccName = document.getElementById(this.getCode() + '_cc_owner');
+                var ccNumber = document.getElementById(this.getCode() + '_cc_number');
+                var ccExpDate = document.getElementById(this.getCode() + '_cc_exp_date');
+                var ccCvv = document.getElementById(this.getCode() + '_cc_cid');
+                var ccSingle = document.getElementById('vindi-vp-cc-ccsingle');
+                var ccFront = document.getElementById('vindi-vp-cc-front');
+                var ccBack = document.getElementById('vindi-vp-cc-back');
+                if (ccName && ccNumber && ccExpDate && ccCvv && ccSingle && ccFront && ccBack) {
+                    creditCardForm(ccName, ccNumber, ccExpDate, ccCvv, ccSingle, ccFront, ccBack);
+                }
             },
 
             getCode: function () {
@@ -153,14 +160,12 @@ define(
              * @returns {Object}
              */
             getData: function () {
-
                 fingerprint(window.checkoutConfig.payment[this.getCode()].sandbox);
-                let ccExpMonth = '';
-                let ccExpYear = '';
-                let ccExpDate = this.creditCardExpDate();
-
+                var ccExpMonth = '';
+                var ccExpYear = '';
+                var ccExpDate = this.creditCardExpDate();
                 if (typeof ccExpDate !== "undefined" && ccExpDate !== null) {
-                    let ccExpDateFull = ccExpDate.split('/');
+                    var ccExpDateFull = ccExpDate.split('/');
                     ccExpMonth = ccExpDateFull[0];
                     ccExpYear = ccExpDateFull[1];
                 }
@@ -170,25 +175,27 @@ define(
                         'payment_profile': this.selectedPaymentProfile(),
                         'taxvat': this.taxvat(),
                         'cc_cid': this.creditCardVerificationNumber(),
-                        'cc_type': this.creditCardType(),
+                        'cc_type': this.mapCardType(this.creditCardType()),
                         'cc_exp_month': ccExpMonth,
-                        'cc_exp_year': ccExpYear.length === 4 ? ccExpYear : '20' + ccExpYear,
+                        'cc_exp_year': ccExpYear && ccExpYear.length === 4 ? ccExpYear : '20' + ccExpYear,
                         'cc_number': this.vindiCreditCardNumber(),
                         'cc_owner': this.creditCardOwner(),
                         'installments': this.creditCardInstallments(),
-                        'fingerprint': window.yapay?.FingerPrint()?.getFingerPrint() || '',
+                        'fingerprint': (window.yapay && window.yapay.FingerPrint) ? window.yapay.FingerPrint().getFingerPrint() : ''
                     }
                 };
             },
 
             getCcAvailableTypes: function () {
-                return window.checkoutConfig.payment[this.getCode()].availableTypes;
+                return window.checkoutConfig && window.checkoutConfig.payment && window.checkoutConfig.payment[this.getCode()] && window.checkoutConfig.payment[this.getCode()].availableTypes ? window.checkoutConfig.payment[this.getCode()].availableTypes : [];
             },
 
             getIcons: function (type) {
-                return window.checkoutConfig.payment[this.getCode()].icons.hasOwnProperty(type)
-                    ? window.checkoutConfig.payment[this.getCode()].icons[type]
-                    : false;
+                var config = window.checkoutConfig && window.checkoutConfig.payment && window.checkoutConfig.payment[this.getCode()];
+                if (config && config.icons && config.icons.hasOwnProperty(type)) {
+                    return config.icons[type];
+                }
+                return false;
             },
 
             isActive: function () {
@@ -196,65 +203,89 @@ define(
             },
 
             validate: function () {
-                const $form = $('#' + 'form_' + this.getCode());
-                return ($form.validation() && $form.validation('isValid'));
+                var $form = $('#' + 'form_' + this.getCode());
+                return ($form && $form.validation() && $form.validation('isValid'));
             },
 
             retrieveInstallmentsUrl: function () {
                 try {
-                    this.installmentsUrl = window.checkoutConfig.payment.ccform.urls[this.getCode()].retrieve_installments;
-                    return this.installmentsUrl;
+                    return window.checkoutConfig.payment && window.checkoutConfig.payment.ccform && window.checkoutConfig.payment.ccform.urls && window.checkoutConfig.payment.ccform.urls[this.getCode()] && window.checkoutConfig.payment.ccform.urls[this.getCode()].retrieve_installments ? window.checkoutConfig.payment.ccform.urls[this.getCode()].retrieve_installments : "";
                 } catch (e) {
                     console.log('Installments URL not defined');
+                    return "";
                 }
-                return false;
             },
 
             isLoggedIn: function () {
                 return customer.isLoggedIn();
             },
 
+            mapCardType: function (type) {
+                var mapping = {
+                    'Mastercard': 'MC',
+                    'Aura': 'AU',
+                    'Visa': 'VI',
+                    'Elo': 'ELO',
+                    'American Express': 'AE',
+                    'JCB': 'JCB',
+                    'Hipercard': 'HC',
+                    'Hiper': 'HI'
+                };
+                return mapping[type] ? mapping[type] : type;
+            },
+
             updateInstallmentsValues: function () {
                 var self = this;
-
+                self.installmentsDisabled(true);
                 if (self.debounceTimer !== null) {
                     clearTimeout(self.debounceTimer);
                 }
-
-                self.debounceTimer = setTimeout(() => {
-                    fetch(self.retrieveInstallmentsUrl(), {
+                self.debounceTimer = setTimeout(function () {
+                    var url = self.retrieveInstallmentsUrl();
+                    if (!url || typeof fetch !== "function") {
+                        self.installmentsDisabled(false);
+                        return;
+                    }
+                    fetch(url, {
                         method: 'POST',
                         cache: 'no-cache',
                         headers: {'Content-Type': 'application/json'},
                         body: JSON.stringify({
                             form_key: window.checkoutConfig.formKey,
-                            cc_type: self.creditCardType()
+                            cc_type: self.mapCardType(self.creditCardType())
                         })
-                    }).then((response) => {
+                    }).then(function (response) {
                         self.installments.removeAll();
                         return response.json();
-                    }).then(json => {
-                        json.forEach(function (installment) {
-                            self.installments.push(installment);
-                            self.hasInstallments(true);
-                        });
+                    }).then(function (json) {
+                        if (json && Array.isArray(json)) {
+                            json.forEach(function (installment) {
+                                self.installments.push(installment);
+                                self.hasInstallments(true);
+                            });
+                            if (json.length > 0) {
+                                self.creditCardInstallments(json[0].installments);
+                            }
+                        }
+                        self.installmentsDisabled(false);
+                    }).catch(function () {
+                        self.installmentsDisabled(false);
                     });
                 }, 500);
             },
 
             getPaymentProfiles: function () {
-                let paymentProfiles = [];
-                const savedCards = window.checkoutConfig.payment?.vindi_vp_cc?.saved_cards;
-
-                if (savedCards) {
+                var paymentProfiles = [];
+                var savedCards = window.checkoutConfig && window.checkoutConfig.payment && window.checkoutConfig.payment.vindi_vp_cc && window.checkoutConfig.payment.vindi_vp_cc.saved_cards;
+                if (savedCards && Array.isArray(savedCards)) {
                     savedCards.forEach(function (card) {
                         paymentProfiles.push({
                             'value': card.id,
-                            'text': `${card.card_type} xxxx-${card.card_number}`
+                            'text': card.card_type + ' xxxx-' + card.card_number,
+                            'card_type': card.card_type
                         });
                     });
                 }
-
                 return paymentProfiles;
             },
 
