@@ -119,6 +119,10 @@ class PaymentProfileList extends Template
     {
         $ccType = strtolower(str_replace(' ', '_', $ccType));
 
+        if ($ccType == 'amex') {
+            $ccType = 'american_express';
+        }
+
         $creditCardOptionArray = $this->creditCardTypeSource->toOptionArray();
 
         foreach ($creditCardOptionArray as $creditCardOption) {

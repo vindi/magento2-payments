@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Vindi\VP\Controller\PaymentProfile;
 
@@ -68,12 +69,12 @@ class Delete extends Action
         Data $helperData
     ) {
         parent::__construct($context);
-        $this->customerSession = $customerSession;
-        $this->creditCardFactory = $creditCardFactory;
-        $this->creditCardResource = $creditCardResource;
-        $this->cardApi = $cardApi;
-        $this->customerRepository = $customerRepository;
-        $this->helperData = $helperData;
+        $this->customerSession     = $customerSession;
+        $this->creditCardFactory   = $creditCardFactory;
+        $this->creditCardResource  = $creditCardResource;
+        $this->cardApi             = $cardApi;
+        $this->customerRepository  = $customerRepository;
+        $this->helperData          = $helperData;
     }
 
     /**
@@ -85,14 +86,14 @@ class Delete extends Action
     public function execute()
     {
         $request = $this->getRequest();
-        $customerId = $this->customerSession->getCustomerId();
+        $customerId = (int)$this->customerSession->getCustomerId();
 
         if (!$customerId) {
             $this->messageManager->addErrorMessage(__('Customer not authenticated.'));
             return $this->resultRedirectFactory->create()->setPath('vindi_vp/paymentprofile/index');
         }
 
-        $creditCardId = $request->getParam('id');
+        $creditCardId = (int)$request->getParam('id');
 
         if (!$creditCardId) {
             $this->messageManager->addErrorMessage(__('Invalid credit card ID.'));
@@ -101,7 +102,7 @@ class Delete extends Action
 
         try {
             $customer = $this->customerRepository->getById($customerId);
-            $accessToken = $this->helperData->getAccessToken((int) $customer->getStoreId());
+            $accessToken = $this->helperData->getAccessToken((int)$customer->getStoreId());
 
             if (empty($accessToken)) {
                 throw new \Exception('Failed to generate access token.');
@@ -115,14 +116,19 @@ class Delete extends Action
                 return $this->resultRedirectFactory->create()->setPath('vindi_vp/paymentprofile/index');
             }
 
+            if ((int)$creditCard->getCustomerId() !== $customerId) {
+                $this->messageManager->addErrorMessage(__('Unauthorized access to credit card.'));
+                return $this->resultRedirectFactory->create()->setPath('vindi_vp/paymentprofile/index');
+            }
+
             $apiData = [
                 'access_token' => $accessToken,
-                'card_token' => $creditCard->getCardToken()
+                'card_token'   => $creditCard->getCardToken()
             ];
 
             $response = $this->cardApi->deactivate($apiData);
 
-            if ($response['status'] !== 200) {
+            if (!isset($response['status']) || $response['status'] !== 200) {
                 $this->messageManager->addErrorMessage(__('Failed to delete card.'));
                 return $this->resultRedirectFactory->create()->setPath('vindi_vp/paymentprofile/index');
             }

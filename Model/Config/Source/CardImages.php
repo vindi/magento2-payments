@@ -44,6 +44,11 @@ class CardImages implements ArrayInterface
                 'code' => 'JCB',
                 'label' => __('jcb')
             ],
+            [
+                'value' => 'hi.png',
+                'code' => 'HIPER',
+                'label' => __('hiper')
+            ],
         ];
     }
 }

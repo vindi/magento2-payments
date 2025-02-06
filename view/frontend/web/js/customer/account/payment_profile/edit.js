@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const cardNumberInput     = document.getElementById('cc_number');
     const cardExpirationInput = document.getElementById('cc_exp_date');
-    const cardTypeInputs    = document.querySelectorAll('.card-type-input');
+    const cardTypeInputs      = document.querySelectorAll('.card-type-input');
     const form                = document.getElementById('payment-profile-form');
 
     cardTypeInputs.forEach(input => {
@@ -42,6 +42,9 @@ document.addEventListener("DOMContentLoaded", function () {
         const visaPattern = /^4/;
         const mastercardPattern = /^(5[1-5]|2[2-7])/;
         const amexPattern = /^3[47]/;
+        const hipercardPattern = /^(606282|3841)/;
+        const hiperPattern = /^(6370|637095|637599|637609|637612)/;
+        const eloPattern = /^(4011|4312|4389|4514|4573|4576|5041|5066|5067|5090|6277|6362|6363|6500|6504|6505|6506|6507|6509|6516|6550)/;
 
         if (visaPattern.test(value)) {
             document.getElementById('visa').checked = true;
@@ -52,6 +55,15 @@ document.addEventListener("DOMContentLoaded", function () {
         } else if (amexPattern.test(value)) {
             document.getElementById('amex').checked = true;
             cardType = 'amex';
+        } else if (hipercardPattern.test(value)) {
+            document.getElementById('hipercard').checked = true;
+            cardType = 'hipercard';
+        } else if (hiperPattern.test(value)) {
+            document.getElementById('hiper').checked = true;
+            cardType = 'hiper';
+        } else if (eloPattern.test(value)) {
+            document.getElementById('elo').checked = true;
+            cardType = 'elo';
         }
 
         e.target.value = mask.cartao(value, cardType);
@@ -67,7 +79,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const cardNumber       = document.getElementById('cc_number').value.replace(/-/g, '');
         const cardExpDate      = document.getElementById('cc_exp_date').value;
         const cardCVV          = document.getElementById('cc_cvv').value;
-        const cardNameInput= document.getElementById('cc_name');
+        const cardNameInput    = document.getElementById('cc_name');
         const cardTypeSelected = document.querySelector('input[name="cc_type"]:checked');
 
         if (!cardTypeSelected) {
@@ -75,7 +87,7 @@ document.addEventListener("DOMContentLoaded", function () {
             return false;
         }
 
-        if (!isValidCardNumber(cardNumber)) {
+        if (!isValidCardNumber(cardNumber, cardTypeSelected.value)) {
             alert('Número do cartão inválido.');
             return false;
         }
@@ -98,7 +110,11 @@ document.addEventListener("DOMContentLoaded", function () {
         form.submit();
     });
 
-    function isValidCardNumber(number) {
+    function isValidCardNumber(number, cardType) {
+        if (cardType === 'elo' || cardType === 'hiper') {
+            return true;
+        }
+
         let sum = 0;
         let shouldDouble = false;
         for (let i = number.length - 1; i >= 0; i--) {
@@ -128,7 +144,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function isValidCVV(cvv, cardType) {
         const cvvLength = cvv.length;
-        return (cardType === 'amex' && cvvLength === 4) || (['visa', 'mastercard'].includes(cardType) && cvvLength === 3);
+        return (cardType === 'amex' && cvvLength === 4) || (['visa', 'mastercard', 'hipercard', 'hiper', 'elo'].includes(cardType) && cvvLength === 3);
     }
 
     function isValidCardName(cardName) {

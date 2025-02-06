@@ -1,13 +1,14 @@
 <?php
+declare(strict_types=1);
 
 /**
  * DISCLAIMER
  *
- * Do not edit or add to this file if you wish to upgrade this extension to newer
+ * Do not edit or add to this file if you wish to upgrade this extension to a newer
  * version in the future.
  *
- * @category    Vindi
- * @package     Vindi_VP
+ * @category Vindi
+ * @package  Vindi_VP
  */
 
 namespace Vindi\VP\Gateway\Request\CreditCard;
@@ -32,29 +33,36 @@ use Vindi\VP\Model\CreditCardRepository;
  */
 class TransactionRequest extends PaymentsRequest implements BuilderInterface
 {
-    /** @var EncryptorInterface */
+    /**
+     * @var EncryptorInterface
+     */
     protected $encryptor;
 
-    /** @var SessionManagerInterface */
+    /**
+     * @var SessionManagerInterface
+     */
     protected $session;
 
-    /** @var CreditCardRepository */
+    /**
+     * @var CreditCardRepository
+     */
     protected $creditCardRepository;
 
     /**
      * TransactionRequest constructor.
-     * @param ManagerInterface $eventManager
-     * @param Data $helper
-     * @param DateTime $date
-     * @param ConfigInterface $config
-     * @param CustomerSession $customerSession
-     * @param DateTime $dateTime
-     * @param ProductRepositoryInterface $productRepository
-     * @param CategoryRepositoryInterface $categoryRepository
-     * @param Api $api
-     * @param EncryptorInterface $encryptor
-     * @param SessionManagerInterface $session
-     * @param CreditCardRepository $creditCardRepository
+     *
+     * @param ManagerInterface              $eventManager
+     * @param Data                          $helper
+     * @param DateTime                      $date
+     * @param ConfigInterface               $config
+     * @param CustomerSession               $customerSession
+     * @param DateTime                      $dateTime
+     * @param ProductRepositoryInterface    $productRepository
+     * @param CategoryRepositoryInterface   $categoryRepository
+     * @param Api                           $api
+     * @param EncryptorInterface            $encryptor
+     * @param SessionManagerInterface       $session
+     * @param CreditCardRepository          $creditCardRepository
      */
     public function __construct(
         ManagerInterface $eventManager,
@@ -70,17 +78,17 @@ class TransactionRequest extends PaymentsRequest implements BuilderInterface
         SessionManagerInterface $session,
         CreditCardRepository $creditCardRepository
     ) {
-        $this->eventManager = $eventManager;
-        $this->helper = $helper;
-        $this->date = $date;
-        $this->config = $config;
-        $this->customerSession = $customerSession;
-        $this->dateTime = $dateTime;
-        $this->productRepository = $productRepository;
-        $this->categoryRepository = $categoryRepository;
-        $this->api = $api;
-        $this->encryptor = $encryptor;
-        $this->session = $session;
+        $this->eventManager         = $eventManager;
+        $this->helper               = $helper;
+        $this->date                 = $date;
+        $this->config               = $config;
+        $this->customerSession      = $customerSession;
+        $this->dateTime             = $dateTime;
+        $this->productRepository    = $productRepository;
+        $this->categoryRepository   = $categoryRepository;
+        $this->api                  = $api;
+        $this->encryptor            = $encryptor;
+        $this->session              = $session;
         $this->creditCardRepository = $creditCardRepository;
     }
 
@@ -91,7 +99,7 @@ class TransactionRequest extends PaymentsRequest implements BuilderInterface
      * @return array
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function build(array $buildSubject)
+    public function build(array $buildSubject): array
     {
         if (!isset($buildSubject['payment'])
             || !$buildSubject['payment'] instanceof PaymentDataObjectInterface
@@ -99,16 +107,18 @@ class TransactionRequest extends PaymentsRequest implements BuilderInterface
             throw new \InvalidArgumentException('Payment data object should be provided');
         }
 
-        /** @var \Magento\Sales\Model\Order\Payment $payment */
         $payment = $buildSubject['payment']->getPayment();
-        $order = $payment->getOrder();
+        $order   = $payment->getOrder();
 
-        $request = $this->getTransaction($order, $buildSubject['amount']);
+        $request     = $this->getTransaction($order, (float)$buildSubject['amount']);
         $paymentData = $this->getPaymentData($payment);
 
         $request['payment'] = $paymentData;
 
-        return ['request' => $request, 'client_config' => ['store_id' => $order->getStoreId()]];
+        return [
+            'request'       => $request,
+            'client_config' => ['store_id' => (int)$order->getStoreId()]
+        ];
     }
 
     /**
@@ -122,7 +132,7 @@ class TransactionRequest extends PaymentsRequest implements BuilderInterface
         $paymentProfileId = $payment->getAdditionalInformation('payment_profile');
 
         if ($paymentProfileId) {
-            return $this->getSavedCardData($paymentProfileId, $payment);
+            return $this->getSavedCardData((string)$paymentProfileId, $payment);
         }
 
         return $this->getNewCardData($payment);
@@ -131,21 +141,20 @@ class TransactionRequest extends PaymentsRequest implements BuilderInterface
     /**
      * Retrieves saved credit card data
      *
-     * @param string $paymentProfileId
-     * @param \Magento\Sales\Model\Order\Payment $payment
+     * @param string                             $paymentProfileId
+     * @param \Magento\Sales\Model\Order\Payment  $payment
      * @return array
      */
-    protected function getSavedCardData($paymentProfileId, $payment): array
+    protected function getSavedCardData(string $paymentProfileId, $payment): array
     {
         $savedCard = $this->creditCardRepository->getById($paymentProfileId);
-        $order = $payment->getOrder();
-
-        $methodName = strtolower(str_replace(' ', '', $savedCard->getCcType()));
+        $order     = $payment->getOrder();
+        $methodName = strtolower(str_replace(' ', '', (string)$savedCard->getCcType()));
 
         return [
-            'card_token' => $savedCard->getCardToken(),
-            'payment_method_id' => $this->helper->getMethodIdByName($methodName),
-            'split' => (string) $this->getInstallments($order)
+            'card_token'         => $savedCard->getCardToken(),
+            'payment_method_id'  => $this->helper->getMethodIdByName($methodName),
+            'split'              => (string)$this->getInstallments($order)
         ];
     }
 
@@ -159,25 +168,33 @@ class TransactionRequest extends PaymentsRequest implements BuilderInterface
     {
         $order = $payment->getOrder();
 
+        $encryptedData = $this->encryptor->encrypt(json_encode([
+            'cc_last_4' => substr($payment->getCcNumber(), -4),
+            'cc_exp_date' => $payment->getCcExpMonth() . '/' . $payment->getCcExpYear(),
+            'cc_name' => $payment->getCcOwner()
+        ]));
+        $this->session->setData('encrypted_card_info', $encryptedData);
+
         return [
-            'payment_method_id' => $this->helper->getMethodId($payment->getCcType()),
-            'card_name' => $payment->getCcOwner(),
-            'card_number' => $payment->getCcNumber(),
+            'payment_method_id'  => $this->helper->getMethodId($payment->getCcType()),
+            'card_name'          => $payment->getCcOwner(),
+            'card_number'        => $payment->getCcNumber(),
             'card_expdate_month' => $payment->getCcExpMonth(),
-            'card_expdate_year' => $payment->getCcExpYear(),
-            'card_cvv' => $payment->getCcCid(),
-            'split' => (string) $this->getInstallments($order)
+            'card_expdate_year'  => $payment->getCcExpYear(),
+            'card_cvv'           => $payment->getCcCid(),
+            'split'              => (string)$this->getInstallments($order)
         ];
     }
 
     /**
      * Retrieves the number of installments
      *
-     * @param \Magento\Sales\Model\Order|\Vindi\VP\Model\CreditCard $entity
+     * @param \Magento\Sales\Model\Order $entity
      * @return int
      */
     protected function getInstallments($entity): int
     {
-        return (int) $entity->getPayment()->getAdditionalInformation('cc_installments') ?: 1;
+        $installments = $entity->getPayment()->getAdditionalInformation('cc_installments');
+        return (int)$installments ?: 1;
     }
 }

@@ -32,6 +32,21 @@ $subscriptionId = $block->getRequest()->getParam('subscriptionId');
                 <label for="amex" class="card-type-label">
                     <img src="<?= $block->getViewFileUrl('Vindi_VP::images/cc/ae.png') ?>" alt="<?= __('American Express') ?>">
                 </label>
+
+                <input type="radio" id="hipercard" name="cc_type" value="hipercard" class="card-type-input" <?= $cardType == 'hipercard' ? 'checked' : '' ?>>
+                <label for="hipercard" class="card-type-label">
+                    <img src="<?= $block->getViewFileUrl('Vindi_VP::images/cc/hc.png') ?>" alt="<?= __('Hipercard') ?>">
+                </label>
+
+                <input type="radio" id="hiper" name="cc_type" value="hiper" class="card-type-input" <?= $cardType == 'hiper' ? 'checked' : '' ?>>
+                <label for="hiper" class="card-type-label">
+                    <img src="<?= $block->getViewFileUrl('Vindi_VP::images/cc/hi.png') ?>" alt="<?= __('Hiper') ?>">
+                </label>
+
+                <input type="radio" id="elo" name="cc_type" value="elo" class="card-type-input" <?= $cardType == 'elo' ? 'checked' : '' ?>>
+                <label for="elo" class="card-type-label">
+                    <img src="<?= $block->getViewFileUrl('Vindi_VP::images/cc/elo.png') ?>" alt="<?= __('Elo') ?>">
+                </label>
             </div>
 
             <div>

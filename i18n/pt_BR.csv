@@ -232,3 +232,8 @@ Payload,Payload
 "Remove Payment Profile","Remover Perfil de Pagamento"
 "Card successfully created.","Cartão criado com sucesso."
 "Remove Credit Card","Remover Cartão de Crédito"
+"Invalid card data.","Dados do cartão inválidos."
+"Unauthorized access to credit card.","Acesso não autorizado ao cartão de crédito."
+"Failed to create card.","Falha ao criar cartão."
+"An error occurred while saving the payment profile. Please try again later.","Ocorreu um erro ao salvar o perfil de pagamento. Por favor, tente novamente mais tarde."
+"An error occurred while saving the payment profile: ","Ocorreu um erro ao salvar o perfil de pagamento: "

@@ -1,13 +1,14 @@
 <?php
+declare(strict_types=1);
 
 /**
  * DISCLAIMER
  *
- * Do not edit or add to this file if you wish to upgrade this extension to newer
+ * Do not edit or add to this file if you wish to upgrade this extension to a newer
  * version in the future.
  *
- * @category    Vindi
- * @package     Vindi_VP
+ * @category Vindi
+ * @package  Vindi_VP
  */
 
 namespace Vindi\VP\Gateway\Response\CreditCard;
@@ -29,31 +30,43 @@ use Magento\Framework\Encryption\EncryptorInterface;
  */
 class TransactionHandler implements HandlerInterface
 {
-    /** @var HelperOrder */
+    /**
+     * @var HelperOrder
+     */
     protected $helperOrder;
 
-    /** @var Data */
+    /**
+     * @var Data
+     */
     protected $helper;
 
-    /** @var SessionManagerInterface */
+    /**
+     * @var SessionManagerInterface
+     */
     protected $session;
 
-    /** @var Api */
+    /**
+     * @var Api
+     */
     protected $api;
 
-    /** @var CreditCardFactory */
+    /**
+     * @var CreditCardFactory
+     */
     protected $creditCardFactory;
 
-    /** @var EncryptorInterface */
+    /**
+     * @var EncryptorInterface
+     */
     protected $encryptor;
 
     /**
-     * @param HelperOrder $helperOrder
-     * @param Data $helper
-     * @param SessionManagerInterface $session
-     * @param Api $api
-     * @param CreditCardFactory $creditCardFactory
-     * @param EncryptorInterface $encryptor
+     * @param HelperOrder              $helperOrder
+     * @param Data                     $helper
+     * @param SessionManagerInterface  $session
+     * @param Api                      $api
+     * @param CreditCardFactory        $creditCardFactory
+     * @param EncryptorInterface       $encryptor
      */
     public function __construct(
         HelperOrder $helperOrder,
@@ -63,12 +76,12 @@ class TransactionHandler implements HandlerInterface
         CreditCardFactory $creditCardFactory,
         EncryptorInterface $encryptor
     ) {
-        $this->helperOrder = $helperOrder;
-        $this->helper = $helper;
-        $this->session = $session;
-        $this->api = $api;
-        $this->creditCardFactory = $creditCardFactory;
-        $this->encryptor = $encryptor;
+        $this->helperOrder         = $helperOrder;
+        $this->helper              = $helper;
+        $this->session             = $session;
+        $this->api                 = $api;
+        $this->creditCardFactory   = $creditCardFactory;
+        $this->encryptor           = $encryptor;
     }
 
     /**
@@ -79,7 +92,7 @@ class TransactionHandler implements HandlerInterface
      * @return void
      * @throws LocalizedException
      */
-    public function handle(array $handlingSubject, array $response)
+    public function handle(array $handlingSubject, array $response): void
     {
         if (!isset($handlingSubject['payment'])
             || !$handlingSubject['payment'] instanceof PaymentDataObjectInterface
@@ -87,7 +100,6 @@ class TransactionHandler implements HandlerInterface
             throw new \InvalidArgumentException(__('Payment data object should be provided'));
         }
 
-        /** @var PaymentDataObjectInterface $paymentData */
         $paymentData = $handlingSubject['payment'];
         $transaction = $response['transaction'];
 
@@ -98,7 +110,7 @@ class TransactionHandler implements HandlerInterface
             throw new LocalizedException(__('There was an error processing your request.'));
         }
 
-        /** @var $payment \Magento\Sales\Model\Order\Payment */
+        /** @var \Magento\Sales\Model\Order\Payment $payment */
         $payment = $paymentData->getPayment();
         $responseTransaction = $transaction['data_response']['transaction'];
         $payment = $this->helperOrder->updateDefaultAdditionalInfo($payment, $responseTransaction);
@@ -108,9 +120,9 @@ class TransactionHandler implements HandlerInterface
         }
 
         if (
-            $responseTransaction['status_id'] == HelperOrder::STATUS_PENDING
-            || $responseTransaction['status_id'] == HelperOrder::STATUS_MONITORING
-            || $responseTransaction['status_id'] == HelperOrder::STATUS_CONTESTATION
+            $responseTransaction['status_id'] === HelperOrder::STATUS_PENDING
+            || $responseTransaction['status_id'] === HelperOrder::STATUS_MONITORING
+            || $responseTransaction['status_id'] === HelperOrder::STATUS_CONTESTATION
         ) {
             $payment->getOrder()->setState('new');
             $payment->setSkipOrderProcessing(true);
@@ -126,13 +138,13 @@ class TransactionHandler implements HandlerInterface
     protected function shouldSaveCreditCard(array $responseTransaction): bool
     {
         $cardData = $responseTransaction['payment'];
-
         $encryptedCardData = $this->session->getData('encrypted_card_info');
-        if (!$encryptedCardData) {
-            return false;
-        }
 
-        return isset($cardData['card_token']) && isset($cardData['payment_method_name']);
+        return (bool) (
+            $encryptedCardData &&
+            isset($cardData['card_token']) &&
+            isset($cardData['payment_method_name'])
+        );
     }
 
     /**
@@ -141,28 +153,35 @@ class TransactionHandler implements HandlerInterface
      * @param \Magento\Sales\Model\Order\Payment $payment
      * @param array $responseTransaction
      * @throws AlreadyExistsException
+     * @return void
      */
-    protected function saveCreditCardData($payment, array $responseTransaction)
+    protected function saveCreditCardData(\Magento\Sales\Model\Order\Payment $payment, array $responseTransaction): void
     {
         $cardData = $responseTransaction['payment'];
-
         $encryptedCardData = $this->session->getData('encrypted_card_info');
         $this->session->unsetData('encrypted_card_info');
 
-        $decryptedData = $encryptedCardData ? json_decode($this->encryptor->decrypt($encryptedCardData), true) : [];
+        $decryptedData = [];
+        if ($encryptedCardData) {
+            $decrypted = $this->encryptor->decrypt($encryptedCardData);
+            $decoded = json_decode($decrypted, true);
+            if (is_array($decoded)) {
+                $decryptedData = $decoded;
+            }
+        }
 
         /** @var \Vindi\VP\Model\CreditCard $creditCard */
         $creditCard = $this->creditCardFactory->create();
         $creditCard->setData([
-            'customer_id' => $payment->getOrder()->getCustomerId(),
-            'card_token' => $cardData['card_token'],
+            'customer_id'    => $payment->getOrder()->getCustomerId(),
+            'card_token'     => $cardData['card_token'],
             'customer_email' => $payment->getOrder()->getCustomerEmail(),
-            'status' => $responseTransaction['status_name'],
-            'cc_type' => $cardData['payment_method_name'],
-            'cc_last_4' => $decryptedData['cc_last_4'] ?? '',
-            'cc_name' => $decryptedData['cc_name'] ?? '',
-            'cc_exp_date' => $decryptedData['cc_exp_date'] ?? '',
-            'cc_number' => '***************' . ($decryptedData['cc_last_4'] ?? ''),
+            'status'         => $responseTransaction['status_name'],
+            'cc_type'        => $cardData['payment_method_name'],
+            'cc_last_4'      => $decryptedData['cc_last_4'] ?? '',
+            'cc_name'        => $decryptedData['cc_name'] ?? '',
+            'cc_exp_date'    => $decryptedData['cc_exp_date'] ?? '',
+            'cc_number'      => '***************' . ($decryptedData['cc_last_4'] ?? ''),
         ]);
         $creditCard->save();
     }
