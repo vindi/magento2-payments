@@ -51,6 +51,8 @@ class CreditCardAssignObserver extends AbstractDataAssignObserver
     }
 
     /**
+     * Execute observer
+     *
      * @param Observer $observer
      * @return void
      * @throws LocalizedException
@@ -72,6 +74,7 @@ class CreditCardAssignObserver extends AbstractDataAssignObserver
                 $ccExpMonth = $additionalData['cc_exp_month'] ?? null;
                 $ccExpYear = $additionalData['cc_exp_year'] ?? null;
                 $paymentProfile = $additionalData["payment_profile"] ?? null;
+                $saveCard = $additionalData['save_card'] ?? 0;
 
                 $this->updateInterest((int) $installments);
 
@@ -93,11 +96,14 @@ class CreditCardAssignObserver extends AbstractDataAssignObserver
                 $paymentInfo->setAdditionalInformation('cc_bin', $ccBin);
                 $paymentInfo->setAdditionalInformation('payment_method', $this->helper->getMethodName($ccType));
                 $paymentInfo->setAdditionalInformation('payment_profile', $paymentProfile);
+                $paymentInfo->setAdditionalInformation('save_card', $saveCard);
             }
         }
     }
 
     /**
+     * Update interest and collect totals
+     *
      * @throws NoSuchEntityException
      * @throws LocalizedException
      */

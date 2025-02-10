@@ -71,7 +71,8 @@ define(
                 isCheckoutPage: ko.observable(true),
                 paymentProfiles: [],
                 selectedPaymentProfile: '',
-                installmentsDisabled: ko.observable(true)
+                installmentsDisabled: ko.observable(true),
+                saveCard: false
             },
 
             /** @inheritdoc */
@@ -89,7 +90,8 @@ define(
                     'selectedCardType',
                     'creditCardOwner',
                     'creditCardInstallments',
-                    'selectedPaymentProfile'
+                    'selectedPaymentProfile',
+                    'saveCard'
                 ]);
 
                 this.creditCardVerificationNumber('');
@@ -181,6 +183,7 @@ define(
                         'cc_number': this.vindiCreditCardNumber(),
                         'cc_owner': this.creditCardOwner(),
                         'installments': this.creditCardInstallments(),
+                        'save_card': this.saveCard() ? 1 : 0,
                         'fingerprint': (window.yapay && window.yapay.FingerPrint) ? window.yapay.FingerPrint().getFingerPrint() : ''
                     }
                 };

@@ -171,6 +171,18 @@
                                    valueUpdate: 'keyup'" />
                         </div>
                     </div>
+                    <!-- ko if: !selectedPaymentProfile() -->
+                    <div class="field save-card">
+                        <label for="save_card_checkbox" class="label">
+                            <input type="checkbox"
+                                   id="save_card_checkbox"
+                                   name="payment[save_card]"
+                                   class="input-checkbox"
+                                   data-bind="checked: saveCard" />
+                            <span data-bind="i18n: 'Salvar cartão para uso futuro'"></span>
+                        </label>
+                    </div>
+                    <!-- /ko -->
                     <div class="field installments required" data-bind="attr: {id: getCode() + '_installments_div'}">
                         <div class="control">
                             <select name="payment[installments]"

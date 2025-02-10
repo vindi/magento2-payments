@@ -27,6 +27,8 @@ use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Session\SessionManagerInterface;
 use Vindi\VP\Helper\Data;
 use Vindi\VP\Model\CreditCardRepository;
+use Vindi\VP\Model\ResourceModel\CreditCard\CollectionFactory as CreditCardCollectionFactory;
+use Magento\Framework\Exception\LocalizedException;
 
 /**
  * Builds transaction request data
@@ -49,6 +51,16 @@ class TransactionRequest extends PaymentsRequest implements BuilderInterface
     protected $creditCardRepository;
 
     /**
+     * @var CustomerSession
+     */
+    protected $customerSession;
+
+    /**
+     * @var CreditCardCollectionFactory
+     */
+    protected $creditCardCollectionFactory;
+
+    /**
      * TransactionRequest constructor.
      *
      * @param ManagerInterface              $eventManager
@@ -63,6 +75,7 @@ class TransactionRequest extends PaymentsRequest implements BuilderInterface
      * @param EncryptorInterface            $encryptor
      * @param SessionManagerInterface       $session
      * @param CreditCardRepository          $creditCardRepository
+     * @param CreditCardCollectionFactory   $creditCardCollectionFactory
      */
     public function __construct(
         ManagerInterface $eventManager,
@@ -76,20 +89,22 @@ class TransactionRequest extends PaymentsRequest implements BuilderInterface
         Api $api,
         EncryptorInterface $encryptor,
         SessionManagerInterface $session,
-        CreditCardRepository $creditCardRepository
+        CreditCardRepository $creditCardRepository,
+        CreditCardCollectionFactory $creditCardCollectionFactory
     ) {
-        $this->eventManager         = $eventManager;
-        $this->helper               = $helper;
-        $this->date                 = $date;
-        $this->config               = $config;
-        $this->customerSession      = $customerSession;
-        $this->dateTime             = $dateTime;
-        $this->productRepository    = $productRepository;
-        $this->categoryRepository   = $categoryRepository;
-        $this->api                  = $api;
-        $this->encryptor            = $encryptor;
-        $this->session              = $session;
+        $this->eventManager = $eventManager;
+        $this->helper = $helper;
+        $this->date = $date;
+        $this->config = $config;
+        $this->customerSession = $customerSession;
+        $this->dateTime = $dateTime;
+        $this->productRepository = $productRepository;
+        $this->categoryRepository = $categoryRepository;
+        $this->api = $api;
+        $this->encryptor = $encryptor;
+        $this->session = $session;
         $this->creditCardRepository = $creditCardRepository;
+        $this->creditCardCollectionFactory = $creditCardCollectionFactory;
     }
 
     /**
@@ -97,7 +112,7 @@ class TransactionRequest extends PaymentsRequest implements BuilderInterface
      *
      * @param array $buildSubject
      * @return array
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
     public function build(array $buildSubject): array
     {
@@ -142,13 +157,28 @@ class TransactionRequest extends PaymentsRequest implements BuilderInterface
      * Retrieves saved credit card data
      *
      * @param string                             $paymentProfileId
-     * @param \Magento\Sales\Model\Order\Payment  $payment
+     * @param \Magento\Sales\Model\Order\Payment $payment
      * @return array
+     * @throws LocalizedException
      */
     protected function getSavedCardData(string $paymentProfileId, $payment): array
     {
-        $savedCard = $this->creditCardRepository->getById($paymentProfileId);
-        $order     = $payment->getOrder();
+        $customerId = $this->customerSession->getCustomerId();
+
+        if (!$customerId) {
+            throw new LocalizedException(__('Customer is not logged in.'));
+        }
+
+        $savedCard = $this->creditCardCollectionFactory->create()
+            ->addFieldToFilter('entity_id', $paymentProfileId)
+            ->addFieldToFilter('customer_id', $customerId)
+            ->getFirstItem();
+
+        if (!$savedCard->getId()) {
+            throw new LocalizedException(__('Saved card not found or does not belong to the current customer.'));
+        }
+
+        $order      = $payment->getOrder();
         $methodName = strtolower(str_replace(' ', '', (string)$savedCard->getCcType()));
 
         return [
@@ -167,13 +197,16 @@ class TransactionRequest extends PaymentsRequest implements BuilderInterface
     protected function getNewCardData($payment): array
     {
         $order = $payment->getOrder();
+        $saveCard = $payment->getAdditionalInformation('save_card');
 
-        $encryptedData = $this->encryptor->encrypt(json_encode([
-            'cc_last_4' => substr($payment->getCcNumber(), -4),
-            'cc_exp_date' => $payment->getCcExpMonth() . '/' . $payment->getCcExpYear(),
-            'cc_name' => $payment->getCcOwner()
-        ]));
-        $this->session->setData('encrypted_card_info', $encryptedData);
+        if ($saveCard) {
+            $encryptedData = $this->encryptor->encrypt(json_encode([
+                'cc_last_4' => substr($payment->getCcNumber(), -4),
+                'cc_exp_date' => $payment->getCcExpMonth() . '/' . $payment->getCcExpYear(),
+                'cc_name' => $payment->getCcOwner()
+            ]));
+            $this->session->setData('encrypted_card_info', $encryptedData);
+        }
 
         return [
             'payment_method_id'  => $this->helper->getMethodId($payment->getCcType()),
