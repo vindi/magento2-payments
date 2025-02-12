@@ -148,6 +148,7 @@ class Save extends Action
             return $this->resultRedirectFactory->create()->setPath('vindi_vp/paymentprofile/index');
         }
 
+        /*
         try {
             $customer = $this->customerRepository->getById($customerId);
             $accessToken = $this->helperData->getAccessToken((int)$customer->getStoreId());
@@ -212,6 +213,7 @@ class Save extends Action
                 __('An error occurred while saving the payment profile. Please try again later.')
             );
         }
+        */
 
         return $this->resultRedirectFactory->create()->setPath('vindi_vp/paymentprofile/index');
     }

@@ -7,7 +7,7 @@
         <referenceBlock name="customer_account_navigation">
             <block
                 class="Magento\Customer\Block\Account\SortLinkInterface"
-                name="customer-account-navigation-vindi-payment-profile"
+                name="vindi-vp-customer-account-navigation-vindi-payment-profile"
             >
                 <arguments>
                     <argument name="path" xsi:type="string">vindi_vp/paymentprofile/index</argument>
