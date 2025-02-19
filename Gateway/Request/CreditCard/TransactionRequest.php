@@ -178,12 +178,18 @@ class TransactionRequest extends PaymentsRequest implements BuilderInterface
             throw new LocalizedException(__('Saved card not found or does not belong to the current customer.'));
         }
 
+        $cvv = $payment->getCcCid();
+        if (!$cvv) {
+            throw new LocalizedException(__('CVV is required for saved cards.'));
+        }
+
         $order      = $payment->getOrder();
         $methodName = strtolower(str_replace(' ', '', (string)$savedCard->getCcType()));
 
         return [
             'card_token'         => $savedCard->getCardToken(),
             'payment_method_id'  => $this->helper->getMethodIdByName($methodName),
+            'card_cvv'           => $cvv,
             'split'              => (string)$this->getInstallments($order)
         ];
     }
