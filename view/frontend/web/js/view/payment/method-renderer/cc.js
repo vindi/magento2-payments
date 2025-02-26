@@ -6,16 +6,14 @@
  * This source file is subject to the Vindi license that is
  * available through the world-wide-web at this URL:
  *
- *
  * DISCLAIMER
  *
- * Do not edit or add to this file if you wish to upgrade this extension to newer
+ * Do not edit or add to this file if you wish to upgrade this extension to a newer
  * version in the future.
  *
- * @category    Vindi
- * @package     Vindi_VP
- * @copyright   Copyright (c) Vindi
- *
+ * @category   Vindi
+ * @package    Vindi_VP
+ * @copyright  Copyright (c) Vindi
  */
 
 define(
@@ -57,7 +55,11 @@ define(
         return Component.extend({
             defaults: {
                 template: 'Vindi_VP/payment/form/cc',
-                taxvat: (window.checkoutConfig && window.checkoutConfig.payment && window.checkoutConfig.payment.vindi_vp_cc && window.checkoutConfig.payment.vindi_vp_cc.customer_taxvat) ? window.checkoutConfig.payment.vindi_vp_cc.customer_taxvat.replace(/[^0-9]/g, "") : "",
+                taxvat: (window.checkoutConfig &&
+                    window.checkoutConfig.payment &&
+                    window.checkoutConfig.payment.vindi_vp_cc &&
+                    window.checkoutConfig.payment.vindi_vp_cc.customer_taxvat
+                ) ? window.checkoutConfig.payment.vindi_vp_cc.customer_taxvat.replace(/[^0-9]/g, "") : "",
                 creditCardOwner: '',
                 creditCardInstallments: '',
                 vindiCreditCardNumber: '',
@@ -78,6 +80,7 @@ define(
             /** @inheritdoc */
             initObservable: function () {
                 var self = this;
+
                 this._super().observe([
                     'taxvat',
                     'creditCardType',
@@ -140,6 +143,9 @@ define(
                 return this;
             },
 
+            /**
+             * Load credit card form
+             */
             loadCard: function () {
                 var ccName = document.getElementById(this.getCode() + '_cc_owner');
                 var ccNumber = document.getElementById(this.getCode() + '_cc_number');
@@ -148,6 +154,7 @@ define(
                 var ccSingle = document.getElementById('vindi-vp-cc-ccsingle');
                 var ccFront = document.getElementById('vindi-vp-cc-front');
                 var ccBack = document.getElementById('vindi-vp-cc-back');
+
                 if (ccName && ccNumber && ccExpDate && ccCvv && ccSingle && ccFront && ccBack) {
                     creditCardForm(ccName, ccNumber, ccExpDate, ccCvv, ccSingle, ccFront, ccBack);
                 }
@@ -163,14 +170,17 @@ define(
              */
             getData: function () {
                 fingerprint(window.checkoutConfig.payment[this.getCode()].sandbox);
+
                 var ccExpMonth = '';
                 var ccExpYear = '';
                 var ccExpDate = this.creditCardExpDate();
+
                 if (typeof ccExpDate !== "undefined" && ccExpDate !== null) {
                     var ccExpDateFull = ccExpDate.split('/');
                     ccExpMonth = ccExpDateFull[0];
                     ccExpYear = ccExpDateFull[1];
                 }
+
                 return {
                     'method': this.item.method,
                     'additional_data': {
@@ -189,40 +199,85 @@ define(
                 };
             },
 
+            /**
+             * Get list of available credit card types
+             * @returns {Array}
+             */
             getCcAvailableTypes: function () {
-                return window.checkoutConfig && window.checkoutConfig.payment && window.checkoutConfig.payment[this.getCode()] && window.checkoutConfig.payment[this.getCode()].availableTypes ? window.checkoutConfig.payment[this.getCode()].availableTypes : [];
+                return (
+                    window.checkoutConfig &&
+                    window.checkoutConfig.payment &&
+                    window.checkoutConfig.payment[this.getCode()] &&
+                    window.checkoutConfig.payment[this.getCode()].availableTypes
+                ) ? window.checkoutConfig.payment[this.getCode()].availableTypes : [];
             },
 
+            /**
+             * Get icons
+             * @param {string} type
+             * @returns {boolean|Object}
+             */
             getIcons: function (type) {
-                var config = window.checkoutConfig && window.checkoutConfig.payment && window.checkoutConfig.payment[this.getCode()];
+                var config = window.checkoutConfig &&
+                    window.checkoutConfig.payment &&
+                    window.checkoutConfig.payment[this.getCode()];
+
                 if (config && config.icons && config.icons.hasOwnProperty(type)) {
                     return config.icons[type];
                 }
                 return false;
             },
 
+            /**
+             * Check if payment is active
+             * @returns {boolean}
+             */
             isActive: function () {
                 return this.getCode() === this.isChecked();
             },
 
+            /**
+             * Validate form
+             * @returns {boolean}
+             */
             validate: function () {
                 var $form = $('#' + 'form_' + this.getCode());
                 return ($form && $form.validation() && $form.validation('isValid'));
             },
 
+            /**
+             * Retrieve installments URL
+             * @returns {string}
+             */
             retrieveInstallmentsUrl: function () {
                 try {
-                    return window.checkoutConfig.payment && window.checkoutConfig.payment.ccform && window.checkoutConfig.payment.ccform.urls && window.checkoutConfig.payment.ccform.urls[this.getCode()] && window.checkoutConfig.payment.ccform.urls[this.getCode()].retrieve_installments ? window.checkoutConfig.payment.ccform.urls[this.getCode()].retrieve_installments : "";
+                    return window.checkoutConfig.payment &&
+                    window.checkoutConfig.payment.ccform &&
+                    window.checkoutConfig.payment.ccform.urls &&
+                    window.checkoutConfig.payment.ccform.urls[this.getCode()] &&
+                    window.checkoutConfig.payment.ccform.urls[this.getCode()].retrieve_installments
+                        ? window.checkoutConfig.payment.ccform.urls[this.getCode()].retrieve_installments
+                        : "";
                 } catch (e) {
+                    // eslint-disable-next-line no-console
                     console.log('Installments URL not defined');
                     return "";
                 }
             },
 
+            /**
+             * Check if user is logged in
+             * @returns {boolean}
+             */
             isLoggedIn: function () {
                 return customer.isLoggedIn();
             },
 
+            /**
+             * Map card type
+             * @param {string} type
+             * @returns {string}
+             */
             mapCardType: function (type) {
                 var mapping = {
                     'Mastercard': 'MC',
@@ -237,12 +292,17 @@ define(
                 return mapping[type] ? mapping[type] : type;
             },
 
+            /**
+             * Update installments values
+             */
             updateInstallmentsValues: function () {
                 var self = this;
                 self.installmentsDisabled(true);
+
                 if (self.debounceTimer !== null) {
                     clearTimeout(self.debounceTimer);
                 }
+
                 self.debounceTimer = setTimeout(function () {
                     var url = self.retrieveInstallmentsUrl();
                     if (!url || typeof fetch !== "function") {
@@ -277,9 +337,17 @@ define(
                 }, 500);
             },
 
+            /**
+             * Get payment profiles
+             * @returns {Array}
+             */
             getPaymentProfiles: function () {
                 var paymentProfiles = [];
-                var savedCards = window.checkoutConfig && window.checkoutConfig.payment && window.checkoutConfig.payment.vindi_vp_cc && window.checkoutConfig.payment.vindi_vp_cc.saved_cards;
+                var savedCards = window.checkoutConfig &&
+                    window.checkoutConfig.payment &&
+                    window.checkoutConfig.payment.vindi_vp_cc &&
+                    window.checkoutConfig.payment.vindi_vp_cc.saved_cards;
+
                 if (savedCards && Array.isArray(savedCards)) {
                     savedCards.forEach(function (card) {
                         paymentProfiles.push({
@@ -292,6 +360,10 @@ define(
                 return paymentProfiles;
             },
 
+            /**
+             * Check if user has payment profiles
+             * @returns {boolean}
+             */
             hasPaymentProfiles: function () {
                 return this.getPaymentProfiles().length > 0;
             }

@@ -11,8 +11,6 @@ use Magento\Framework\Exception\NotFoundException;
 use Vindi\VP\Model\ResourceModel\CreditCard as CreditCardResource;
 use Vindi\VP\Model\CreditCardFactory;
 use Magento\Customer\Api\CustomerRepositoryInterface;
-use Vindi\VP\Gateway\Http\Client\Api\Card;
-use Vindi\VP\Helper\Data;
 
 /**
  * Class Delete
@@ -36,45 +34,29 @@ class Delete extends Action
     protected $creditCardResource;
 
     /**
-     * @var Card
-     */
-    protected $cardApi;
-
-    /**
      * @var CustomerRepositoryInterface
      */
     protected $customerRepository;
-
-    /**
-     * @var Data
-     */
-    protected $helperData;
 
     /**
      * @param Context $context
      * @param Session $customerSession
      * @param CreditCardFactory $creditCardFactory
      * @param CreditCardResource $creditCardResource
-     * @param Card $cardApi
      * @param CustomerRepositoryInterface $customerRepository
-     * @param Data $helperData
      */
     public function __construct(
         Context $context,
         Session $customerSession,
         CreditCardFactory $creditCardFactory,
         CreditCardResource $creditCardResource,
-        Card $cardApi,
-        CustomerRepositoryInterface $customerRepository,
-        Data $helperData
+        CustomerRepositoryInterface $customerRepository
     ) {
         parent::__construct($context);
-        $this->customerSession     = $customerSession;
-        $this->creditCardFactory   = $creditCardFactory;
-        $this->creditCardResource  = $creditCardResource;
-        $this->cardApi             = $cardApi;
-        $this->customerRepository  = $customerRepository;
-        $this->helperData          = $helperData;
+        $this->customerSession    = $customerSession;
+        $this->creditCardFactory  = $creditCardFactory;
+        $this->creditCardResource = $creditCardResource;
+        $this->customerRepository = $customerRepository;
     }
 
     /**
@@ -101,13 +83,6 @@ class Delete extends Action
         }
 
         try {
-            $customer = $this->customerRepository->getById($customerId);
-            $accessToken = $this->helperData->getAccessToken((int)$customer->getStoreId());
-
-            if (empty($accessToken)) {
-                throw new \Exception('Failed to generate access token.');
-            }
-
             $creditCard = $this->creditCardFactory->create();
             $this->creditCardResource->load($creditCard, $creditCardId);
 
@@ -121,20 +96,7 @@ class Delete extends Action
                 return $this->resultRedirectFactory->create()->setPath('vindi_vp/paymentprofile/index');
             }
 
-            $apiData = [
-                'access_token' => $accessToken,
-                'card_token'   => $creditCard->getCardToken()
-            ];
-
-            $response = $this->cardApi->deactivate($apiData);
-
-            if (!isset($response['status']) || $response['status'] !== 200) {
-                $this->messageManager->addErrorMessage(__('Failed to delete card.'));
-                return $this->resultRedirectFactory->create()->setPath('vindi_vp/paymentprofile/index');
-            }
-
             $this->creditCardResource->delete($creditCard);
-
             $this->messageManager->addSuccessMessage(__('Card successfully deleted.'));
         } catch (\Exception $e) {
             $this->messageManager->addErrorMessage(__('An error occurred while deleting the card: ') . $e->getMessage());
