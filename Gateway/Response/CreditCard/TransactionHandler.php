@@ -24,6 +24,8 @@ use Magento\Payment\Gateway\Response\HandlerInterface;
 use Vindi\VP\Model\CreditCardFactory;
 use Magento\Framework\Exception\AlreadyExistsException;
 use Magento\Framework\Encryption\EncryptorInterface;
+use Vindi\VP\Model\CreditCardRepository;
+use Magento\Framework\Exception\NoSuchEntityException;
 
 /**
  * Handles transaction response and stores credit card data securely
@@ -61,12 +63,18 @@ class TransactionHandler implements HandlerInterface
     protected $encryptor;
 
     /**
+     * @var CreditCardRepository
+     */
+    protected $creditCardRepository;
+
+    /**
      * @param HelperOrder              $helperOrder
      * @param Data                     $helper
      * @param SessionManagerInterface  $session
      * @param Api                      $api
      * @param CreditCardFactory        $creditCardFactory
      * @param EncryptorInterface       $encryptor
+     * @param CreditCardRepository     $creditCardRepository
      */
     public function __construct(
         HelperOrder $helperOrder,
@@ -74,14 +82,16 @@ class TransactionHandler implements HandlerInterface
         SessionManagerInterface $session,
         Api $api,
         CreditCardFactory $creditCardFactory,
-        EncryptorInterface $encryptor
+        EncryptorInterface $encryptor,
+        CreditCardRepository $creditCardRepository
     ) {
-        $this->helperOrder         = $helperOrder;
-        $this->helper              = $helper;
-        $this->session             = $session;
-        $this->api                 = $api;
-        $this->creditCardFactory   = $creditCardFactory;
-        $this->encryptor           = $encryptor;
+        $this->helperOrder          = $helperOrder;
+        $this->helper               = $helper;
+        $this->session              = $session;
+        $this->api                  = $api;
+        $this->creditCardFactory    = $creditCardFactory;
+        $this->encryptor            = $encryptor;
+        $this->creditCardRepository = $creditCardRepository;
     }
 
     /**
@@ -114,6 +124,22 @@ class TransactionHandler implements HandlerInterface
         $payment = $paymentData->getPayment();
         $responseTransaction = $transaction['data_response']['transaction'];
         $payment = $this->helperOrder->updateDefaultAdditionalInfo($payment, $responseTransaction);
+
+        $paymentAdditional = $payment->getAdditionalInformation();
+        if (!empty($paymentAdditional['payment_profile'])) {
+            $profileId = $paymentAdditional['payment_profile'];
+            try {
+                $creditCard = $this->creditCardRepository->getById($profileId);
+                if ($creditCard && $creditCard->getData('cc_name')) {
+                    $payment->setCcOwner($creditCard->getData('cc_name'));
+                }
+                if ($creditCard && $creditCard->getData('cc_last_4')) {
+                    $payment->setCcLast4($creditCard->getData('cc_last_4'));
+                }
+            } catch (NoSuchEntityException $e) {
+                // Do nothing if credit card record not found
+            }
+        }
 
         if ($this->shouldSaveCreditCard($responseTransaction)) {
             $this->saveCreditCardData($payment, $responseTransaction);
