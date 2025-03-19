@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Vindi\VP\Cron;
 
@@ -30,7 +31,7 @@ class ProcessCallbackQueue
     protected $fileDriver;
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param ResourceConnection $resource
      * @param LoggerInterface $logger
@@ -50,15 +51,15 @@ class ProcessCallbackQueue
     }
 
     /**
-     * Execute Cron Job to process callback queue
+     * Execute Cron Job to process callback queue.
      *
      * @return void
      */
-    public function execute()
+    public function execute(): void
     {
         $lockFile = BP . '/var/locks/process_callback_queue.lock';
-
         $fp = $this->fileDriver->fileOpen($lockFile, 'w+');
+
         if (!$fp) {
             $this->logger->error(__('Unable to open lock file: %1', $lockFile));
             return;
@@ -102,7 +103,7 @@ class ProcessCallbackQueue
                         if ($order && $order->getId()) {
                             $vindiStatus = $transaction['status_id'] ?? '';
                             $amount = $transaction['price_original'] ?? $order->getGrandTotal();
-                            $this->helperOrder->updateOrder($order, $vindiStatus, $transaction, $amount, true);
+                            $this->helperOrder->updateOrder($order, $vindiStatus, $transaction, (float)$amount, true);
                         }
                     }
 

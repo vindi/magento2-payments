@@ -1,21 +1,12 @@
 <?php
-
-/**
- *
- * @category    Vindi
- * @package     Vindi_VP
- */
+declare(strict_types=1);
 
 namespace Vindi\VP\Controller\Callback;
 
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Controller\ResultFactory;
-use Vindi\VP\Controller\Callback;
-use Vindi\VP\Gateway\Http\Client\Api;
-use Vindi\VP\Helper\Order as HelperOrder;
-use Magento\Sales\Model\Order as SalesOrder;
 
-class Payments extends Callback
+class Payments extends \Vindi\VP\Controller\Callback
 {
     /**
      * @var string
@@ -32,7 +23,7 @@ class Payments extends Callback
     {
         $hash = $request->getParam('hash');
         $storeHash = sha1($this->helperData->getToken());
-        return ($hash == $storeHash);
+        return ($hash === $storeHash);
     }
 
     /**
@@ -52,7 +43,6 @@ class Payments extends Callback
             $this->logParams($content, $params);
 
             if (isset($params['transaction'])) {
-                /** @var \Vindi\VP\Model\Callback $callBack */
                 $callBack = $this->callbackFactory->create();
                 $callBack->setStatus($params['transaction']['status_name'] ?? '');
                 $callBack->setMethod('vindi-payments');
