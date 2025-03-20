@@ -57,20 +57,7 @@ class ProcessCallbackQueue
      */
     public function execute(): void
     {
-        $lockFile = BP . '/var/locks/process_callback_queue.lock';
-        $fp = $this->fileDriver->fileOpen($lockFile, 'w+');
-
-        if (!$fp) {
-            $this->logger->error(__('Unable to open lock file: %1', $lockFile));
-            return;
-        }
-
-        if (!flock($fp, LOCK_EX | LOCK_NB)) {
-            $this->logger->info(__('Cron job already running. Exiting.'));
-            return;
-        }
-
-        $this->logger->info(__('Lock acquired. Starting callback processing.'));
+        $this->logger->info(__('Starting callback processing without lock mechanism.'));
 
         try {
             $connection = $this->resource->getConnection();
@@ -89,7 +76,6 @@ class ProcessCallbackQueue
                 $this->logger->info(__('Processing callback ID: %1', $callbackId));
                 $attempts = (int)$callback['attempts'];
 
-                // Atualiza o número de tentativas antes de processar
                 $connection->update(
                     $tableName,
                     ['attempts' => $attempts + 1],
@@ -140,10 +126,6 @@ class ProcessCallbackQueue
             $this->logger->info(__('Finished processing callbacks.'));
         } catch (\Exception $e) {
             $this->logger->error(__('Error executing cron job: %1', $e->getMessage()));
-        } finally {
-            flock($fp, LOCK_UN);
-            $this->fileDriver->fileClose($fp);
-            $this->logger->info(__('Lock released.'));
         }
     }
 }
