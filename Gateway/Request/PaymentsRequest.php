@@ -49,7 +49,7 @@ class PaymentsRequest
     protected $helper;
 
     /**
-     * @var CustomerSession $customerSession
+     * @var CustomerSession
      */
     protected $customerSession;
 
@@ -116,10 +116,11 @@ class PaymentsRequest
     protected function getTransaction(Order $order, float $amount): array
     {
         $transaction = [
-            'token_account' => $this->helper->getToken($order->getStoreId()),
-            'finger_print' => $order->getPayment()->getAdditionalInformation('finger_print'),
-            'customer' => $this->getCustomerData($order),
-            'transaction' => $this->getTransactionInfo($order, $amount),
+            'token_account'       => $this->helper->getToken($order->getStoreId()),
+            'finger_print'        => $order->getPayment()->getAdditionalInformation('finger_print'),
+            'customer'            => $this->getCustomerData($order),
+            'transaction'         => $this->getTransactionInfo($order, $amount),
+            'transaction_shipping'=> $this->getTransactionShipping($order),
             'transaction_product' => $this->getItemsData($order)
         ];
 
@@ -132,6 +133,8 @@ class PaymentsRequest
     }
 
     /**
+     * Get the transaction information.
+     *
      * @param Order $order
      * @param float $orderAmount
      * @return array
@@ -139,17 +142,39 @@ class PaymentsRequest
     protected function getTransactionInfo(Order $order, float $orderAmount): array
     {
         return [
-            'customer_ip' => $order->getRemoteIp(),
-            'order_number' => $order->getIncrementId(),
-            'shipping_type' => $order->getShippingDescription(),
-            'shipping_price' => (string) $order->getShippingAmount(),
-            'price_discount' => (string) $this->getDiscountAmount($order, $orderAmount),
+            'customer_ip'      => $order->getRemoteIp(),
+            'order_number'     => $order->getIncrementId(),
+            'price_discount'   => (string) $this->getDiscountAmount($order, $orderAmount),
             'price_additional' => (string) $this->getPriceAdditional($order, $orderAmount),
             'url_notification' => $this->helper->getPaymentsNotificationUrl($order),
-            'free' => 'MAGENTO_API_' . $this->helper->getModuleVersion()
+            'free'             => 'MAGENTO_API_' . $this->helper->getModuleVersion()
         ];
     }
 
+    /**
+     * Get the shipping information for the transaction.
+     *
+     * @param Order $order
+     * @return array
+     */
+    protected function getTransactionShipping(Order $order): array
+    {
+        $shippingDescription = $order->getShippingDescription();
+        $shippingType = $shippingDescription ? $shippingDescription : 'SEM_FRETE';
+
+        return [
+            'type_shipping' => $shippingType,
+            'shipping_price'=> (string) $order->getShippingAmount()
+        ];
+    }
+
+    /**
+     * Get the discount amount for the order.
+     *
+     * @param Order $order
+     * @param float $orderAmount
+     * @return float
+     */
     public function getDiscountAmount(Order $order, $orderAmount): float
     {
         $discountAmount = (float) $order->getDiscountAmount();
@@ -160,6 +185,13 @@ class PaymentsRequest
         return round(abs($discountAmount), 2);
     }
 
+    /**
+     * Get the additional price for the transaction.
+     *
+     * @param Order $order
+     * @param float $orderAmount
+     * @return float
+     */
     protected function getPriceAdditional(Order $order, float $orderAmount): float
     {
         $priceAdditional = 0;
@@ -170,6 +202,12 @@ class PaymentsRequest
         return round((float) $priceAdditional, 2);
     }
 
+    /**
+     * Get customer data.
+     *
+     * @param Order $order
+     * @return array
+     */
     public function getCustomerData(Order $order): array
     {
         $address = $order->getBillingAddress();
@@ -184,13 +222,13 @@ class PaymentsRequest
         $fullName = $order->getCustomerName() ?: $firstName . ' ' . $lastName;
 
         $customerData = [
-            'name' => $fullName,
-            'cpf' => preg_replace('/\D/', '', (string) $customerTaxVat),
-            'email' => $order->getCustomerEmail(),
+            'name'     => $fullName,
+            'cpf'      => preg_replace('/\D/', '', (string) $customerTaxVat),
+            'email'    => $order->getCustomerEmail(),
             'contacts' => [
                 [
-                    'type_contact' => 'M',
-                    'number_contact' => $this->helper->formatPhoneNumber($address->getTelephone())
+                    'type_contact'  => 'M',
+                    'number_contact'=> $this->helper->formatPhoneNumber($address->getTelephone())
                 ]
             ],
             'addresses' => $this->getAddresses($order)
@@ -206,7 +244,9 @@ class PaymentsRequest
     }
 
     /**
-     * @param \Magento\Sales\Model\Order $order
+     * Get addresses data.
+     *
+     * @param Order $order
      * @return array
      */
     protected function getAddresses($order): array
@@ -215,13 +255,13 @@ class PaymentsRequest
         $addresses = [
             [
                 'type_address' => 'B',
-                'postal_code' => $billingAddress->getPostcode(),
-                'street' => $billingAddress->getStreetLine($this->getStreetField('street')),
-                'number' => $billingAddress->getStreetLine($this->getStreetField('number')),
-                'completion' => $billingAddress->getStreetLine($this->getStreetField('complement')),
+                'postal_code'  => $billingAddress->getPostcode(),
+                'street'       => $billingAddress->getStreetLine($this->getStreetField('street')),
+                'number'       => $billingAddress->getStreetLine($this->getStreetField('number')),
+                'completion'   => $billingAddress->getStreetLine($this->getStreetField('complement')),
                 'neighborhood' => $billingAddress->getStreetLine($this->getStreetField('district')),
-                'city' => $billingAddress->getCity(),
-                'state' => $billingAddress->getRegionCode()
+                'city'         => $billingAddress->getCity(),
+                'state'        => $billingAddress->getRegionCode()
             ]
         ];
 
@@ -229,24 +269,36 @@ class PaymentsRequest
             $shippingAddress = $order->getShippingAddress();
             $addresses[] = [
                 'type_address' => 'D',
-                'postal_code' => $shippingAddress->getPostcode(),
-                'street' => $shippingAddress->getStreetLine($this->getStreetField('street')),
-                'number' => $shippingAddress->getStreetLine($this->getStreetField('number')),
-                'completion' => $shippingAddress->getStreetLine($this->getStreetField('complement')),
+                'postal_code'  => $shippingAddress->getPostcode(),
+                'street'       => $shippingAddress->getStreetLine($this->getStreetField('street')),
+                'number'       => $shippingAddress->getStreetLine($this->getStreetField('number')),
+                'completion'   => $shippingAddress->getStreetLine($this->getStreetField('complement')),
                 'neighborhood' => $shippingAddress->getStreetLine($this->getStreetField('district')),
-                'city' => $shippingAddress->getCity(),
-                'state' => $shippingAddress->getRegionCode()
+                'city'         => $shippingAddress->getCity(),
+                'state'        => $shippingAddress->getRegionCode()
             ];
         }
 
         return $addresses;
     }
 
+    /**
+     * Get the street field position.
+     *
+     * @param string $config
+     * @return int
+     */
     public function getStreetField(string $config): int
     {
         return (int) $this->helper->getConfig($config, 'address', 'vindi_vp') + 1;
     }
 
+    /**
+     * Get items data for the transaction.
+     *
+     * @param Order $order
+     * @return array
+     */
     protected function getItemsData(Order $order): array
     {
         $items = [];
@@ -260,11 +312,11 @@ class PaymentsRequest
 
             $item = [];
             $item['description'] = $quoteItem->getName();
-            $item['quantity'] = (string) $quoteItem->getQtyOrdered();
-            $item['price_unit'] = (string) $quoteItem->getPrice();
-            $item['code'] = $quoteItem->getProductId();
-            $item['sku_code'] = $quoteItem->getSku();
-            $item['extra'] = $quoteItem->getItemId();
+            $item['quantity']    = (string) $quoteItem->getQtyOrdered();
+            $item['price_unit']  = (string) $quoteItem->getPrice();
+            $item['code']        = $quoteItem->getProductId();
+            $item['sku_code']    = $quoteItem->getSku();
+            $item['extra']       = $quoteItem->getItemId();
 
             $this->eventManager->dispatch('vindi_payment_get_item', ['item' => &$item, 'quote_item' => $quoteItem]);
 
