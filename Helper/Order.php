@@ -1,11 +1,5 @@
 <?php
-
-/**
- * Vindi
- *
- * @category    Vindi
- * @package     Vindi_VP
- */
+declare(strict_types=1);
 
 namespace Vindi\VP\Helper;
 
@@ -20,6 +14,7 @@ use Vindi\VP\Gateway\Http\Client\Api;
 use Vindi\VP\Model\Ui\CreditCard\ConfigProvider as CcConfigProvider;
 use Magento\Framework\App\Config\Initial;
 use Magento\Framework\App\Filesystem\DirectoryList;
+use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
 use Magento\Framework\Filesystem;
 use Magento\Framework\Stdlib\DateTime\DateTime;
@@ -41,19 +36,12 @@ use Magento\Store\Model\App\Emulation;
 class Order extends \Magento\Payment\Helper\Data
 {
     const STATUS_APPROVED = 6;
-
     const STATUS_PENDING = 4;
-
     const STATUS_DENIED = 7;
-
     const STATUS_REFUNDED = 89;
-
     const STATUS_CONTESTATION = 24;
-
     const STATUS_CHARGEBACK = 24;
-
     const STATUS_MONITORING = 87;
-
     const DEFAULT_QRCODE_WIDTH = 400;
     const DEFAULT_QRCODE_HEIGHT = 400;
     const DEFAULT_EXPIRATION_TIME = 30;
@@ -69,7 +57,7 @@ class Order extends \Magento\Payment\Helper\Data
     protected $orderFactory;
 
     /**
-     * @var OrderFactory
+     * @var OrderRepository
      */
     protected $orderRepository;
 
@@ -103,10 +91,14 @@ class Order extends \Magento\Payment\Helper\Data
      */
     protected $filesystem;
 
-    /** @var Client */
+    /**
+     * @var Client
+     */
     protected $client;
 
-    /** @var Api */
+    /**
+     * @var Api
+     */
     protected $api;
 
     /**
@@ -115,11 +107,12 @@ class Order extends \Magento\Payment\Helper\Data
     protected $dateTime;
 
     /**
-     * Order constructor.
+     * Constructor.
+     *
      * @param Context $context
      * @param LayoutFactory $layoutFactory
      * @param Factory $paymentMethodFactory
-     * @param Emulation $appEmulation
+     * @param \Magento\Store\Model\App\Emulation $appEmulation
      * @param Config $paymentConfig
      * @param Initial $initialConfig
      * @param OrderFactory $orderFactory
@@ -133,13 +126,13 @@ class Order extends \Magento\Payment\Helper\Data
      * @param Client $client
      * @param Api $api
      * @param DateTime $dateTime
-     * @param Data $helperData
+     * @param HelperData $helperData
      */
     public function __construct(
         Context $context,
         LayoutFactory $layoutFactory,
         Factory $paymentMethodFactory,
-        Emulation $appEmulation,
+        \Magento\Store\Model\App\Emulation $appEmulation,
         Config $paymentConfig,
         Initial $initialConfig,
         OrderFactory $orderFactory,
@@ -156,7 +149,6 @@ class Order extends \Magento\Payment\Helper\Data
         HelperData $helperData
     ) {
         parent::__construct($context, $layoutFactory, $paymentMethodFactory, $appEmulation, $paymentConfig, $initialConfig);
-
         $this->helperData = $helperData;
         $this->orderFactory = $orderFactory;
         $this->orderRepository = $orderRepository;
@@ -172,7 +164,7 @@ class Order extends \Magento\Payment\Helper\Data
     }
 
     /**
-     * Update Order Status
+     * Update Order Status.
      *
      * @param SalesOrder $order
      * @param string $vindiStatus
@@ -194,7 +186,7 @@ class Order extends \Magento\Payment\Helper\Data
             $orderStatus = $payment->getAdditionalInformation('status');
             $order->addCommentToStatusHistory(__('Callback received %1 -> %2', $orderStatus, $vindiStatus));
 
-            if ($vindiStatus != $orderStatus) {
+            if ($vindiStatus !== $orderStatus) {
                 if ($vindiStatus == self::STATUS_APPROVED) {
                     if ($order->canInvoice()) {
                         $this->invoiceOrder($order, $amount);
@@ -230,20 +222,25 @@ class Order extends \Magento\Payment\Helper\Data
     }
 
     /**
+     * Save Payment.
+     *
      * @param Payment $payment
      * @return void
      * @throws \Magento\Framework\Exception\AlreadyExistsException
      */
-    public function savePayment($payment): void
+    public function savePayment(Payment $payment): void
     {
         $this->resourcePayment->save($payment);
     }
 
     /**
+     * Invoice Order.
+     *
      * @param SalesOrder $order
      * @param float $amount
+     * @return void
      */
-    protected function invoiceOrder(SalesOrder $order, $amount): void
+    protected function invoiceOrder(SalesOrder $order, float $amount): void
     {
         /** @var Payment $payment */
         $payment = $order->getPayment();
@@ -252,11 +249,13 @@ class Order extends \Magento\Payment\Helper\Data
     }
 
     /**
+     * Cancel Order.
+     *
      * @param SalesOrder $order
      * @param float $amount
-     * @param boolean $callback
-     * @return SalesOrder $order
-     *@throws \Magento\Framework\Exception\LocalizedException
+     * @param bool $callback
+     * @return SalesOrder
+     * @throws LocalizedException
      */
     public function cancelOrder(SalesOrder $order, float $amount, bool $callback = false): SalesOrder
     {
@@ -280,19 +279,21 @@ class Order extends \Magento\Payment\Helper\Data
     }
 
     /**
+     * Refund Order.
+     *
      * @param SalesOrder $order
      * @param float $amount
      * @param bool $callback
-     * @return mixed
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @return SalesOrder
+     * @throws LocalizedException
      */
     public function refundOrder(SalesOrder $order, float $amount, bool $callback = false): SalesOrder
     {
-        if ($order->getBaseGrandTotal() == $amount) {
+        if ((float)$order->getBaseGrandTotal() === $amount) {
             return $this->cancelOrder($order, $amount, $callback);
         }
 
-        $totalRefunded = (float) $order->getTotalRefunded() + $amount;
+        $totalRefunded = (float)$order->getTotalRefunded() + $amount;
         $order->setTotalRefunded($totalRefunded);
         $order->addCommentToStatusHistory(__('The order had the amount refunded by Vindi. Amount of %1', $amount));
 
@@ -300,9 +301,11 @@ class Order extends \Magento\Payment\Helper\Data
     }
 
     /**
-     * @param $order
+     * Create credit memo for order.
+     *
+     * @param SalesOrder $order
      * @return void
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
     public function credimemoOrder(SalesOrder $order): void
     {
@@ -311,11 +314,13 @@ class Order extends \Magento\Payment\Helper\Data
     }
 
     /**
-     * @param $order
+     * Capture Order.
+     *
+     * @param SalesOrder $order
+     * @param string $captureCase
      * @return void
-     * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function captureOrder(SalesOrder $order, $captureCase = 'online'): void
+    public function captureOrder(SalesOrder $order, string $captureCase = 'online'): void
     {
         if ($order->canInvoice()) {
             /** @var Invoice $invoice */
@@ -326,14 +331,18 @@ class Order extends \Magento\Payment\Helper\Data
 
             $this->invoiceRepository->save($invoice);
 
-            // Update the order
             $order->getPayment()->setAdditionalInformation('captured', true);
             $this->orderRepository->save($order);
         }
     }
 
     /**
-     * @throws LocalizedException
+     * Set transaction information in Payment.
+     *
+     * @param Payment $payment
+     * @param array $content
+     * @param string $prefix
+     * @return Payment
      */
     protected function setTransactionInformation(Payment $payment, array $content, string $prefix = ''): Payment
     {
@@ -345,17 +354,23 @@ class Order extends \Magento\Payment\Helper\Data
         return $payment;
     }
 
+    /**
+     * Update default additional information in Payment.
+     *
+     * @param Payment $payment
+     * @param array $content
+     * @return Payment
+     */
     public function updateDefaultAdditionalInfo(Payment $payment, array $content): Payment
     {
         try {
-            //transaction_id, token_transaction, status_name, status_id, max_days_to_keep_waiting_payment
             $payment = $this->setTransactionInformation($payment, $content);
             $tid = $content['token_transaction'];
 
             if (isset($content['payment'])) {
                 $paymentResponse = $content['payment'];
                 $payment = $this->setTransactionInformation($payment, $paymentResponse);
-                if (isset($paymentResponse['tid']) && $paymentResponse['tid']) {
+                if (!empty($paymentResponse['tid'])) {
                     $tid = $paymentResponse['tid'];
                 }
             }
@@ -377,7 +392,13 @@ class Order extends \Magento\Payment\Helper\Data
         return $payment;
     }
 
-
+    /**
+     * Update bank slip additional information in Payment.
+     *
+     * @param Payment $payment
+     * @param array $content
+     * @return Payment
+     */
     public function updateBankSlipAdditionalInfo(Payment $payment, array $content): Payment
     {
         try {
@@ -393,6 +414,13 @@ class Order extends \Magento\Payment\Helper\Data
         return $payment;
     }
 
+    /**
+     * Update pix additional information in Payment.
+     *
+     * @param Payment $payment
+     * @param array $content
+     * @return Payment
+     */
     public function updatePixAdditionalInfo(Payment $payment, array $content): Payment
     {
         try {
@@ -412,7 +440,14 @@ class Order extends \Magento\Payment\Helper\Data
         return $payment;
     }
 
-    public function updateRefundedAdditionalInformation(Payment $payment, $transaction): Payment
+    /**
+     * Update refunded additional information in Payment.
+     *
+     * @param Payment $payment
+     * @param array $transaction
+     * @return Payment
+     */
+    public function updateRefundedAdditionalInformation(Payment $payment, array $transaction): Payment
     {
         if (isset($transaction['refunds'])) {
             foreach ($transaction['refunds'] as $i => $refund) {
@@ -422,7 +457,14 @@ class Order extends \Magento\Payment\Helper\Data
         return $payment;
     }
 
-    public function generateQrCode($payment, $qrCode): string
+    /**
+     * Generate QR code for pix payment.
+     *
+     * @param Payment $payment
+     * @param string $qrCode
+     * @return string
+     */
+    public function generateQrCode($payment, string $qrCode): string
     {
         $pixUrl = '';
         if ($qrCode) {
@@ -447,16 +489,27 @@ class Order extends \Magento\Payment\Helper\Data
         return $pixUrl;
     }
 
+    /**
+     * Load order by increment ID.
+     *
+     * @param string $incrementId
+     * @return SalesOrder
+     */
     public function loadOrder(string $incrementId): SalesOrder
     {
         $order = $this->orderFactory->create();
         if ($incrementId) {
             $order->loadByIncrementId($incrementId);
         }
-
         return $order;
     }
 
+    /**
+     * Get status state.
+     *
+     * @param string $status
+     * @return string
+     */
     public function getStatusState($status): string
     {
         if ($status) {
@@ -469,15 +522,16 @@ class Order extends \Magento\Payment\Helper\Data
                 return $statuses->getFirstItem()->getState();
             }
         }
-
         return '';
     }
 
     /**
-     * @param $payment
+     * Get payment status state.
+     *
+     * @param Payment $payment
      * @return string
      */
-    public function getPaymentStatusState($payment): string
+    public function getPaymentStatusState(Payment $payment): string
     {
         $defaultState = $payment->getOrder()->getState();
         $paymentMethod = $payment->getMethodInstance();
@@ -498,13 +552,14 @@ class Order extends \Magento\Payment\Helper\Data
         return $state;
     }
 
-
     /**
-     * @param $state
+     * Check if order processing can be skipped.
+     *
+     * @param string $state
      * @return bool
      */
     public function canSkipOrderProcessing($state): bool
     {
-        return $state != SalesOrder::STATE_PROCESSING;
+        return $state !== SalesOrder::STATE_PROCESSING;
     }
 }
