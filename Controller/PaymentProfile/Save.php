@@ -139,7 +139,6 @@ class Save extends Action
     {
         $request = $this->getRequest();
         $data = $request->getPostValue();
-        $customerId = (int)$this->customerSession->getCustomerId();
 
         if (empty($data) ||
             !isset($data['cc_type'], $data['cc_number'], $data['cc_name'], $data['cc_cvv'], $data['cc_exp_date'])
@@ -147,73 +146,6 @@ class Save extends Action
             $this->messageManager->addErrorMessage(__('Invalid card data.'));
             return $this->resultRedirectFactory->create()->setPath('vindi_vp/paymentprofile/index');
         }
-
-        /*
-        try {
-            $customer = $this->customerRepository->getById($customerId);
-            $accessToken = $this->helperData->getAccessToken((int)$customer->getStoreId());
-
-            if (empty($accessToken)) {
-                throw new \Exception('Failed to generate access token.');
-            }
-
-            $methodName = strtolower(str_replace(' ', '', (string)$data['cc_type']));
-            $paymentMethodId = $this->helperData->getMethodIdByName($methodName);
-
-            $cleanCardNumber = preg_replace('/\D/', '', (string)$data['cc_number']);
-            $expDate = (string)$data['cc_exp_date'];
-            if (strlen($expDate) < 4) {
-                throw new \Exception('Invalid expiration date format.');
-            }
-            $expMonth = substr($expDate, 0, 2);
-            $expYear = '20' . substr($expDate, -2);
-
-            $apiData = [
-                'access_token'       => $accessToken,
-                'payment_method_id'  => $paymentMethodId,
-                'card_number'        => $cleanCardNumber,
-                'card_name'          => (string)$data['cc_name'],
-                'card_cvv'           => (string)$data['cc_cvv'],
-                'card_expdate_month' => $expMonth,
-                'card_expdate_year'  => $expYear
-            ];
-
-            $response = $this->cardApi->create($apiData);
-
-            if (
-                !isset($response['status'], $response['response']['message_response']['message'], $response['response']['data_response']['card_token']) ||
-                $response['status'] !== 200 ||
-                $response['response']['message_response']['message'] !== 'success'
-            ) {
-                $this->messageManager->addErrorMessage(__('Failed to create card.'));
-                return $this->resultRedirectFactory->create()->setPath('vindi_vp/paymentprofile/index');
-            }
-
-            $cardToken = (string) $response['response']['data_response']['card_token'];
-            $cardType  = (string) $response['response']['data_response']['payment_method_name'];
-
-            $creditCard = $this->creditCardFactory->create();
-            $creditCard->setData([
-                'card_token'     => $cardToken,
-                'customer_id'    => $customerId,
-                'customer_email' => $customer->getEmail(),
-                'cc_number'      => '***************' . substr($cleanCardNumber, -4),
-                'cc_exp_date'    => $expDate,
-                'cc_name'        => (string) $data['cc_name'],
-                'cc_type'        => $cardType,
-                'cc_last_4'      => substr($cleanCardNumber, -4)
-            ]);
-
-            $this->creditCardResource->save($creditCard);
-
-            $this->messageManager->addSuccessMessage(__('Card successfully created.'));
-        } catch (\Exception $e) {
-            $this->logger->critical($e);
-            $this->messageManager->addErrorMessage(
-                __('An error occurred while saving the payment profile. Please try again later.')
-            );
-        }
-        */
 
         return $this->resultRedirectFactory->create()->setPath('vindi_vp/paymentprofile/index');
     }

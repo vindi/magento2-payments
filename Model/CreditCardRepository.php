@@ -14,14 +14,40 @@ use Vindi\VP\Model\ResourceModel\CreditCard\CollectionFactory;
 
 /**
  * Class CreditCardRepository
+ * @package Vindi\VP\Model
  */
 class CreditCardRepository implements CreditCardRepositoryInterface
 {
+    /**
+     * @var CreditCardResource
+     */
     private $creditCardResource;
+
+    /**
+     * @var CreditCardFactory
+     */
     private $creditCardFactory;
+
+    /**
+     * @var CollectionFactory
+     */
     private $collectionFactory;
+
+    /**
+     * @var SearchResultsFactory
+     */
     private $searchResultsFactory;
 
+    /**
+     * Constructor
+     *
+     * @param CreditCardResource $creditCardResource Resource model for Credit Card
+     * @param CreditCardFactory $creditCardFactory Factory for creating Credit Card instances
+     * @param CollectionFactory $collectionFactory Factory for creating collections
+     * @param SearchResultsFactory $searchResultsFactory Factory for search results
+     *
+     * @return void
+     */
     public function __construct(
         CreditCardResource $creditCardResource,
         CreditCardFactory $creditCardFactory,
@@ -34,6 +60,13 @@ class CreditCardRepository implements CreditCardRepositoryInterface
         $this->searchResultsFactory = $searchResultsFactory;
     }
 
+    /**
+     * Save Credit Card
+     *
+     * @param CreditCardInterface $creditCard
+     * @return CreditCardInterface
+     * @throws CouldNotSaveException
+     */
     public function save(CreditCardInterface $creditCard)
     {
         try {
@@ -44,6 +77,11 @@ class CreditCardRepository implements CreditCardRepositoryInterface
         return $creditCard;
     }
 
+    /**
+     * @param $id
+     * @return CreditCardInterface
+     * @throws NoSuchEntityException
+     */
     public function getById($id)
     {
         $creditCard = $this->creditCardFactory->create();
@@ -54,22 +92,38 @@ class CreditCardRepository implements CreditCardRepositoryInterface
         return $creditCard;
     }
 
-    public function delete(CreditCardInterface $creditCard)
+    /**
+     * @param CreditCardInterface $creditCard
+     * @return bool
+     * @throws CouldNotDeleteException
+     */
+    public function delete(CreditCardInterface $creditCard): bool
     {
         try {
             $this->creditCardResource->delete($creditCard);
         } catch (\Exception $e) {
-            throw new \Exception(__('Unable to delete credit card: %1', $e->getMessage()));
+            throw new CouldNotDeleteException(
+                __('Unable to delete credit card: %1', $e->getMessage())
+            );
         }
         return true;
     }
 
+    /**
+     * @param $id
+     * @return bool
+     * @throws NoSuchEntityException
+     */
     public function deleteById($id)
     {
         $creditCard = $this->getById($id);
         return $this->delete($creditCard);
     }
 
+    /**
+     * @param SearchCriteriaInterface $searchCriteria
+     * @return \Magento\Framework\Api\SearchResults|SearchResultsInterface
+     */
     public function getList(SearchCriteriaInterface $searchCriteria)
     {
         $collection = $this->collectionFactory->create();

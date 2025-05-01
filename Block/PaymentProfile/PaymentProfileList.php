@@ -49,7 +49,7 @@ class PaymentProfileList extends Template
     }
 
     /**
-     * @return $this
+     * @return string
      */
     protected function _prepareLayout()
     {
@@ -75,6 +75,9 @@ class PaymentProfileList extends Template
         return $this->getChildHtml('pager');
     }
 
+    /**
+     * @return \Vindi\VP\Model\ResourceModel\CreditCard\Collection
+     */
     public function getPaymentProfiles()
     {
         if ($this->customerSession->isLoggedIn()) {
@@ -89,11 +92,17 @@ class PaymentProfileList extends Template
         return null;
     }
 
+    /**
+     * @return int|null
+     */
     public function getCustomerId()
     {
         return $this->customerSession->getCustomerId();
     }
 
+    /**
+     * @return int
+     */
     public function getCountPaymentProfiles()
     {
         if ($this->customerSession->isLoggedIn()) {
@@ -110,10 +119,8 @@ class PaymentProfileList extends Template
     }
 
     /**
-     * Get credit card image by type
-     *
      * @param $ccType
-     * @return string
+     * @return mixed|string
      */
     public function getCreditCardImage($ccType)
     {
