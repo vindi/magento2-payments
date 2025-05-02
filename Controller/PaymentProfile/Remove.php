@@ -2,20 +2,17 @@
 
 namespace Vindi\VP\Controller\PaymentProfile;
 
+use Magento\Customer\Controller\AbstractAccount;
 use Magento\Customer\Model\Session;
-use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
-use Magento\Framework\App\RequestInterface;
-use Magento\Framework\App\ResponseInterface;
-use Magento\Framework\Exception\NotFoundException;
 use Magento\Framework\View\Result\PageFactory;
+use Magento\Framework\Controller\ResultInterface;
 
 /**
- * Class Index
+ * Class Remove
  * @package Vindi\VP\Controller\PaymentProfile
-
  */
-class Remove extends Action
+class Remove extends AbstractAccount
 {
     /**
      * @var PageFactory
@@ -23,47 +20,28 @@ class Remove extends Action
     protected $resultPageFactory;
 
     /**
-     * @var Session
-     */
-    protected $customerSession;
-
-    /**
-     * @param Context $context
+     * Remove constructor.
+     *
+     * @param Context     $context
+     * @param Session     $customerSession
      * @param PageFactory $resultPageFactory
      */
     public function __construct(
         Context $context,
-        PageFactory $resultPageFactory,
-        Session $customerSession
+        Session $customerSession,
+        PageFactory $resultPageFactory
     ) {
-        parent::__construct($context);
+        parent::__construct($context, $customerSession);
         $this->resultPageFactory = $resultPageFactory;
-        $this->customerSession = $customerSession;
     }
 
     /**
-     * Dispatch request
+     * Execute remove payment profile page.
      *
-     * @param RequestInterface $request
-     * @return ResponseInterface
-     * @throws NotFoundException
-     */
-    public function dispatch(RequestInterface $request)
-    {
-        if (!$this->customerSession->authenticate()) {
-            $this->_actionFlag->set('', 'no-dispatch', true);
-        }
-        return parent::dispatch($request);
-    }
-
-    /**
-     * Execute method.
-     *
-     * @return \Magento\Framework\App\ResponseInterface|\Magento\Framework\Controller\ResultInterface
+     * @return ResultInterface
      */
     public function execute()
     {
-        $resultPage = $this->resultPageFactory->create();
-        return $resultPage;
+        return $this->resultPageFactory->create();
     }
 }

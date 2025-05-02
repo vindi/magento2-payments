@@ -1,16 +1,19 @@
 <?php
+declare(strict_types=1);
 
 namespace Vindi\VP\Model;
 
 use Magento\Framework\Api\SearchCriteriaInterface;
-use Magento\Framework\Api\SearchResultsInterface;
 use Magento\Framework\Api\SearchResultsFactory;
+use Magento\Framework\Api\SearchResultsInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Exception\CouldNotDeleteException;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Vindi\VP\Api\CreditCardRepositoryInterface;
 use Vindi\VP\Api\Data\CreditCardInterface;
 use Vindi\VP\Model\ResourceModel\CreditCard as CreditCardResource;
 use Vindi\VP\Model\ResourceModel\CreditCard\CollectionFactory;
+use Vindi\VP\Model\CreditCardFactory;
 
 /**
  * Class CreditCardRepository
@@ -18,36 +21,11 @@ use Vindi\VP\Model\ResourceModel\CreditCard\CollectionFactory;
  */
 class CreditCardRepository implements CreditCardRepositoryInterface
 {
-    /**
-     * @var CreditCardResource
-     */
-    private $creditCardResource;
+    private CreditCardResource $creditCardResource;
+    private CreditCardFactory $creditCardFactory;
+    private CollectionFactory $collectionFactory;
+    private SearchResultsFactory $searchResultsFactory;
 
-    /**
-     * @var CreditCardFactory
-     */
-    private $creditCardFactory;
-
-    /**
-     * @var CollectionFactory
-     */
-    private $collectionFactory;
-
-    /**
-     * @var SearchResultsFactory
-     */
-    private $searchResultsFactory;
-
-    /**
-     * Constructor
-     *
-     * @param CreditCardResource $creditCardResource Resource model for Credit Card
-     * @param CreditCardFactory $creditCardFactory Factory for creating Credit Card instances
-     * @param CollectionFactory $collectionFactory Factory for creating collections
-     * @param SearchResultsFactory $searchResultsFactory Factory for search results
-     *
-     * @return void
-     */
     public function __construct(
         CreditCardResource $creditCardResource,
         CreditCardFactory $creditCardFactory,
@@ -67,7 +45,7 @@ class CreditCardRepository implements CreditCardRepositoryInterface
      * @return CreditCardInterface
      * @throws CouldNotSaveException
      */
-    public function save(CreditCardInterface $creditCard)
+    public function save(CreditCardInterface $creditCard): CreditCardInterface
     {
         try {
             $this->creditCardResource->save($creditCard);
@@ -78,11 +56,13 @@ class CreditCardRepository implements CreditCardRepositoryInterface
     }
 
     /**
-     * @param $id
+     * Get Credit Card by ID
+     *
+     * @param int $id
      * @return CreditCardInterface
      * @throws NoSuchEntityException
      */
-    public function getById($id)
+    public function getById($id): CreditCardInterface
     {
         $creditCard = $this->creditCardFactory->create();
         $this->creditCardResource->load($creditCard, $id);
@@ -93,6 +73,8 @@ class CreditCardRepository implements CreditCardRepositoryInterface
     }
 
     /**
+     * Delete Credit Card
+     *
      * @param CreditCardInterface $creditCard
      * @return bool
      * @throws CouldNotDeleteException
@@ -102,35 +84,37 @@ class CreditCardRepository implements CreditCardRepositoryInterface
         try {
             $this->creditCardResource->delete($creditCard);
         } catch (\Exception $e) {
-            throw new CouldNotDeleteException(
-                __('Unable to delete credit card: %1', $e->getMessage())
-            );
+            throw new CouldNotDeleteException(__('Unable to delete credit card: %1', $e->getMessage()));
         }
         return true;
     }
 
     /**
-     * @param $id
+     * Delete Credit Card by ID
+     *
+     * @param int $id
      * @return bool
      * @throws NoSuchEntityException
+     * @throws CouldNotDeleteException
      */
-    public function deleteById($id)
+    public function deleteById($id): bool
     {
         $creditCard = $this->getById($id);
         return $this->delete($creditCard);
     }
 
     /**
+     * List Credit Cards matching the specified criteria
+     *
      * @param SearchCriteriaInterface $searchCriteria
-     * @return \Magento\Framework\Api\SearchResults|SearchResultsInterface
+     * @return SearchResultsInterface
      */
-    public function getList(SearchCriteriaInterface $searchCriteria)
+    public function getList(SearchCriteriaInterface $searchCriteria): SearchResultsInterface
     {
         $collection = $this->collectionFactory->create();
-
         foreach ($searchCriteria->getFilterGroups() as $filterGroup) {
             foreach ($filterGroup->getFilters() as $filter) {
-                $condition = $filter->getConditionType() ? $filter->getConditionType() : 'eq';
+                $condition = $filter->getConditionType() ?: 'eq';
                 $collection->addFieldToFilter($filter->getField(), [$condition => $filter->getValue()]);
             }
         }
