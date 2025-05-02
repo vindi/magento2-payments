@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
     const mask = {
-        cartao(value, cardType) {
+        card(value, cardType) {
             if (cardType === 'amex') {
                 return value
                     .replace(/\D/g, '')
@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     .substr(0, 19);
             }
         },
-        expiracao(value) {
+        expiration(value) {
             return value
                 .replace(/\D/g, '')
                 .replace(/(\d{2})(\d)/, '$1/$2')
@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     cardNumberInput.addEventListener('input', function (e) {
-        e.target.value = mask.cartao(e.target.value);
+        e.target.value = mask.card(e.target.value);
     });
 
     cardNumberInput.addEventListener('input', function (e) {
@@ -66,11 +66,11 @@ document.addEventListener("DOMContentLoaded", function () {
             cardType = 'elo';
         }
 
-        e.target.value = mask.cartao(value, cardType);
+        e.target.value = mask.card(value, cardType);
     });
 
     cardExpirationInput.addEventListener('input', function (e) {
-        e.target.value = mask.expiracao(e.target.value);
+        e.target.value = mask.expiration(e.target.value);
     });
 
     form.addEventListener('submit', function (e) {
