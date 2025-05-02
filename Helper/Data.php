@@ -67,11 +67,24 @@ class Data extends \Magento\Payment\Helper\Data
         'VI' => '3',
         'ELO' => '16',
         'AE' => '5',
-        'HC' => '28',
+        'HC' => '20',
         'HI' => '25',
         'PIX' => '27',
         'BANKSLIP' => '6',
         'BANKSLIPPIX' => '28'
+    ];
+
+    protected array $methodIdsByName = [
+        'mastercard' => '4',
+        'visa' => '3',
+        'elo' => '16',
+        'americanexpress' => '5',
+        'amex' => '5',
+        'hipercard' => '20',
+        'hiper' => '25',
+        'pix' => '27',
+        'bankslip' => '6',
+        'bankslippix' => '28'
     ];
 
     protected array $transactionStatus = [
@@ -592,6 +605,14 @@ class Data extends \Magento\Payment\Helper\Data
             $brandName = $this->methodNames[$ccType];
         }
         return $brandName;
+    }
+
+    public function getMethodIdByName(string $ccType): string
+    {
+        if (isset($this->methodIdsByName[$ccType])) {
+            $methodId = $this->methodIdsByName[$ccType];
+        }
+        return $methodId ?? '0';
     }
 
     public function getMethodId(string $ccType): string

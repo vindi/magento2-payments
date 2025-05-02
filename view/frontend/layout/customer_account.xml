@@ -4,5 +4,17 @@
         <referenceContainer name="content">
             <block class="Vindi\VP\Block\Customer\PaymentLinkNotification" name="payment_link_notification" template="Vindi_VP::customer/payment_link_notification.phtml" before="customer.account.dashboard.info"/>
         </referenceContainer>
+        <referenceBlock name="customer_account_navigation">
+            <block
+                class="Magento\Customer\Block\Account\SortLinkInterface"
+                name="vindi-vp-customer-account-navigation-vindi-payment-profile"
+            >
+                <arguments>
+                    <argument name="path" xsi:type="string">vindi_vp/paymentprofile/index</argument>
+                    <argument name="label" xsi:type="string" translate="true">My Saved Cards</argument>
+                    <argument name="sortOrder" xsi:type="number">150</argument>
+                </arguments>
+            </block>
+        </referenceBlock>
     </body>
 </page>

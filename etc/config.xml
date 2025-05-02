@@ -59,6 +59,11 @@
                     <track>api/v3/sales/trace</track>
                 </payments>
                 <installments>v1/transactions/simulate_splitting</installments>
+                <card>
+                    <create>person_cards/create</create>
+                    <delete>person_cards/status_inactive</delete>
+                    <get>person_cards/search</get>
+                </card>
             </endpoints>
             <authorization>
                 <code />
