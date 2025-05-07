@@ -17,6 +17,7 @@
 namespace Vindi\VP\Model\Ui\CreditCard;
 
 use Vindi\VP\Helper\Data;
+use Vindi\VP\Model\ResourceModel\CreditCard\CollectionFactory as CreditCardCollectionFactory;
 use Magento\Checkout\Model\Session;
 use Magento\Customer\Model\Session as CustomerSession;
 use Magento\Framework\UrlInterface;
@@ -60,13 +61,19 @@ class ConfigProvider extends CcGenericConfigProvider
     protected $assetSource;
 
     /**
+     * @var CreditCardCollectionFactory
+     */
+    protected $creditCardCollectionFactory;
+
+    /**
      * @param Session $checkoutSession
-     * @param CustomerSession $customerSession,
+     * @param CustomerSession $customerSession
      * @param Data $helper
      * @param CcConfig $ccConfig
      * @param UrlInterface $urlBuilder
      * @param PaymentHelper $paymentHelper
      * @param Source $assetSource
+     * @param CreditCardCollectionFactory $creditCardCollectionFactory
      */
     public function __construct(
         Session $checkoutSession,
@@ -75,7 +82,8 @@ class ConfigProvider extends CcGenericConfigProvider
         CcConfig $ccConfig,
         UrlInterface $urlBuilder,
         PaymentHelper $paymentHelper,
-        Source $assetSource
+        Source $assetSource,
+        CreditCardCollectionFactory $creditCardCollectionFactory
     ) {
         parent::__construct($ccConfig, $paymentHelper, [self::CODE]);
         $this->checkoutSession = $checkoutSession;
@@ -83,6 +91,7 @@ class ConfigProvider extends CcGenericConfigProvider
         $this->helper = $helper;
         $this->urlBuilder = $urlBuilder;
         $this->assetSource = $assetSource;
+        $this->creditCardCollectionFactory = $creditCardCollectionFactory;
     }
 
     /**
@@ -107,12 +116,13 @@ class ConfigProvider extends CcGenericConfigProvider
         return [
             'payment' => [
                 self::CODE => [
-                    'grand_total' => $this->checkoutSession->getQuote()->getGrandTotal(),
+                    'grand_total' => $grandTotal,
                     'customer_taxvat' => $customerTaxvat,
                     'sandbox' => (int) $this->helper->getGeneralConfig('use_sandbox'),
                     'fingerprint_url' => \Vindi\VP\Helper\Data::FINGERPRINT_URL,
                     'icons' => $this->getIcons(),
-                    'availableTypes' => $this->getCcAvailableTypes($methodCode)
+                    'availableTypes' => $this->getCcAvailableTypes($methodCode),
+                    'saved_cards' => $this->getSavedCreditCards()
                 ],
                 'ccform' => [
                     'grandTotal' => [$methodCode => $grandTotal],
@@ -130,6 +140,33 @@ class ConfigProvider extends CcGenericConfigProvider
         ];
     }
 
+    /**
+     * Get saved credit cards for logged-in customers
+     *
+     * @return array
+     */
+    public function getSavedCreditCards()
+    {
+        $savedCards = [];
+
+        if (!$this->customerSession->isLoggedIn()) {
+            return $savedCards;
+        }
+
+        $customerId = $this->customerSession->getCustomerId();
+        $creditCardCollection = $this->creditCardCollectionFactory->create()
+            ->addFieldToFilter('customer_id', $customerId);
+
+        foreach ($creditCardCollection as $creditCard) {
+            $savedCards[] = [
+                'id' => $creditCard->getId(),
+                'card_number' => $creditCard->getData('cc_last_4'),
+                'card_type' => $creditCard->getData('cc_type')
+            ];
+        }
+
+        return $savedCards;
+    }
 
     /**
      * Get icons for available payment methods

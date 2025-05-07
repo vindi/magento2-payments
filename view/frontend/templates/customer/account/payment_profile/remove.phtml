@@ -1,0 +1,27 @@
+<?php
+/** @var \Vindi\VP\Block\PaymentProfile\Remove $block */
+$paymentProfile  = $block->getPaymentProfile();
+
+$cardType   = $paymentProfile->getCcType();
+$cardLast4  = $paymentProfile->getCcLast4();
+?>
+<div class="payment-profile-remove">
+    <div>
+        <p class="title"><?= __('Remove Credit Card') ?></p>
+        <hr>
+        <form id="payment-profile-remove-form" action="<?= $block->getUrl('vindi_vp/paymentprofile/delete') . '/id/' . $block->getRequest('id') ?>" method="POST">
+            <input type="hidden" name="form_key" value="<?= $block->getFormKey() ?>">
+            <input type="hidden" name="entity_id" value="<?= $paymentProfile->getId() ?>">
+
+            <div class="cofirm-text">
+                <span><?= __('Confirm that you really want to delete the card') ?></span>
+                <strong><?= __('%1 ****%2 ', $cardType, $cardLast4) ?></strong>
+            </div>
+
+            <div class="buttons-set">
+                <button type="button" class="back" onclick="window.location.href='<?= $block->getUrl('vindi_vr/paymentprofile/index') ?>'"><?= __('Back'); ?></button>
+                <button type="submit" class="confirm"><?= __('Confirm Remove') ?></button>
+            </div>
+        </form>
+    </div>
+</div>

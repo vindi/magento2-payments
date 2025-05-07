@@ -25,7 +25,7 @@
                                                     <item name="children" xsi:type="array">
                                                         <item name="renders" xsi:type="array">
                                                             <item name="children" xsi:type="array">
-                                                                <item name="vindi_payments" xsi:type="array">
+                                                                <item name="Vindi_VPs" xsi:type="array">
                                                                     <item name="component" xsi:type="string">Vindi_VP/js/view/payment/vindi</item>
                                                                     <item name="methods" xsi:type="array">
                                                                         <item name="vindi_vp_bankslip" xsi:type="array">

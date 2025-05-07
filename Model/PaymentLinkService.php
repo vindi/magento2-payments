@@ -190,7 +190,7 @@ class PaymentLinkService
                     $paymentLink = $this->updatePaymentLink($paymentLink);
                 }
             } else {
-                $this->createPaymentLink($orderId, str_replace('vindi_vr_payment_link_', '', $order->getPayment()->getMethod()));
+                $this->createPaymentLink($orderId, str_replace('vindi_vp_payment_link_', '', $order->getPayment()->getMethod()));
                 $paymentLink = $this->getPaymentLink($orderId);
             }
 
