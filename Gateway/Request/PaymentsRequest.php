@@ -1,6 +1,12 @@
 <?php
 
 /**
+ *
+ *
+ *
+ *
+ *
+ *
  * DISCLAIMER
  *
  * Do not edit or add to this file if you wish to upgrade this extension to newer
@@ -8,6 +14,8 @@
  *
  * @category    Vindi
  * @package     Vindi_VP
+ *
+ *
  */
 
 namespace Vindi\VP\Gateway\Request;
@@ -93,90 +101,31 @@ class PaymentsRequest
         $this->api                = $api;
     }
 
-    /**
-     * Determine payment payload based on selected method.
-     *
-     * @param Order $order
-     * @return array
-     * @throws LocalizedException
-     */
     protected function getPaymentMethod(Order $order): array
     {
-        $payment    = $order->getPayment();
-        $methodCode = $payment->getMethodInstance()->getCode();
-
-        switch ($methodCode) {
-            case 'vindi_cc':
-                return $this->buildCreditCardPayment($payment);
-            case 'vindi_boleto':
-                return [
-                    'payment_method_id' => $this->helper->getMethodId('BOLETO'),
-                    'split'             => 1
-                ];
-            case 'vindi_pix':
-                return [
-                    'payment_method_id' => $this->helper->getMethodId('PIX'),
-                    'split'             => 1
-                ];
-            default:
-                throw new LocalizedException(__('Unsupported payment method "%1"', $methodCode));
-        }
+        return [
+            'payment_method_id' => $this->helper->getMethodId('PIX'),
+            'split'             => 1
+        ];
     }
 
-    /**
-     * Build transaction data array.
-     *
-     * @param Order $order
-     * @param float $amount
-     * @return array
-     */
     protected function getTransaction(Order $order, float $amount): array
     {
         $transaction = [
-            'token_account'        => $this->helper->getTokenAccount($order->getStoreId()),
+            'token_account'        => $this->helper->getToken($order->getStoreId()),
             'finger_print'         => $order->getPayment()->getAdditionalInformation('finger_print'),
             'customer'             => $this->getCustomerData($order),
             'transaction'          => $this->getTransactionInfo($order, $amount),
             'transaction_shipping' => $this->getTransactionShipping($order),
-            'transaction_product'  => $this->getItemsData($order),
-            'payment'              => $this->getPaymentMethod($order)
+            'transaction_product'  => $this->getItemsData($order)
         ];
 
-        if ($resellerToken = $this->helper->getResellerToken($order->getStoreId())) {
+        $resellerToken = $this->helper->getResellerToken($order->getStoreId());
+        if ($resellerToken) {
             $transaction['reseller_token'] = $resellerToken;
         }
 
         return $transaction;
-    }
-
-    /**
-     * Build credit card payment payload (new or saved).
-     *
-     * @param \Magento\Sales\Model\Order\Payment $payment
-     * @return array
-     */
-    protected function buildCreditCardPayment($payment): array
-    {
-        $profileId    = $payment->getAdditionalInformation('payment_profile');
-        $installments = (int)$payment->getAdditionalInformation('cc_installments') ?: 1;
-
-        if ($profileId) {
-            return [
-                'payment_method_id' => $this->helper->getMethodId($payment->getCcType()),
-                'card_id'           => $profileId,
-                'split'             => $installments
-            ];
-        }
-
-        return [
-            'payment_method_id'      => $this->helper->getMethodId($payment->getCcType()),
-            'card_name'              => $payment->getCcOwner(),
-            'card_number'            => $payment->getCcNumber(),
-            'card_expdate_month'     => $payment->getCcExpMonth(),
-            'card_expdate_year'      => $payment->getCcExpYear(),
-            'card_cvv'               => $payment->getCcCid(),
-            'split'                  => $installments
-        ];
     }
 
     /**
@@ -206,7 +155,8 @@ class PaymentsRequest
      */
     protected function getTransactionShipping(Order $order): array
     {
-        $shippingType = $order->getShippingDescription() ?: 'SEM_FRETE';
+        $shippingDescription = $order->getShippingDescription();
+        $shippingType        = $shippingDescription ?: 'SEM_FRETE';
 
         return [
             'type_shipping'  => $shippingType,
@@ -223,14 +173,12 @@ class PaymentsRequest
      */
     public function getDiscountAmount(Order $order, $orderAmount): float
     {
-        $discount = (float)$order->getDiscountAmount();
-        $total    = $order->getBaseSubtotal() + $order->getShippingAmount() + $discount;
-
-        if ($total > $orderAmount) {
-            $discount = $total - $orderAmount;
+        $discountAmount   = (float)$order->getDiscountAmount();
+        $transactionTotal = $order->getBaseSubtotal() + $order->getShippingAmount() + $discountAmount;
+        if ($transactionTotal > $orderAmount) {
+            $discountAmount = $transactionTotal - $orderAmount;
         }
-
-        return round(abs($discount), 2);
+        return round(abs($discountAmount), 2);
     }
 
     /**
@@ -242,12 +190,10 @@ class PaymentsRequest
      */
     protected function getPriceAdditional(Order $order, float $orderAmount): float
     {
-        $total = $order->getBaseSubtotal() + $order->getShippingAmount() + $order->getDiscountAmount();
-
-        if ($total < $orderAmount) {
-            return round($orderAmount - $total, 2);
+        $transactionTotal = $order->getBaseSubtotal() + $order->getShippingAmount() + $order->getDiscountAmount();
+        if ($transactionTotal < $orderAmount) {
+            return round($orderAmount - $transactionTotal, 2);
         }
-
         return 0.00;
     }
 
@@ -259,21 +205,20 @@ class PaymentsRequest
      */
     public function getCustomerData(Order $order): array
     {
-        $address    = $order->getBillingAddress();
-        $vat        = $address->getVatId() ?: $order->getCustomerTaxvat();
-        $vindiVat   = $order->getPayment()->getAdditionalInformation('vindi_customer_taxvat');
-
-        if ($vindiVat) {
-            $vat = $vindiVat;
+        $address             = $order->getBillingAddress();
+        $customerTaxVat      = $address->getVatId() ?: $order->getCustomerTaxvat();
+        $vindiCustomerTaxVat = $order->getPayment()->getAdditionalInformation('vindi_customer_taxvat');
+        if ($vindiCustomerTaxVat) {
+            $customerTaxVat = $vindiCustomerTaxVat;
         }
 
         $firstName = $address->getFirstname() ?: $order->getCustomerFirstname();
-        $lastName  = $address->getLastname() ?: $order->getCustomerLastname();
-        $name      = $order->getCustomerName() ?: trim("$firstName $lastName");
+        $lastName  = $address->getLastname()  ?: $order->getCustomerLastname();
+        $fullName  = $order->getCustomerName() ?: trim("$firstName $lastName");
 
-        $data = [
-            'name'      => $name,
-            'cpf'       => preg_replace('/\D/', '', (string)$vat),
+        $customerData = [
+            'name'      => $fullName,
+            'cpf'       => preg_replace('/\D/', '', (string)$customerTaxVat),
             'email'     => $order->getCustomerEmail(),
             'contacts'  => [[
                 'type_contact'   => 'M',
@@ -282,13 +227,7 @@ class PaymentsRequest
             'addresses' => $this->getAddresses($order)
         ];
 
-        $data = $this->helper->getCompanyData($order, $data);
-
-        if ($order->getCustomerDob()) {
-            $data['birth_date'] = $this->helper->formatDate($order->getCustomerDob());
-        }
-
-        return $data;
+        return $this->helper->getCompanyData($order, $customerData);
     }
 
     /**
@@ -299,18 +238,18 @@ class PaymentsRequest
      */
     protected function getAddresses($order): array
     {
-        $addresses = [];
-        $billing   = $order->getBillingAddress();
+        $addresses      = [];
+        $billingAddress = $order->getBillingAddress();
 
         $addresses[] = [
             'type_address' => 'B',
-            'postal_code'  => $billing->getPostcode(),
-            'street'       => $billing->getStreetLine($this->getStreetField('street')),
-            'number'       => $billing->getStreetLine($this->getStreetField('number')),
-            'completion'   => $billing->getStreetLine($this->getStreetField('complement')),
-            'neighborhood' => $billing->getStreetLine($this->getStreetField('district')),
-            'city'         => $billing->getCity(),
-            'state'        => $billing->getRegionCode()
+            'postal_code'  => $billingAddress->getPostcode(),
+            'street'       => $billingAddress->getStreetLine($this->getStreetField('street')),
+            'number'       => $billingAddress->getStreetLine($this->getStreetField('number')),
+            'completion'   => $billingAddress->getStreetLine($this->getStreetField('complement')),
+            'neighborhood' => $billingAddress->getStreetLine($this->getStreetField('district')),
+            'city'         => $billingAddress->getCity(),
+            'state'        => $billingAddress->getRegionCode()
         ];
 
         if ($shipping = $order->getShippingAddress()) {
@@ -349,26 +288,28 @@ class PaymentsRequest
     protected function getItemsData(Order $order): array
     {
         $items = [];
-
-        foreach ($order->getAllItems() as $item) {
-            if ($item->getParentItemId() || $item->getParentItem() || $item->getPrice() == 0) {
+        foreach ($order->getAllItems() as $quoteItem) {
+            if ($quoteItem->getParentItemId() || $quoteItem->getParentItem() || $quoteItem->getPrice() == 0) {
                 continue;
             }
 
-            $unitPrice = $item->getRowTotalInclTax() / (float)$item->getQtyOrdered();
+            $unitPrice = $quoteItem->getRowTotalInclTax() / (float)$quoteItem->getQtyOrdered();
 
-            $row = [
-                'description' => $item->getName(),
-                'quantity'    => (string)$item->getQtyOrdered(),
+            $item = [
+                'description' => $quoteItem->getName(),
+                'quantity'    => (string)$quoteItem->getQtyOrdered(),
                 'price_unit'  => number_format($unitPrice, 2, '.', ''),
-                'code'        => $item->getProductId(),
-                'sku_code'    => $item->getSku(),
-                'extra'       => $item->getItemId()
+                'code'        => $quoteItem->getProductId(),
+                'sku_code'    => $quoteItem->getSku(),
+                'extra'       => $quoteItem->getItemId()
             ];
 
-            $this->eventManager->dispatch('vindi_payment_get_item', ['item' => &$row, 'quote_item' => $item]);
+            $this->eventManager->dispatch(
+                'vindi_payment_get_item',
+                ['item' => &$item, 'quote_item' => $quoteItem]
+            );
 
-            $items[] = $row;
+            $items[] = $item;
         }
 
         return $items;
