@@ -16,6 +16,7 @@
  *
  *
  */
+declare(strict_types=1);
 
 namespace Vindi\VP\Gateway\Request;
 
@@ -77,6 +78,19 @@ class PaymentsRequest
      */
     protected $api;
 
+    /**
+     * PaymentsRequest constructor.
+     *
+     * @param ManagerInterface           $eventManager
+     * @param Data                       $helper
+     * @param DateTime                   $date
+     * @param ConfigInterface            $config
+     * @param CustomerSession            $customerSession
+     * @param DateTime                   $dateTime
+     * @param ProductRepositoryInterface $productRepository
+     * @param CategoryRepositoryInterface $categoryRepository
+     * @param Api                        $api
+     */
     public function __construct(
         ManagerInterface $eventManager,
         Data $helper,
@@ -99,6 +113,12 @@ class PaymentsRequest
         $this->api                = $api;
     }
 
+    /**
+     * Get the payment method data.
+     *
+     * @param Order $order
+     * @return array
+     */
     protected function getPaymentMethod(Order $order): array
     {
         return [
@@ -107,6 +127,13 @@ class PaymentsRequest
         ];
     }
 
+    /**
+     * Get the transaction data.
+     *
+     * @param Order $order
+     * @param float $amount
+     * @return array
+     */
     protected function getTransaction(Order $order, float $amount): array
     {
         $transaction = [
@@ -156,9 +183,14 @@ class PaymentsRequest
         $shippingDescription = $order->getShippingDescription();
         $shippingType        = $shippingDescription ?: 'SEM_FRETE';
 
+        $shippingAmount = (float) $order->getShippingAmount();
+        if ($shippingAmount <= 0 && method_exists($order, 'getShippingInclTax')) {
+            $shippingAmount = (float) $order->getShippingInclTax();
+        }
+
         return [
             'type_shipping'  => $shippingType,
-            'shipping_price' => number_format((float)$order->getShippingInclTax(), 2, '.', '')
+            'shipping_price' => number_format($shippingAmount, 2, '.', '')
         ];
     }
 
