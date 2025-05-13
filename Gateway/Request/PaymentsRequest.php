@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  *
@@ -30,6 +31,7 @@ use Magento\Catalog\Api\CategoryRepositoryInterface;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Sales\Api\Data\OrderItemInterface;
 use Magento\Sales\Model\Order;
+use Magento\Framework\Exception\LocalizedException;
 
 class PaymentsRequest
 {
@@ -220,12 +222,11 @@ class PaymentsRequest
      */
     protected function getPriceAdditional(Order $order, float $orderAmount): float
     {
-        $priceAdditional  = 0;
         $transactionTotal = $order->getBaseSubtotal() + $order->getShippingAmount() + $order->getDiscountAmount();
         if ($transactionTotal < $orderAmount) {
-            $priceAdditional = $orderAmount - $transactionTotal;
+            return round($orderAmount - $transactionTotal, 2);
         }
-        return round($priceAdditional, 2);
+        return 0.00;
     }
 
     /**
@@ -236,27 +237,25 @@ class PaymentsRequest
      */
     public function getCustomerData(Order $order): array
     {
-        $address               = $order->getBillingAddress();
-        $customerTaxVat        = $address->getVatId() ?: $order->getCustomerTaxvat();
-        $vindiCustomerTaxVat   = $order->getPayment()->getAdditionalInformation('vindi_customer_taxvat');
+        $address             = $order->getBillingAddress();
+        $customerTaxVat      = $address->getVatId() ?: $order->getCustomerTaxvat();
+        $vindiCustomerTaxVat = $order->getPayment()->getAdditionalInformation('vindi_customer_taxvat');
         if ($vindiCustomerTaxVat) {
             $customerTaxVat = $vindiCustomerTaxVat;
         }
 
         $firstName = $address->getFirstname() ?: $order->getCustomerFirstname();
-        $lastName  = $address->getLastname() ?: $order->getCustomerLastname();
+        $lastName  = $address->getLastname()  ?: $order->getCustomerLastname();
         $fullName  = $order->getCustomerName() ?: trim("$firstName $lastName");
 
         $customerData = [
-            'name'     => $fullName,
-            'cpf'      => preg_replace('/\D/', '', (string)$customerTaxVat),
-            'email'    => $order->getCustomerEmail(),
-            'contacts' => [
-                [
-                    'type_contact'   => 'M',
-                    'number_contact' => $this->helper->formatPhoneNumber($address->getTelephone())
-                ]
-            ],
+            'name'      => $fullName,
+            'cpf'       => preg_replace('/\D/', '', (string)$customerTaxVat),
+            'email'     => $order->getCustomerEmail(),
+            'contacts'  => [[
+                'type_contact'   => 'M',
+                'number_contact' => $this->helper->formatPhoneNumber($address->getTelephone())
+            ]],
             'addresses' => $this->getAddresses($order)
         ];
 
@@ -271,31 +270,30 @@ class PaymentsRequest
      */
     protected function getAddresses($order): array
     {
+        $addresses      = [];
         $billingAddress = $order->getBillingAddress();
-        $addresses      = [
-            [
-                'type_address' => 'B',
-                'postal_code'  => $billingAddress->getPostcode(),
-                'street'       => $billingAddress->getStreetLine($this->getStreetField('street')),
-                'number'       => $billingAddress->getStreetLine($this->getStreetField('number')),
-                'completion'   => $billingAddress->getStreetLine($this->getStreetField('complement')),
-                'neighborhood' => $billingAddress->getStreetLine($this->getStreetField('district')),
-                'city'         => $billingAddress->getCity(),
-                'state'        => $billingAddress->getRegionCode()
-            ]
+
+        $addresses[] = [
+            'type_address' => 'B',
+            'postal_code'  => $billingAddress->getPostcode(),
+            'street'       => $billingAddress->getStreetLine($this->getStreetField('street')),
+            'number'       => $billingAddress->getStreetLine($this->getStreetField('number')),
+            'completion'   => $billingAddress->getStreetLine($this->getStreetField('complement')),
+            'neighborhood' => $billingAddress->getStreetLine($this->getStreetField('district')),
+            'city'         => $billingAddress->getCity(),
+            'state'        => $billingAddress->getRegionCode()
         ];
 
-        if ($order->getShippingAddress()) {
-            $shippingAddress = $order->getShippingAddress();
-            $addresses[]     = [
+        if ($shipping = $order->getShippingAddress()) {
+            $addresses[] = [
                 'type_address' => 'D',
-                'postal_code'  => $shippingAddress->getPostcode(),
-                'street'       => $shippingAddress->getStreetLine($this->getStreetField('street')),
-                'number'       => $shippingAddress->getStreetLine($this->getStreetField('number')),
-                'completion'   => $shippingAddress->getStreetLine($this->getStreetField('complement')),
-                'neighborhood' => $shippingAddress->getStreetLine($this->getStreetField('district')),
-                'city'         => $shippingAddress->getCity(),
-                'state'        => $shippingAddress->getRegionCode()
+                'postal_code'  => $shipping->getPostcode(),
+                'street'       => $shipping->getStreetLine($this->getStreetField('street')),
+                'number'       => $shipping->getStreetLine($this->getStreetField('number')),
+                'completion'   => $shipping->getStreetLine($this->getStreetField('complement')),
+                'neighborhood' => $shipping->getStreetLine($this->getStreetField('district')),
+                'city'         => $shipping->getCity(),
+                'state'        => $shipping->getRegionCode()
             ];
         }
 
@@ -321,11 +319,8 @@ class PaymentsRequest
      */
     protected function getItemsData(Order $order): array
     {
-        $items      = [];
-        $quoteItems = $order->getAllItems();
-
-        /** @var OrderItemInterface $quoteItem */
-        foreach ($quoteItems as $quoteItem) {
+        $items = [];
+        foreach ($order->getAllItems() as $quoteItem) {
             if ($quoteItem->getParentItemId() || $quoteItem->getParentItem() || $quoteItem->getPrice() == 0) {
                 continue;
             }
@@ -341,7 +336,10 @@ class PaymentsRequest
                 'extra'       => $quoteItem->getItemId()
             ];
 
-            $this->eventManager->dispatch('vindi_payment_get_item', ['item' => &$item, 'quote_item' => $quoteItem]);
+            $this->eventManager->dispatch(
+                'vindi_payment_get_item',
+                ['item' => &$item, 'quote_item' => $quoteItem]
+            );
 
             $items[] = $item;
         }
