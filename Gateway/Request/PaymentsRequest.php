@@ -143,7 +143,6 @@ class PaymentsRequest
             'finger_print'         => $order->getPayment()->getAdditionalInformation('finger_print'),
             'customer'             => $this->getCustomerData($order),
             'transaction'          => $this->getTransactionInfo($order, $amount),
-            'transaction_shipping' => $this->getTransactionShipping($order),
             'transaction_product'  => $this->getItemsData($order)
         ];
 
@@ -156,31 +155,11 @@ class PaymentsRequest
     }
 
     /**
-     * Get the transaction information.
-     *
      * @param Order $order
      * @param float $orderAmount
      * @return array
      */
     protected function getTransactionInfo(Order $order, float $orderAmount): array
-    {
-        return [
-            'customer_ip'      => $order->getRemoteIp(),
-            'order_number'     => $order->getIncrementId(),
-            'price_discount'   => number_format($this->getDiscountAmount($order, $orderAmount), 2, '.', ''),
-            'price_additional' => number_format($this->getPriceAdditional($order, $orderAmount), 2, '.', ''),
-            'url_notification' => $this->helper->getPaymentsNotificationUrl($order),
-            'free'             => 'MAGENTO_API_' . $this->helper->getModuleVersion()
-        ];
-    }
-
-    /**
-     * Get the shipping information for the transaction.
-     *
-     * @param Order $order
-     * @return array
-     */
-    protected function getTransactionShipping(Order $order): array
     {
         $shippingDescription = $order->getShippingDescription();
         $shippingType        = $shippingDescription ?: 'SEM_FRETE';
@@ -191,7 +170,13 @@ class PaymentsRequest
         }
 
         return [
-            'type_shipping'  => $shippingType,
+            'customer_ip'      => $order->getRemoteIp(),
+            'order_number'     => $order->getIncrementId(),
+            'price_discount'   => number_format($this->getDiscountAmount($order, $orderAmount), 2, '.', ''),
+            'price_additional' => number_format($this->getPriceAdditional($order, $orderAmount), 2, '.', ''),
+            'url_notification' => $this->helper->getPaymentsNotificationUrl($order),
+            'free'             => 'MAGENTO_API_' . $this->helper->getModuleVersion(),
+            'shipping_type'  => $shippingType,
             'shipping_price' => number_format($shippingAmount, 2, '.', '')
         ];
     }
