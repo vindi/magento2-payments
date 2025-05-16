@@ -1,0 +1,25 @@
+<?php
+/** @var \Vindi\VP\Block\Product\OneClickBuy $block */
+?>
+
+<?php if($block->showOneclickBuy()): ?>
+    <p id="product-id" style="display:none"><?= $block->getProductId() ?></p>
+    <select id="vp-card-selector">
+        <?php foreach($block->getCards() as $card): ?>
+            <option value="<?= $card['value'] ?>"><?= $card['label'] ?></option>
+        <?php endforeach; ?>
+    </select>
+    <label>CVV</label>
+    <input type="text" name="vp-cvv" id="vp-cvv" class="input" />
+    <button type="submit" id="vp-payment-oneclickbuy" class="action primary">
+        <?php /* @escapeNotVerified */ echo $block->getButtonText(); ?>
+    </button>
+
+    <script type="text/x-magento-init">
+        {
+            "*": {
+                "vindi_vp/oneclickbuy": ""
+            }
+        }
+    </script>
+<?php endif; ?>
