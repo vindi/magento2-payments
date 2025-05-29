@@ -192,7 +192,7 @@ class PaymentsRequest
     {
         $discountAmount   = (float)$order->getDiscountAmount();
         $transactionTotal = $order->getBaseSubtotal() + $order->getShippingAmount() + $discountAmount;
-        if ($transactionTotal > $orderAmount) {
+        if (round($transactionTotal - $orderAmount, 2) > 0) {
             $discountAmount = $transactionTotal - $orderAmount;
         }
         return round(abs($discountAmount), 2);
