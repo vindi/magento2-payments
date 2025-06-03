@@ -5,7 +5,7 @@
     </head>
     <body>
         <referenceBlock name="product.info.addtocart">
-            <block class="Vindi\VP\Block\Product\OneClickBuy" name="vp.product.oneclickbuy.button" template="Vindi_VP::product/oneclickbuy.phtml" after="-" />
+            <block class="Vindi\VP\Block\Product\OneClickBuy" name="vp.product.oneclickbuy.button" template="Vindi_VP::product/oneclickbuy.phtml" after="-" cacheable="false" />
         </referenceBlock>
     </body>
 </page>
