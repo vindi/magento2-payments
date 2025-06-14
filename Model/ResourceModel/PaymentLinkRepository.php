@@ -34,7 +34,7 @@ class PaymentLinkRepository implements PaymentLinkRepositoryInterface
     /**
      * @var PaymentLinkFactory
      */
-    protected PaymentLinkFactory $paymentLinkFactory;
+    protected $paymentLinkFactory;
 
     /**
      * @param PaymentLink $resource

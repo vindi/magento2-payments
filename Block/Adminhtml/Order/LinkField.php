@@ -28,7 +28,7 @@ class LinkField extends Template
     /**
      * @var PaymentLinkService
      */
-    private PaymentLinkService $paymentLinkService;
+    private $paymentLinkService;
 
     /**
      * @param Context $context

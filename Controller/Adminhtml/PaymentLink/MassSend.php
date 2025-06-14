@@ -20,27 +20,27 @@ class MassSend extends Action
     /**
      * @var JsonFactory
      */
-    private JsonFactory $resultJsonFactory;
+    private $resultJsonFactory;
 
     /**
      * @var PaymentLinkService
      */
-    private PaymentLinkService $paymentLinkService;
+    private $paymentLinkService;
 
     /**
      * @var LoggerInterface
      */
-    private LoggerInterface $logger;
+    private $logger;
 
     /**
      * @var Validator
      */
-    private Validator $formKeyValidator;
+    private $formKeyValidator;
 
     /**
      * @var OrderRepositoryInterface
      */
-    private OrderRepositoryInterface $orderRepository;
+    private $orderRepository;
 
     /**
      * Maximum number of orders allowed for processing at once.

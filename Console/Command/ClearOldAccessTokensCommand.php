@@ -15,7 +15,7 @@ class ClearOldAccessTokensCommand extends Command
     /**
      * @var ClearOldAccessTokens
      */
-    private ClearOldAccessTokens $clearOldAccessTokens;
+    private $clearOldAccessTokens;
 
     /**
      * Constructor.

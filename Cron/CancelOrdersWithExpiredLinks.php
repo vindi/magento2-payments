@@ -15,27 +15,27 @@ class CancelOrdersWithExpiredLinks
     /**
      * @var PaymentLinkFactory
      */
-    private PaymentLinkFactory $paymentLinkFactory;
+    private $paymentLinkFactory;
 
     /**
      * @var OrderRepositoryInterface
      */
-    private OrderRepositoryInterface $orderRepository;
+    private $orderRepository;
 
     /**
      * @var OrderManagementInterface
      */
-    private OrderManagementInterface $orderManagement;
+    private $orderManagement;
 
     /**
      * @var DateTime
      */
-    private DateTime $dateTime;
+    private $dateTime;
 
     /**
      * @var LoggerInterface
      */
-    private LoggerInterface $logger;
+    private $logger;
 
     /**
      * @param PaymentLinkFactory $paymentLinkFactory

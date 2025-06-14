@@ -108,7 +108,9 @@ class Interest extends AbstractTotal
 
             $selectedInstallment = array_filter(
                 $allInstallments,
-                fn($installment) => $installment['installments'] == $installmentsNumber
+                function($installment) use ($installmentsNumber) {
+                    return $installment['installments'] == $installmentsNumber;
+                }
             );
 
             $installment = array_shift($selectedInstallment);

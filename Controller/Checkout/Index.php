@@ -35,37 +35,37 @@ class Index implements HttpGetActionInterface
     /**
      * @var PageFactory
      */
-    protected PageFactory $resultPageFactory;
+    protected $resultPageFactory;
 
     /**
      * @var PaymentLinkService
      */
-    private PaymentLinkService $paymentLinkService;
+    private $paymentLinkService;
 
     /**
      * @var RequestInterface
      */
-    private RequestInterface $request;
+    private $request;
 
     /**
      * @var RedirectFactory
      */
-    private RedirectFactory $redirectFactory;
+    private $redirectFactory;
 
     /**
      * @var ManagerInterface
      */
-    private ManagerInterface $messageManager;
+    private $messageManager;
 
     /**
      * @var CustomerSession
      */
-    private CustomerSession $customerSession;
+    private $customerSession;
 
     /**
      * @var OrderRepositoryInterface
      */
-    private OrderRepositoryInterface $orderRepository;
+    private $orderRepository;
 
     /**
      * @param PageFactory $resultPageFactory

@@ -30,17 +30,17 @@ class SendEmailService
     /**
      * @var mixed|Emulation
      */
-    private mixed $emulation;
+    private $emulation;
 
     /**
      * @var StoreManagerInterface
      */
-    private StoreManagerInterface $storeManager;
+    private $storeManager;
 
     /**
      * @var TransportBuilder
      */
-    private TransportBuilder $transportBuilder;
+    private $transportBuilder;
 
     /**
      * @param StoreManagerInterface $storeManager
