@@ -25,6 +25,7 @@ use Magento\Quote\Model\ResourceModel\Quote as QuoteResource;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Store\Model\StoreRepository;
 use Vindi\VP\Model\CreditCardRepository;
+use Magento\Store\Model\StoreManagerInterface;
 
 class Transaction implements HttpPostActionInterface
 {
@@ -100,6 +101,11 @@ class Transaction implements HttpPostActionInterface
     private JsonFactory $resultJsonFactory;
 
     /**
+     * @var StoreManagerInterface
+     */
+    private StoreManagerInterface $storeManager;
+
+    /**
      * @param CheckoutSession $checkoutSession
      * @param StoreRepository $storeRepository
      * @param ProductRepository $productRepository
@@ -114,6 +120,7 @@ class Transaction implements HttpPostActionInterface
      * @param OrderRepositoryInterface $orderRepository
      * @param ManagerInterface $messageManager
      * @param CreditCardRepository $creditCardRepository
+     * @param StoreManagerInterface $storeManager
      */
     public function __construct(
         CheckoutSession $checkoutSession,
@@ -129,7 +136,8 @@ class Transaction implements HttpPostActionInterface
         RequestInterface $httpRequest,
         OrderRepositoryInterface $orderRepository,
         ManagerInterface $messageManager,
-        CreditCardRepository $creditCardRepository
+        CreditCardRepository $creditCardRepository,
+        StoreManagerInterface $storeManager
     ) {
         $this->checkoutSession = $checkoutSession;
         $this->storeRepository = $storeRepository;
@@ -145,6 +153,7 @@ class Transaction implements HttpPostActionInterface
         $this->orderRepository = $orderRepository;
         $this->messageManager = $messageManager;
         $this->creditCardRepository = $creditCardRepository;
+        $this->storeManager = $storeManager;
     }
 
     /**
@@ -153,73 +162,117 @@ class Transaction implements HttpPostActionInterface
     public function execute()
     {
         $resultJson = $this->resultJsonFactory->create();
-        $result = ['success' => false, 'message' => 'Ocorreu um erro ao processar o seu pagamento'];
+        $result = ['success' => false, 'message' => 'Ocorreu um erro ao processar o seu pagamento', 'redirect_url' => ''];
 
-        $productId = $this->httpRequest->getParam('productId');
-        $paymentProfileId = $this->httpRequest->getParam('profile');
-        $cvv = $this->httpRequest->getParam('cvv');
-
-        $customerId = $this->customerSession->getCustomerId();
-        $customer = $this->customerRepository->getById($customerId);
-        $store = $this->storeRepository->getById($customer->getStoreId());
-
-        $quote = $this->quoteFactory->create();
-        $quote->setStore($store);
-        $quote->setStoreId($store->getId());
-        $quote->assignCustomer($customer);
-
-        $product = $this->productRepository->getById($productId);
-        $buyRequest = [
-            'product' => $productId,
-            'qty' => 1,
-        ];
-
-        $quote->addProduct(
-            $product,
-            new DataObject($buyRequest)
-        );
-
-        $quoteAddress = $this->getQuoteAddress($customer);
-        $quote->setBillingAddress($quoteAddress);
-        $this->quoteResource->save($quote);
-        // Set Sales Order Payment
-        $payment = $quote->getPayment();
-        $payment->importData([
-            'method'           => 'vindi_vp_cc',
-            'additional_data'  => [
-                'payment_profile' => $paymentProfileId,
-                'installments'    => '1'
-            ]
-        ]);
-        $payment->setAdditionalInformation('payment_profile', $paymentProfileId);
-        $payment->setCcCid($cvv);
-        $payment->setAdditionalInformation('cc_cid', $cvv);
-        $quote->getPayment()->setAdditionalInformation('payment_profile', $paymentProfileId);
-
-        $this->quoteResource->save($quote);
-
-        // Collect Totals & Save Quote
-        $quote->collectTotals();
-        $this->quoteResource->save($quote);
-
-        // Create Order From Quote and send e-mail
-        /** @var \Magento\Sales\Model\Order $order */
         try {
+            $productId = $this->httpRequest->getParam('productId');
+            $paymentProfileId = $this->httpRequest->getParam('profile');
+            $cvv = $this->httpRequest->getParam('cvv');
+            $qty = (int) $this->httpRequest->getParam('qty', 1);
+            $installments = $this->httpRequest->getParam('installments', '1');
+
+            $customerId = $this->customerSession->getCustomerId();
+            $customer = $this->customerRepository->getById($customerId);
+            $store = $this->storeRepository->getById($customer->getStoreId());
+
+            $quote = $this->quoteFactory->create();
+            $quote->setStore($store);
+            $quote->setStoreId($store->getId());
+            $quote->assignCustomer($customer);
+
+            if ($qty <= 0) {
+                throw new LocalizedException(__('A quantidade deve ser maior que zero.'));
+            }
+
+            $product = $this->productRepository->getById($productId);
+            $buyRequest = [
+                'product' => $productId,
+                'qty' => $qty,
+            ];
+
+            $quote->addProduct(
+                $product,
+                new DataObject($buyRequest)
+            );
+
+            $quoteAddress = $this->getQuoteAddress($customer);
+            $quote->setBillingAddress($quoteAddress);
+            $this->quoteResource->save($quote);
+            
+            // Set Sales Order Payment
+            $payment = $quote->getPayment();
+            $paymentData = [
+                'method' => 'vindi_vp_cc',
+                'additional_data' => [
+                    'payment_profile' => $paymentProfileId,
+                    'installments' => $installments,
+                    'cc_cid' => $cvv
+                ]
+            ];
+            $payment->importData($paymentData);
+            $payment->setAdditionalInformation('payment_profile', $paymentProfileId);
+            $payment->setAdditionalInformation('installments', $installments);
+            $payment->setAdditionalInformation('cc_cid', $cvv);
+            $payment->setAdditionalInformation('additional_data', [
+                'payment_profile' => $paymentProfileId,
+                'installments' => $installments,
+                'cc_cid' => $cvv
+            ]);
+            $payment->setCcCid($cvv);
+
+            $quote->getPayment()->setAdditionalInformation('payment_profile', $paymentProfileId);
+
+            $this->quoteResource->save($quote);
+
+            // Collect Totals & Save Quote
+            $quote->collectTotals();
+            $this->quoteResource->save($quote);
+
+            // Create Order From Quote
             $order = $this->quoteManagement->submit($quote);
+            
+            $this->checkoutSession->clearQuote();
             $this->checkoutSession->setLastSuccessQuoteId($quote->getId());
             $this->checkoutSession->setLastQuoteId($quote->getId());
             $this->checkoutSession->setLastOrderId($order->getId());
-            $result = ['success' => true, 'message' => ''];
+            $this->checkoutSession->setLastRealOrderId($order->getIncrementId());
+            
+            $order = $this->orderRepository->get($order->getId());
+            $this->checkoutSession->setLastOrderStatus($order->getStatus());
+
+            $result = [
+                'success' => true,
+                'redirect_url' => $this->storeManager->getStore()->getUrl('checkout/onepage/success'),
+                'message' => '',
+            ];
+            
         } catch (LocalizedException $e) {
             $this->messageManager->addErrorMessage($e->getMessage());
+            $result['message'] = $e->getMessage();
+        } catch (\Exception $e) {
+            $this->messageManager->addErrorMessage('Erro interno do servidor.');
+            $result['message'] = 'Erro interno do servidor.';
         }
 
         return $resultJson->setData($result);
     }
 
-
-    public function getQuoteAddress($customer){
-        $address = $customer->getAddresses()[0];
+    /**
+     * Get quote address from customer
+     *
+     * @param $customer
+     * @return \Magento\Quote\Api\Data\AddressInterface
+     * @throws LocalizedException
+     */
+    public function getQuoteAddress($customer)
+    {
+        $addresses = $customer->getAddresses();
+        
+        if (empty($addresses)) {
+            throw new LocalizedException(__('Customer does not have any saved addresses.'));
+        }
+        
+        $address = $addresses[0];
         $quoteBillingAddress = $this->addressInterface->create();
         $quoteBillingAddress->addData([
             'firstname' => $address->getFirstname(),
@@ -234,6 +287,7 @@ class Transaction implements HttpPostActionInterface
             'address_type' => Address::TYPE_BILLING,
             'should_ignore_validation' => true
         ]);
+        
         return $quoteBillingAddress;
     }
 }

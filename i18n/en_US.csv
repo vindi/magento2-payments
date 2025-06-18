@@ -146,3 +146,4 @@ Payload,Payload
 "Total amount: ","Total amount:"
 "%1 items","%1 items"
 "To refund is necessary to add consumer key and consumer secret, if you don't have it, create a new app at Vindi with the return URL as 'URL_LOJA/vindi_vp/auth/'","To refund is necessary to add consumer key and consumer secret, if you don't have it, create a new app at Vindi with the return URL as 'URL_LOJA/vindi_vp/auth/'"
+"One click buy","One click buy"
