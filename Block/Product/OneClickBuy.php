@@ -75,14 +75,11 @@ class OneClickBuy extends Template
     }
 
     /**
-     * @return Bool
+     * @return bool
      */
     public function showOneclickBuy()
     {
-        if($this->getProduct()->getTypeId() == 'virtual' && $this->customerSession->isLoggedIn())
-            return true;
-        else
-            return false;
+        return $this->getProduct()->getTypeId() === 'virtual' && $this->customerSession->isLoggedIn();
     }
 
     public function getProductId() {
