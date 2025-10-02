@@ -12,12 +12,12 @@ class UpdateExpiredLinks
     /**
      * @var PaymentLinkService
      */
-    private PaymentLinkService $paymentLinkService;
+    private $paymentLinkService;
 
     /**
      * @var LoggerInterface
      */
-    private LoggerInterface $logger;
+    private $logger;
 
     /**
      * @param PaymentLinkService $paymentLinkService

@@ -21,10 +21,25 @@ use Vindi\VP\Model\CreditCardFactory;
  */
 class CreditCardRepository implements CreditCardRepositoryInterface
 {
-    private CreditCardResource $creditCardResource;
-    private CreditCardFactory $creditCardFactory;
-    private CollectionFactory $collectionFactory;
-    private SearchResultsFactory $searchResultsFactory;
+    /**
+     * @var CreditCardResource
+     */
+    private $creditCardResource;
+    
+    /**
+     * @var CreditCardFactory
+     */
+    private $creditCardFactory;
+    
+    /**
+     * @var CollectionFactory
+     */
+    private $collectionFactory;
+    
+    /**
+     * @var SearchResultsFactory
+     */
+    private $searchResultsFactory;
 
     public function __construct(
         CreditCardResource $creditCardResource,

@@ -29,32 +29,32 @@ class Success implements HttpGetActionInterface
     /**
      * @var PageFactory
      */
-    protected PageFactory $resultPageFactory;
+    protected $resultPageFactory;
 
     /**
      * @var PaymentLinkService
      */
-    private PaymentLinkService $paymentLinkService;
+    private $paymentLinkService;
 
     /**
      * @var RequestInterface
      */
-    private RequestInterface $request;
+    private $request;
 
     /**
      * @var RedirectFactory
      */
-    private RedirectFactory $redirectFactory;
+    private $redirectFactory;
 
     /**
      * @var Data
      */
-    private Data $helperData;
+    private $helperData;
 
     /**
      * @var ManagerInterface
      */
-    private ManagerInterface $messageManager;
+    private $messageManager;
 
     /**
      * @param PageFactory $resultPageFactory

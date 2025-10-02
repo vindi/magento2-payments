@@ -31,22 +31,22 @@ class Send extends Action implements HttpPostActionInterface
     /**
      * @var JsonFactory
      */
-    private JsonFactory $resultJsonFactory;
+    private $resultJsonFactory;
 
     /**
      * @var PaymentLinkService
      */
-    private PaymentLinkService $paymentLinkService;
+    private $paymentLinkService;
 
     /**
      * @var LoggerInterface
      */
-    private LoggerInterface $logger;
+    private $logger;
 
     /**
      * @var Validator
      */
-    private Validator $formKeyValidator;
+    private $formKeyValidator;
 
     /**
      * @param Context $context

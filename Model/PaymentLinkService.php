@@ -55,52 +55,52 @@ class PaymentLinkService
     /**
      * @var PaymentLinkCollectionFactory
      */
-    private PaymentLinkCollectionFactory $paymentLinkCollectionFactory;
+    private $paymentLinkCollectionFactory;
 
     /**
      * @var OrderRepositoryInterface
      */
-    private OrderRepositoryInterface $orderRepository;
+    private $orderRepository;
 
     /**
      * @var ScopeConfigInterface
      */
-    private ScopeConfigInterface $scopeConfig;
+    private $scopeConfig;
 
     /**
      * @var StoreManagerInterface
      */
-    private StoreManagerInterface $storeManager;
+    private $storeManager;
 
     /**
      * @var LoggerInterface
      */
-    private LoggerInterface $logger;
+    private $logger;
 
     /**
      * @var PaymentLinkFactory
      */
-    private PaymentLinkFactory $paymentLinkFactory;
+    private $paymentLinkFactory;
 
     /**
      * @var Data
      */
-    private Data $helper;
+    private $helper;
 
     /**
      * @var PaymentLinkRepositoryInterface
      */
-    private PaymentLinkRepositoryInterface $linkRepository;
+    private $linkRepository;
 
     /**
      * @var DateTimeFactory
      */
-    private DateTimeFactory $dateTimeFactory;
+    private $dateTimeFactory;
 
     /**
      * @var SendEmailService
      */
-    private SendEmailService $sendEmailService;
+    private $sendEmailService;
 
     /**
      * @param PaymentLinkCollectionFactory $paymentLinkCollectionFactory
@@ -142,7 +142,7 @@ class PaymentLinkService
      * @param string|int $orderId
      * @return mixed
      */
-    public function getPaymentLink(string|int $orderId)
+    public function getPaymentLink($orderId)
     {
         return $this->paymentLinkCollectionFactory->create()
             ->addFieldToFilter('order_id', $orderId)
@@ -164,7 +164,7 @@ class PaymentLinkService
      * @param string|int $orderId
      * @return \Magento\Sales\Api\Data\OrderInterface
      */
-    public function getOrderByOrderId(string|int $orderId)
+    public function getOrderByOrderId($orderId)
     {
         return $this->orderRepository->get($orderId);
     }
@@ -411,7 +411,7 @@ class PaymentLinkService
      * @return string
      * @throws NoSuchEntityException
      */
-    protected function buildPaymentLink(string|int $orderId)
+    protected function buildPaymentLink($orderId)
     {
         return $this->storeManager->getStore()->getBaseUrl() . 'vindi_vp/checkout/?hash=' .
             hash_hmac('sha256', $orderId . date("Y/m/d h:i:s"), $this->helper->getToken());

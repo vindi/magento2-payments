@@ -15,12 +15,12 @@ class RunCancelOrdersWithExpiredLinks extends Command
     /**
      * @var CancelOrdersWithExpiredLinks
      */
-    private CancelOrdersWithExpiredLinks $cancelOrdersWithExpiredLinks;
+    private $cancelOrdersWithExpiredLinks;
 
     /**
      * @var LoggerInterface
      */
-    private LoggerInterface $logger;
+    private $logger;
 
     /**
      * @param CancelOrdersWithExpiredLinks $cancelOrdersWithExpiredLinks

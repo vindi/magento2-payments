@@ -12,12 +12,12 @@ class ClearOldAccessTokens
     /**
      * @var AccessTokenRepository
      */
-    private AccessTokenRepository $accesTokenRepository;
+    private $accesTokenRepository;
 
     /**
      * @var LoggerInterface
      */
-    private LoggerInterface $logger;
+    private $logger;
 
     /**
      * @param AccessTokenRepository $accesTokenRepository

@@ -27,7 +27,7 @@ class ChangePaymentBeforePlace implements ObserverInterface
     /**
      * @var VindiHelper
      */
-    private VindiHelper $vindiHelper;
+    private $vindiHelper;
 
     /**
      * @param VindiHelper $vindiHelper

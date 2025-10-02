@@ -34,7 +34,7 @@ class AccessTokenRepository implements AccessTokenRepositoryInterface
     /**
      * @var AccessTokenFactory
      */
-    protected AccessTokenFactory $accessTokenFactory;
+    protected $accessTokenFactory;
 
     /**
      * @param AccessToken $resource

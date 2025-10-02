@@ -40,42 +40,42 @@ class PaymentLink extends Template
     /**
      * @var PaymentLinkService
      */
-    private PaymentLinkService $paymentLinkService;
+    private $paymentLinkService;
 
     /**
      * @var ConfigProvider
      */
-    private ConfigProvider $configProvider;
+    private $configProvider;
 
     /**
      * @var FormKey
      */
-    private FormKey $formKey;
+    private $formKey;
 
     /**
      * @var Helper
      */
-    private Helper $helper;
+    private $helper;
 
     /**
      * @var StoreManagerInterface
      */
-    private StoreManagerInterface $storeManager;
+    private $storeManager;
 
     /**
      * @var CustomerRepositoryInterface
      */
-    private CustomerRepositoryInterface $customerRepository;
+    private $customerRepository;
 
     /**
      * @var PriceHelper
      */
-    private PriceHelper $priceHelper;
+    private $priceHelper;
 
     /**
      * @var TaxConfigProvider
      */
-    public TaxConfigProvider $taxConfigProvider;
+    public $taxConfigProvider;
 
     /**
      * @param Context $context
@@ -182,8 +182,10 @@ class PaymentLink extends Template
     /**
      * @throws NoSuchEntityException
      * @throws LocalizedException
+     * @param int|string $customerId
+     * @return \Magento\Customer\Api\Data\CustomerInterface
      */
-    public function getCustomerById(string|int $customerId)
+    public function getCustomerById($customerId)
     {
         return $this->customerRepository->getById($customerId);
     }

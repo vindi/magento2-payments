@@ -28,17 +28,17 @@ class PaymentLinkSuccess extends Template
     /**
      * @var PaymentLinkService
      */
-    private PaymentLinkService $paymentLinkService;
+    private $paymentLinkService;
 
     /**
      * @var FormKey
      */
-    private FormKey $formKey;
+    private $formKey;
 
     /**
      * @var Helper
      */
-    private Helper $helper;
+    private $helper;
 
     /**
      * @param Context $context

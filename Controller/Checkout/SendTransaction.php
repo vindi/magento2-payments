@@ -34,32 +34,32 @@ class SendTransaction implements HttpPostActionInterface
     /**
      * @var JsonFactory
      */
-    private JsonFactory $resultJsonFactory;
+    private $resultJsonFactory;
 
     /**
      * @var PaymentLinkService
      */
-    private PaymentLinkService $paymentLinkService;
+    private $paymentLinkService;
 
     /**
      * @var RequestInterface
      */
-    private RequestInterface $httpRequest;
+    private $httpRequest;
 
     /**
      * @var OrderRepositoryInterface
      */
-    private OrderRepositoryInterface $orderRepository;
+    private $orderRepository;
 
     /**
      * @var ManagerInterface
      */
-    private ManagerInterface $messageManager;
+    private $messageManager;
 
     /**
      * @var HelperOrder
      */
-    private HelperOrder $helperOrder;
+    private $helperOrder;
 
     /**
      * @param JsonFactory $resultJsonFactory

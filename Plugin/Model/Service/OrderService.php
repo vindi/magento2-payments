@@ -24,12 +24,12 @@ class OrderService
     /**
      * @var PaymentLinkService
      */
-    private PaymentLinkService $paymentLinkService;
+    private $paymentLinkService;
 
     /**
      * @var VindiHelper
      */
-    private VindiHelper $vindiHelper;
+    private $vindiHelper;
 
     /**
      * @param PaymentLinkService $paymentLinkService
