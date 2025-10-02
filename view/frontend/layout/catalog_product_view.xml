@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <script src="Vindi_Payment::js/product/oneclickbuy.js"/>
+    </head>
+    <body>
+        <referenceBlock name="product.info.addtocart">
+            <block class="Vindi\VP\Block\Product\OneClickBuy" name="vp.product.oneclickbuy.button" template="Vindi_VP::product/oneclickbuy.phtml" after="-" cacheable="false" />
+        </referenceBlock>
+    </body>
+</page>
