@@ -1,5 +1,4 @@
 <?php
-
 declare(strict_types=1);
 
 namespace Vindi\VP\Model;
@@ -10,209 +9,222 @@ use Vindi\VP\Model\ResourceModel\CreditCard as CreditCardResource;
 
 /**
  * Class CreditCard
- * @package Vindi\VP\Model
  *
- * Model for Vindi Credit Cards
+ * @package Vindi\VP\Model
  */
 class CreditCard extends AbstractModel implements CreditCardInterface
 {
     /**
-     * @inheritdoc
+     * Initialize resource model
+     *
+     * @return void
      */
-    protected function _construct()
+    protected function _construct(): void
     {
         $this->_init(CreditCardResource::class);
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function getEntityId()
     {
-        return $this->getData(CreditCardInterface::ENTITY_ID);
+        return $this->getData(self::ENTITY_ID);
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function setEntityId($entityId)
     {
-        return $this->setData(CreditCardInterface::ENTITY_ID, $entityId);
+        $this->setData(self::ENTITY_ID, $entityId);
+        return $this;
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function getCustomerId()
     {
-        return $this->getData(CreditCardInterface::CUSTOMER_ID);
+        return $this->getData(self::CUSTOMER_ID);
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function setCustomerId($customerId)
     {
-        return $this->setData(CreditCardInterface::CUSTOMER_ID, $customerId);
+        $this->setData(self::CUSTOMER_ID, $customerId);
+        return $this;
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function getCardToken()
     {
-        return $this->getData(CreditCardInterface::CARD_TOKEN);
+        return $this->getData(self::CARD_TOKEN);
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function setCardToken($cardToken)
     {
-        return $this->setData(CreditCardInterface::CARD_TOKEN, $cardToken);
+        $this->setData(self::CARD_TOKEN, $cardToken);
+        return $this;
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function getCustomerEmail()
     {
-        return $this->getData(CreditCardInterface::CUSTOMER_EMAIL);
+        return $this->getData(self::CUSTOMER_EMAIL);
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function setCustomerEmail($customerEmail)
     {
-        return $this->setData(CreditCardInterface::CUSTOMER_EMAIL, $customerEmail);
+        $this->setData(self::CUSTOMER_EMAIL, $customerEmail);
+        return $this;
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function getStatus()
     {
-        return $this->getData(CreditCardInterface::STATUS);
+        return $this->getData(self::STATUS);
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function setStatus($status)
     {
-        return $this->setData(CreditCardInterface::STATUS, $status);
+        $this->setData(self::STATUS, $status);
+        return $this;
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function getType()
     {
-        return $this->getData(CreditCardInterface::TYPE);
+        return $this->getData(self::TYPE);
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function setType($type)
     {
-        return $this->setData(CreditCardInterface::TYPE, $type);
+        $this->setData(self::TYPE, $type);
+        return $this;
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function getCcType()
     {
-        return $this->getData(CreditCardInterface::CC_TYPE);
+        return $this->getData(self::CC_TYPE);
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function setCcType($ccType)
     {
-        return $this->setData(CreditCardInterface::CC_TYPE, $ccType);
+        $this->setData(self::CC_TYPE, $ccType);
+        return $this;
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function getCcLast4()
     {
-        return $this->getData(CreditCardInterface::CC_LAST_4);
+        return $this->getData(self::CC_LAST_4);
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function setCcLast4($ccLast4)
     {
-        return $this->setData(CreditCardInterface::CC_LAST_4, $ccLast4);
+        $this->setData(self::CC_LAST_4, $ccLast4);
+        return $this;
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function getCcName()
     {
-        return $this->getData(CreditCardInterface::CC_NAME);
+        return $this->getData(self::CC_NAME);
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function setCcName($ccName)
     {
-        return $this->setData(CreditCardInterface::CC_NAME, $ccName);
+        $this->setData(self::CC_NAME, $ccName);
+        return $this;
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function getCcExpDate()
     {
-        return $this->getData(CreditCardInterface::CC_EXP_DATE);
+        return $this->getData(self::CC_EXP_DATE);
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function setCcExpDate($ccExpDate)
     {
-        return $this->setData(CreditCardInterface::CC_EXP_DATE, $ccExpDate);
+        $this->setData(self::CC_EXP_DATE, $ccExpDate);
+        return $this;
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function getCreatedAt()
     {
-        return $this->getData(CreditCardInterface::CREATED_AT);
+        return $this->getData(self::CREATED_AT);
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function setCreatedAt($createdAt)
     {
-        return $this->setData(CreditCardInterface::CREATED_AT, $createdAt);
+        $this->setData(self::CREATED_AT, $createdAt);
+        return $this;
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function getUpdatedAt()
     {
-        return $this->getData(CreditCardInterface::UPDATED_AT);
+        return $this->getData(self::UPDATED_AT);
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function setUpdatedAt($updatedAt)
     {
-        return $this->setData(CreditCardInterface::UPDATED_AT, $updatedAt);
+        $this->setData(self::UPDATED_AT, $updatedAt);
+        return $this;
     }
 }
